@@ -14,7 +14,7 @@
       "type": "registry:base",
       "extends": "none",
       "title": "Eridanus base",
-      "description": "Starts a project on the Eridanus look: the shadcn base-rhea style on Base UI (preset beqC918K: zinc, Phosphor icons, Inter), JetBrains Mono for code, success/warning/info status colors, and light-mode muted-foreground and destructive values that keep text at 4.5:1 on muted grounds and badge tints. Use with `shadcn init`.",
+      "description": "Starts a project on the Eridanus look: the shadcn base-rhea style on Base UI (preset beqC918K: zinc, Phosphor icons, Inter), JetBrains Mono for code, success/warning/info status colors, and destructive and muted-foreground values that keep text at 4.5:1 or better in both themes, on muted grounds, on badge tints over tinted or hovered table rows, and on the destructive button's hover. Use with `shadcn init`.",
       "categories": [
         "theme",
         "setup"
@@ -64,7 +64,7 @@
           "muted-foreground": "oklch(0.52 0.016 285.938)",
           "accent": "oklch(0.967 0.001 286.375)",
           "accent-foreground": "oklch(0.21 0.006 285.885)",
-          "destructive": "oklch(0.53 0.22 27.325)",
+          "destructive": "oklch(0.495 0.202 27.325)",
           "border": "oklch(0.92 0.004 286.32)",
           "input": "oklch(0.92 0.004 286.32)",
           "ring": "oklch(0.705 0.015 286.067)",
@@ -98,7 +98,7 @@
           "muted-foreground": "oklch(0.705 0.015 286.067)",
           "accent": "oklch(0.274 0.006 286.033)",
           "accent-foreground": "oklch(0.985 0 0)",
-          "destructive": "oklch(0.704 0.191 22.216)",
+          "destructive": "oklch(0.719 0.175 22.216)",
           "border": "oklch(1 0 0 / 10%)",
           "input": "oklch(1 0 0 / 15%)",
           "ring": "oklch(0.552 0.016 285.938)",
@@ -144,7 +144,7 @@
       "name": "status-colors",
       "type": "registry:theme",
       "title": "Status colors",
-      "description": "success, warning and info color tokens (bg-success, text-warning, …) for both themes. Text in these colors measures at least 4.84:1 on white and on its own 10% tint, and at least 5.68:1 on the dark background's 20% tint.",
+      "description": "success, warning and info color tokens (bg-success, text-warning, …) for both themes. Text in these colors keeps 4.5:1 or better on the page, on its own badge tint, and on that tint over a tinted, hovered table row: at least 4.56:1 in light mode and 4.81:1 in dark mode.",
       "categories": [
         "theme"
       ],
@@ -155,9 +155,9 @@
           "color-info": "var(--info)"
         },
         "light": {
-          "success": "oklch(0.5 0.14 150.069)",
-          "warning": "oklch(0.53 0.155 48.998)",
-          "info": "oklch(0.52 0.23 262.881)"
+          "success": "oklch(0.48 0.132 150.069)",
+          "warning": "oklch(0.51 0.136 48.998)",
+          "info": "oklch(0.505 0.223 262.881)"
         },
         "dark": {
           "success": "oklch(0.792 0.209 151.711)",

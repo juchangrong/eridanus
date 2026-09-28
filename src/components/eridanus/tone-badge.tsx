@@ -5,8 +5,9 @@ import { cn } from "@/lib/utils";
 
 export type Tone = "success" | "error" | "info" | "warning" | "neutral" | "outline";
 
-/** Tints for the states the badge has no variant for. The text measures
- * 4.5:1 or better on its own tint in both themes (status-colors tokens). */
+/** Tints for the states the badge has no variant for. With the base and
+ * status-colors tokens the text keeps 4.5:1 or better on its own tint in both
+ * themes, also inside a tinted ClickableRow under the pointer. */
 const TONE_CLASS: Record<Tone, string> = {
   success: "bg-success/10 text-success dark:bg-success/20",
   error: "bg-destructive/10 text-destructive dark:bg-destructive/20",
