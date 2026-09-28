@@ -1,0 +1,62 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry.json",
+  "items": [
+    {
+      "name": "time",
+      "type": "registry:component",
+      "title": "Time",
+      "description": "Renders an instant as readable Chinese text (12 分钟前, 今天 14:05) inside a <time> element, with a tooltip giving the exact local time to the millisecond, the UTC time and the relative time; screen readers get the exact local time too. Props: value (Date | ISO string | epoch ms), clock (bare HH:mm:ss), seconds, placeholder, delay.",
+      "categories": ["time", "data-display"],
+      "registryDependencies": ["tooltip", "juchangrong/eridanus/format-time"],
+      "files": [
+        { "path": "time.tsx", "type": "registry:component", "target": "@components/eridanus/time.tsx" }
+      ]
+    },
+    {
+      "name": "tone-badge",
+      "type": "registry:component",
+      "title": "ToneBadge",
+      "description": "Status badge with a tone: success, error, info, warning, neutral or outline. Tinted backgrounds keep the text at 4.5:1 or better in both themes; the word always states the status, so it never relies on color alone. Map domain states (failed, running, …) to tones at the call site.",
+      "categories": ["status", "data-display"],
+      "registryDependencies": ["badge", "juchangrong/eridanus/status-colors"],
+      "files": [
+        { "path": "tone-badge.tsx", "type": "registry:component", "target": "@components/eridanus/tone-badge.tsx" }
+      ]
+    },
+    {
+      "name": "notice",
+      "type": "registry:component",
+      "title": "Notice",
+      "description": "Page-level notice built on Alert: tone error (announced as an alert), warning or neutral, with an optional title, description and one trailing action such as a retry button.",
+      "categories": ["feedback"],
+      "dependencies": ["@phosphor-icons/react"],
+      "registryDependencies": ["alert", "juchangrong/eridanus/status-colors"],
+      "files": [
+        { "path": "notice.tsx", "type": "registry:component", "target": "@components/eridanus/notice.tsx" }
+      ]
+    },
+    {
+      "name": "empty-state",
+      "type": "registry:component",
+      "title": "EmptyState",
+      "description": "Frameless empty, no-access or error panel built on Empty: icon, title, description and a contents slot for the way out. size=\"sm\" fits an empty table body or list.",
+      "categories": ["feedback"],
+      "registryDependencies": ["empty"],
+      "files": [
+        { "path": "empty-state.tsx", "type": "registry:component", "target": "@components/eridanus/empty-state.tsx" }
+      ]
+    },
+    {
+      "name": "copy-button",
+      "type": "registry:component",
+      "title": "CopyButton",
+      "description": "Icon-only copy button: copies text, cross-fades the copy icon to a check for 1.5 s and switches its accessible name to 已复制. Props: text, label (default 复制), copiedLabel, variant, size.",
+      "categories": ["clipboard", "actions"],
+      "dependencies": ["@phosphor-icons/react"],
+      "registryDependencies": ["button", "juchangrong/eridanus/clipboard"],
+      "files": [
+        { "path": "copy-button.tsx", "type": "registry:component", "target": "@components/eridanus/copy-button.tsx" }
+      ]
+    }
+  ]
+}

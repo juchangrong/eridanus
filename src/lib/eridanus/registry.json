@@ -1,0 +1,25 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry.json",
+  "items": [
+    {
+      "name": "format-time",
+      "type": "registry:lib",
+      "title": "format-time",
+      "description": "Time formatting in Chinese for the browser's time zone: friendly() for the readable surface (刚刚, 12 分钟前, 今天 14:05, 9月21日 20:40), exactTime() for local time to the millisecond with its UTC offset plus UTC and relative forms, and clock(), timestamp(), localDay(), relative(), utcOffset(). Accepts Date, ISO strings or epoch milliseconds.",
+      "categories": ["time", "format"],
+      "files": [
+        { "path": "format-time.ts", "type": "registry:lib", "target": "@lib/eridanus/format-time.ts" }
+      ]
+    },
+    {
+      "name": "clipboard",
+      "type": "registry:lib",
+      "title": "clipboard",
+      "description": "copyText(text): copies with the async Clipboard API and falls back to execCommand on insecure (plain-http) pages; rejects when both fail.",
+      "categories": ["clipboard"],
+      "files": [
+        { "path": "clipboard.ts", "type": "registry:lib", "target": "@lib/eridanus/clipboard.ts" }
+      ]
+    }
+  ]
+}
