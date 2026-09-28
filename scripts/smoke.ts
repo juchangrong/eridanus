@@ -121,7 +121,7 @@ if (config.style !== "base-rhea") failures.push(`components.json style is ${conf
 if (config.iconLibrary !== "phosphor") failures.push(`components.json iconLibrary is ${config.iconLibrary}, expected phosphor`);
 if (config.tailwind.baseColor !== "zinc") failures.push(`components.json baseColor is ${config.tailwind.baseColor}, expected zinc`);
 const css = readFileSync(join(app, "src", "index.css"), "utf8");
-for (const needle of ["--success:", "--color-success: var(--success)", "--muted-foreground: oklch(0.52 0.016 285.938)", "Inter Variable", "JetBrains Mono Variable"]) {
+for (const needle of ["--success:", "--color-success: var(--success)", "--muted-foreground: oklch(0.52 0.016 285.938)", "Inter Variable", "JetBrains Mono Variable", "color-scheme: dark"]) {
   if (!css.includes(needle)) failures.push(`src/index.css lacks ${needle}`);
 }
 

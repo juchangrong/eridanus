@@ -130,6 +130,12 @@
           },
           "code, kbd, samp, pre": {
             "@apply font-mono": {}
+          },
+          ":root": {
+            "color-scheme": "light"
+          },
+          ".dark": {
+            "color-scheme": "dark"
           }
         }
       }
