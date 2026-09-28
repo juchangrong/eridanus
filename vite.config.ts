@@ -8,4 +8,7 @@ export default defineConfig({
   resolve: {
     alias: { "@": fileURLToPath(new URL("./src", import.meta.url)) },
   },
+  // The gallery is one page that renders every item at once, so splitting its
+  // bundle would not load anything later.
+  build: { chunkSizeWarningLimit: 800 },
 });

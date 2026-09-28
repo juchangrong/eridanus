@@ -12,6 +12,7 @@
     "verbatimModuleSyntax": true,
     "allowImportingTsExtensions": true,
     "types": ["vite/client", "node"],
+    "resolveJsonModule": true,
     "paths": {
       "@/*": ["./src/*"]
     }
