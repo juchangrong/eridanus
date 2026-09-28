@@ -1,6 +1,6 @@
 # Eridanus plan
 
-Eridanus is a private shadcn registry on GitHub. It distributes the UI vocabulary that the w0 admin console settled on: a design-system base, composite components, hooks and agent guidelines, installable into any React project with the shadcn CLI:
+Eridanus is a private shadcn registry on GitHub. It distributes the UI vocabulary an operations console settled on: a design-system base, composite components, hooks and agent guidelines, installable into any React project with the shadcn CLI:
 
 ```bash
 npx shadcn@latest add juchangrong/eridanus/time
@@ -14,7 +14,7 @@ npx shadcn@latest add juchangrong/eridanus/time
 
 ## Non-goals
 
-- w0 domain blocks (trace viewer, run timeline, project directory) and anything that names a company-internal domain, endpoint or identifier.
+- Domain blocks from that console (trace viewer, run timeline, project directory) and anything that names a company-internal product, domain, endpoint or identifier.
 - Radix-based styles. Items use Base UI's `render` prop, which Radix's `asChild` does not accept.
 - An npm package or a self-hosted JSON endpoint. The repository is the registry.
 
@@ -30,17 +30,18 @@ Two rules of GitHub registries shape the source:
 ## Repository layout
 
 ```text
-registry.json                 root: name, homepage, include
-registry/*.json               item definitions, grouped by kind
+registry.json                 root: name, homepage, the base items, include
 src/components/ui/            shadcn primitives, exactly as the CLI writes them
-src/components/eridanus/      published components and blocks
-src/lib/eridanus/             published helpers
-src/hooks/eridanus/           published hooks
-src/skills/                   published agent guidelines
-src/gallery/                  the gallery app that renders every item
+src/components/eridanus/      published components, with their registry.json
+src/lib/eridanus/             published helpers, with their registry.json
+src/hooks/eridanus/           published hooks, with their registry.json
+skills/                       published agent guidelines, with their registry.json
+src/gallery/                  the gallery: every item with its install command and a live demo
 scripts/                      install smoke test and release helpers
-docs/                         this plan and the maintainer guide
+docs/                         this plan
 ```
+
+Each item is defined in the `registry.json` beside its files, and the root file includes them. The gallery reads the same files, so an item missing from the gallery is one missing from the registry.
 
 The repository is itself a shadcn project (Vite, React, Tailwind CSS v4, `components.json` on the `base-rhea` style). Published files live where a consumer's copy will live, and they import through the same aliases a consumer has (`@/components/ui/*`, `@/components/eridanus/*`, `@/lib/*`, `@/hooks/*`), which the CLI rewrites to each consumer's configured aliases. Item files set `target` with the `@components/`, `@lib/` and `@hooks/` placeholders, so every install lands in an `eridanus/` folder beside the consumer's own code.
 
@@ -56,8 +57,8 @@ The repository is itself a shadcn project (Vite, React, Tailwind CSS v4, `compon
 
 | Item | Type | What it carries |
 |---|---|---|
-| `base` | base | `base-rhea` on zinc with Phosphor and Inter, JetBrains Mono for code, the status colors, AA values for `muted-foreground` and `destructive` in light mode |
-| `status-colors` | theme | `success`, `warning`, `info` and `violet` tokens for projects that keep another base |
+| `base` | base | `base-rhea` on zinc with Phosphor and Inter, JetBrains Mono for code, the status colors, `color-scheme` per theme, AA values for `muted-foreground` and `destructive` |
+| `status-colors` | theme | `success`, `warning` and `info` tokens for projects that keep another base |
 | `format-time` | lib | readable times in Chinese (`刚刚`, `今天 14:05`) and the exact local, UTC and relative forms |
 | `clipboard` | lib | copy text with a fallback for pages without the async clipboard |
 | `use-debounced-value`, `use-paging` | hook | settled search input; page state that resets when filters change |
@@ -88,7 +89,7 @@ Every push runs:
 3. The gallery build, which renders every published component.
 4. The install smoke test: `shadcn build` the items, point their Eridanus dependencies at the built files, create a fresh Vite app, `init` it from the built `base`, `add` every item, then type-check and build that app. This catches missing dependencies and import paths that only break after the CLI rewrites them.
 
-Accessibility is checked on the gallery with axe in both themes before a release.
+Accessibility is checked on the gallery with axe in both themes before a release. Contrast is checked beyond axe's static pass: status text must keep 4.5:1 on the darkest stack the components draw, a badge tint over a tinted table row under the pointer, and on the destructive button's hover.
 
 ## Versioning
 
@@ -96,9 +97,9 @@ Releases are git tags `vX.Y.Z` with a `CHANGELOG.md` entry. Consumers pin with `
 
 ## Phases
 
-0. **Foundation.** Repository, this plan, the Vite project initialised with `shadcn init --base base --preset beqC918K`, lint and type-check scripts, CI. Done when the gallery builds and CI is green.
-1. **Base and first items.** `base`, `status-colors`, `format-time`, `clipboard`, `time`, `tone-badge`, `notice`, `empty-state`, `copy-button`, and the smoke test. Done when `init` from `base` in a fresh Vite app matches a `--preset beqC918K` project plus the status colors, and `add time` compiles there.
-2. **Remaining components.** Hooks, `theme-provider`, `confirm-dialog`, `form-input`, `search-field`, `filter-select`, `pager`, `table-kit`, `page-layout`, `person-avatar`, `meter`, `toaster`, `ui-guidelines`. Done when every item installs and builds in the smoke test and the gallery shows each one.
+0. **Foundation** (done). Repository, this plan, the Vite project initialised with `shadcn init --base base --preset beqC918K`, lint and type-check scripts, CI. Done when the gallery builds and CI is green.
+1. **Base and first items** (done). `base`, `status-colors`, `format-time`, `clipboard`, `time`, `tone-badge`, `notice`, `empty-state`, `copy-button`, and the smoke test. Done when `init` from `base` in a fresh Vite app matches a `--preset beqC918K` project plus the status colors, and `add time` compiles there.
+2. **Remaining components** (done). Hooks, `theme-provider`, `confirm-dialog`, `form-input`, `search-field`, `filter-select`, `pager`, `table-kit`, `page-layout`, `person-avatar`, `meter`, `toaster`, `ui-guidelines`. Done when every item installs and builds in the smoke test and the gallery shows each one.
 3. **Shell and release.** `app-shell`, the release script that pins dependencies, `v0.1.0`.
 4. **Adoption.** First consumers, and a scheduled job that diffs the shadcn primitives against upstream.
 
