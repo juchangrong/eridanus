@@ -1,0 +1,84 @@
+---
+name: eridanus-ui
+description: Design rules and the component catalog for UI built with the Eridanus shadcn registry (juchangrong/eridanus). Use when building or changing pages, tables, forms, status displays, times or notices in a project that has components under components/eridanus or a components.json on the base-rhea style.
+---
+
+# Eridanus UI
+
+Eridanus is a shadcn registry on GitHub. Items install as source into the project:
+
+```bash
+npx shadcn@latest add juchangrong/eridanus/<item>
+```
+
+Installed files live in `components/eridanus/`, `lib/eridanus/` and `hooks/eridanus/`. Do not edit them; wrap them in the project's own components, so `npx shadcn@latest add juchangrong/eridanus/<item> --diff` and `--overwrite` keep working for upgrades. The shadcn primitives in `components/ui/` stay as the CLI wrote them too.
+
+## Rules
+
+1. **Open layout.** Sections, tables and figures sit on the page ground, separated by space, headings and padding. Do not wrap page content in cards or bordered boxes, and do not draw rules between table or list rows. Cards are for self-contained panels such as a sidebar status box.
+2. **Exact on demand.** Show times with `Time` (readable on the surface, exact in the tooltip and for screen readers). A shortened ID, name or value keeps its full form one hover away (`title` or a tooltip).
+3. **Status never relies on color alone.** Use `ToneBadge` with the status word. Color marks only what needs action: failures (`error`, `text-destructive`), backlog or stale work (`warning`, `text-warning`). Everything else stays neutral.
+4. **Contrast.** Text keeps 4.5:1 in both themes. Use the tokens (`text-muted-foreground`, `text-success`, `bg-warning/10`, …), never raw palette colors, and check any new tint.
+5. **One control height.** Buttons use `size="sm"` (28px); `SearchField`, `FilterSelect` and the `Pager` match it. The default (near-black) button variant marks the single main action of a page, form or dialog; other actions use `secondary`, destructive ones `destructive`, inline and icon controls `ghost`.
+6. **Writes confirm.** Irreversible or outward-facing writes go through `ConfirmDialog`, which stays open and shows the error until the write succeeds. Report success with `notify()`.
+7. **Copy.** Visible text is short plain Chinese. Identifiers and paths are monospace. Every Eridanus component takes its visible strings as props when another language is needed.
+
+## Catalog
+
+| Need | Item | Use |
+|---|---|---|
+| Start a project | `base` | `npx shadcn@latest init juchangrong/eridanus/base` |
+| Status tokens only | `status-colors` | `bg-success/10`, `text-warning`, `text-info` |
+| Time on screen | `time` | `<Time value={iso} />`, `clock` for HH:mm:ss, `seconds` |
+| Time as text | `format-time` | `friendly()`, `exactTime()`, `clock()`, `relative()` |
+| Status | `tone-badge` | `<ToneBadge tone="error">failed</ToneBadge>` |
+| Page frame | `page-layout` | `Page`, `PageHeader`, `Section`, `FactLine`, `Facts`, `StatStrip` |
+| Tables | `table-kit` | `TableScroll` › `Table` › `TableHeaderRow` + `TableBody` › `TableRows` / `ClickableRow` |
+| Paging | `pager`, `use-paging` | `usePaging([filters])` feeds `<Pager {...paging} total={n} />` |
+| Filters | `search-field`, `filter-select`, `use-debounced-value` | debounce the search value before querying |
+| Nothing to show | `empty-state` | also for no-access and failed pages |
+| Notices | `notice` | `tone="error"` for failed reads with a retry `action` |
+| Forms | `form-input` | label, hint and error wired for screen readers |
+| Confirmation | `confirm-dialog` | `onConfirm` returns a promise; reject to show the error |
+| Feedback | `toaster` | wrap the app in `AppToaster`, call `notify()` |
+| Copy values | `copy-button`, `clipboard` | icon button next to an ID or URL |
+| Capacity | `meter` | in-flight work against a cap |
+| People | `person-avatar` | decorative; show the name beside it |
+| Theme | `theme-provider` | `ThemeProvider`, `useTheme()`; the `dark` class on `<html>` |
+
+## Patterns
+
+A list page:
+
+```tsx
+<Page fill>
+  <PageHeader title="运行记录" hideTitle />
+  <div className="flex flex-wrap items-center gap-2">
+    <SearchField label="搜索运行" value={q} onChange={setQ} />
+    <FilterSelect label="状态" value={status} onChange={setStatus} options={statuses} />
+  </div>
+  <TableScroll fill>
+    <Table>
+      <TableHeaderRow>
+        <TableHead>运行</TableHead>
+        <TableHead>状态</TableHead>
+        <TableHead>创建时间</TableHead>
+      </TableHeaderRow>
+      <TableBody>
+        <TableRows colSpan={3} pending={isPending} rows={rows} empty={{ title: "还没有运行" }}>
+          {(row) => (
+            <ClickableRow key={row.id}>
+              <TableCell><a href={`/runs/${row.id}`}>{row.id}</a></TableCell>
+              <TableCell><ToneBadge tone={toneOf(row.status)}>{row.status}</ToneBadge></TableCell>
+              <TableCell><Time value={row.createdAt} /></TableCell>
+            </ClickableRow>
+          )}
+        </TableRows>
+      </TableBody>
+    </Table>
+  </TableScroll>
+  <Pager {...paging} total={total} />
+</Page>
+```
+
+A read that fails before any data arrives shows only the `Notice` with a retry action; a refresh that fails later keeps the last data on screen under the notice.

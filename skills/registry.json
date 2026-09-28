@@ -1,0 +1,22 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry.json",
+  "items": [
+    {
+      "name": "ui-guidelines",
+      "type": "registry:item",
+      "title": "Eridanus UI guidelines",
+      "description": "A Claude Code skill (.claude/skills/eridanus-ui/SKILL.md) with the Eridanus design rules, the item catalog and a list-page pattern, so agents build UI that follows them.",
+      "categories": [
+        "ai",
+        "guidelines"
+      ],
+      "files": [
+        {
+          "path": "eridanus-ui/SKILL.md",
+          "type": "registry:file",
+          "target": "~/.claude/skills/eridanus-ui/SKILL.md"
+        }
+      ]
+    }
+  ]
+}

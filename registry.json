@@ -4,7 +4,9 @@
   "homepage": "https://github.com/juchangrong/eridanus",
   "include": [
     "src/lib/eridanus/registry.json",
-    "src/components/eridanus/registry.json"
+    "src/hooks/eridanus/registry.json",
+    "src/components/eridanus/registry.json",
+    "skills/registry.json"
   ],
   "items": [
     {

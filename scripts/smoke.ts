@@ -13,7 +13,7 @@
  * Needs network access for npm packages and shadcn's own primitives.
  */
 import { execFileSync } from "node:child_process";
-import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { dirname, join, relative } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -125,19 +125,24 @@ for (const needle of ["--success:", "--color-success: var(--success)", "--muted-
   if (!css.includes(needle)) failures.push(`src/index.css lacks ${needle}`);
 }
 
-const installed: string[] = [];
-for (const [dir, alias] of [["components/eridanus", "@/components/eridanus"], ["lib/eridanus", "@/lib/eridanus"], ["hooks/eridanus", "@/hooks/eridanus"]] as const) {
-  const path = join(app, "src", dir);
-  if (!existsSync(path)) continue;
-  for (const file of readdirSync(path, { recursive: true }) as string[]) {
-    if (/\.tsx?$/.test(file)) installed.push(`${alias}/${file.replace(/\.tsx?$/, "")}`);
+// Every code file an item targets, as the import specifier the app uses.
+const PLACEHOLDER: Record<string, string> = { "@components/": "@/components/", "@lib/": "@/lib/", "@hooks/": "@/hooks/" };
+const expected: string[] = [];
+for (const { name } of catalog.items) {
+  const item = JSON.parse(readFileSync(join(out, `${name}.json`), "utf8")) as { files?: { target?: string }[] };
+  for (const { target = "" } of item.files ?? []) {
+    const prefix = Object.keys(PLACEHOLDER).find((p) => target.startsWith(p));
+    if (prefix && /\.tsx?$/.test(target)) expected.push(PLACEHOLDER[prefix] + target.slice(prefix.length).replace(/\.tsx?$/, ""));
   }
 }
-const expected = catalog.items.filter((i) => !["registry:base", "registry:theme", "registry:file"].includes(i.type)).length;
-if (installed.length < expected) failures.push(`only ${installed.length} modules installed for ${expected} code items`);
+for (const spec of expected) {
+  const base = join(app, "src", spec.slice(2));
+  if (!existsSync(`${base}.ts`) && !existsSync(`${base}.tsx`)) failures.push(`${spec} was not installed`);
+}
+if (!existsSync(join(app, ".claude", "skills", "eridanus-ui", "SKILL.md"))) failures.push(".claude/skills/eridanus-ui/SKILL.md was not installed");
 write(join(app, "src", "all.ts"), [
-  ...installed.map((spec, i) => `import * as m${i} from "${spec}";`),
-  `export const modules = { ${installed.map((spec, i) => `"${spec}": m${i}`).join(", ")} };`,
+  ...expected.map((spec, i) => `import * as m${i} from "${spec}";`),
+  `export const modules = { ${expected.map((spec, i) => `"${spec}": m${i}`).join(", ")} };`,
   "",
 ].join("\n"));
 
@@ -147,4 +152,4 @@ if (failures.length) {
 }
 run("pnpm", ["exec", "tsc", "--noEmit"], app);
 run("pnpm", ["exec", "vite", "build"], app);
-console.log(`\nsmoke: ${installed.length} modules installed and built`);
+console.log(`\nsmoke: ${catalog.items.length} items, ${expected.length} modules installed and built`);
