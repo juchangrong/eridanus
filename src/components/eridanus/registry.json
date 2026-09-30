@@ -128,7 +128,7 @@
       "title": "FormInput",
       "description": "A labelled text input with a hint and an error, both linked through aria-describedby, aria-invalid while there is an error, and a required marker. Accepts every input prop.",
       "categories": ["forms"],
-      "registryDependencies": ["field", "input"],
+      "registryDependencies": ["field", "juchangrong/eridanus/input"],
       "files": [
         {
           "path": "form-input.tsx",
@@ -144,7 +144,7 @@
       "description": "A 28px toolbar search input with a magnifier and a clear button; Escape clears a non-empty field. label is the accessible name.",
       "categories": ["forms", "search", "toolbar"],
       "dependencies": ["@phosphor-icons/react"],
-      "registryDependencies": ["input-group"],
+      "registryDependencies": ["juchangrong/eridanus/input-group"],
       "files": [
         {
           "path": "search-field.tsx",
@@ -159,7 +159,7 @@
       "title": "FilterSelect",
       "description": "A 28px select for filtering a list; the trigger reads \"<label> <choice>\" and the first option, allLabel (全部), means no filter (value \"\").",
       "categories": ["forms", "toolbar"],
-      "registryDependencies": ["select"],
+      "registryDependencies": ["juchangrong/eridanus/select"],
       "files": [
         {
           "path": "filter-select.tsx",
@@ -175,7 +175,11 @@
       "description": "Paging controls under a table: the range shown (第 1–50 条，共 173 条), an optional page-size select, first/previous/next/last buttons and a page field. Zero-based; folds back to the last page when the total shrinks. All text comes from the labels prop.",
       "categories": ["table", "navigation"],
       "dependencies": ["@phosphor-icons/react"],
-      "registryDependencies": ["button", "input", "select"],
+      "registryDependencies": [
+        "button",
+        "juchangrong/eridanus/input",
+        "juchangrong/eridanus/select"
+      ],
       "files": [
         {
           "path": "pager.tsx",

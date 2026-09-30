@@ -39,6 +39,7 @@ Installed files live in `components/eridanus/`, `lib/eridanus/` and `hooks/erida
 | Nothing to show | `empty-state` | also for no-access and failed pages |
 | Notices | `notice` | `tone="error"` for failed reads with a retry `action` |
 | Forms | `form-input` | label, hint and error wired for screen readers |
+| Fields | `input`, `textarea`, `select`, `input-group` | Eridanus forks in `components/ui`, same API as shadcn's; keep them when adding upstream items (answer no to overwriting, never `--overwrite`) |
 | Confirmation | `confirm-dialog` | `onConfirm` returns a promise; reject to show the error |
 | Feedback | `toaster` | wrap the app in `AppToaster`, call `notify()` |
 | Copy values | `copy-button`, `clipboard` | icon button next to an ID or URL |

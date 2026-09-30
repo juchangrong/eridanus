@@ -3,6 +3,7 @@
   "name": "eridanus",
   "homepage": "https://github.com/juchangrong/eridanus",
   "include": [
+    "src/components/ui/registry.json",
     "src/lib/eridanus/registry.json",
     "src/hooks/eridanus/registry.json",
     "src/components/eridanus/registry.json",
@@ -14,7 +15,7 @@
       "type": "registry:base",
       "extends": "none",
       "title": "Eridanus base",
-      "description": "Starts a project on the Eridanus look: the shadcn base-rhea style on Base UI (preset beqC918K: zinc, Phosphor icons, Inter), JetBrains Mono for code, success/warning/info status colors, and destructive and muted-foreground values that keep text at 4.5:1 or better in both themes, on muted grounds, on badge tints over tinted or hovered table rows, and on the destructive button's hover. Use with `shadcn init`.",
+      "description": "Starts a project on the Eridanus look: the shadcn base-rhea style on Base UI (preset beqC918K: zinc, Phosphor icons, Inter), JetBrains Mono for code, success/warning/info status colors, and destructive and muted-foreground values that keep text at 4.5:1 or better in both themes, on muted grounds, on badge tints over tinted or hovered table rows, and on the destructive button's hover. Installs the Eridanus forks of input, textarea, select and input-group, whose focus and errors show on the border alone. Use with `shadcn init`.",
       "categories": ["theme", "setup"],
       "config": {
         "style": "base-rhea",
@@ -36,7 +37,11 @@
       "registryDependencies": [
         "utils",
         "font-inter",
-        "juchangrong/eridanus/status-colors"
+        "juchangrong/eridanus/status-colors",
+        "juchangrong/eridanus/input",
+        "juchangrong/eridanus/textarea",
+        "juchangrong/eridanus/select",
+        "juchangrong/eridanus/input-group"
       ],
       "cssVars": {
         "theme": {

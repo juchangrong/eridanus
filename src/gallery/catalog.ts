@@ -6,6 +6,7 @@
 import root from "../../registry.json";
 import skills from "../../skills/registry.json";
 import components from "../components/eridanus/registry.json";
+import forks from "../components/ui/registry.json";
 import hooks from "../hooks/eridanus/registry.json";
 import lib from "../lib/eridanus/registry.json";
 
@@ -75,6 +76,10 @@ const GROUPS = [
     names: ["notice", "empty-state", "toaster", "confirm-dialog"],
   },
   {
+    title: "输入控件",
+    names: ["input", "textarea", "select", "input-group"],
+  },
+  {
     title: "表单与筛选",
     names: ["form-input", "search-field", "filter-select"],
   },
@@ -87,8 +92,9 @@ const GROUPS = [
 const OTHER = "其他";
 export const PRIMITIVES_GROUP = "shadcn 原语";
 
-/** The primitives with a page. sidebar is left out: it only makes sense as a
- * whole app frame, which app-shell will show. */
+/** The shadcn primitives with a page. sidebar is left out: it only makes
+ * sense as a whole app frame, which app-shell will show. input, textarea,
+ * select and input-group are Eridanus forks, listed with the Eridanus items. */
 const PRIMITIVES: Record<string, { title: string; description: string }> = {
   "alert-dialog": {
     title: "Alert Dialog",
@@ -122,16 +128,7 @@ const PRIMITIVES: Record<string, { title: string; description: string }> = {
     description:
       "表单字段的结构：标签、控件、说明和错误信息，并为读屏器关联好。",
   },
-  "input-group": {
-    title: "Input Group",
-    description: "带前后缀、图标或按钮的输入框组合。",
-  },
-  input: { title: "Input", description: "单行文本输入框。" },
   label: { title: "Label", description: "表单控件的可点击标签。" },
-  select: {
-    title: "Select",
-    description: "从一组选项中选择一个值的下拉选择器。",
-  },
   separator: {
     title: "Separator",
     description: "在视觉或语义上分隔内容的分割线。",
@@ -144,7 +141,6 @@ const PRIMITIVES: Record<string, { title: string; description: string }> = {
   spinner: { title: "Spinner", description: "表示正在进行中的加载指示器。" },
   table: { title: "Table", description: "展示结构化数据的表格。" },
   tabs: { title: "Tabs", description: "在同一区域内切换多个相关视图。" },
-  textarea: { title: "Textarea", description: "多行文本输入框。" },
   toast: { title: "Toast", description: "操作完成后短暂出现的通知。" },
   "toggle-group": {
     title: "Toggle Group",
@@ -157,6 +153,7 @@ const PRIMITIVES: Record<string, { title: string; description: string }> = {
 function eridanusEntries(): DocEntry[] {
   const registries = [
     { dir: "", items: root.items },
+    { dir: "src/components/ui/", items: forks.items },
     { dir: "src/lib/eridanus/", items: lib.items },
     { dir: "src/hooks/eridanus/", items: hooks.items },
     { dir: "src/components/eridanus/", items: components.items },
@@ -171,7 +168,12 @@ function eridanusEntries(): DocEntry[] {
         const path = dir + file.path;
         return {
           path,
-          target: file.target ?? path,
+          // registry:ui files without a target land in the ui alias.
+          target:
+            file.target ??
+            (item.type === "registry:ui"
+              ? `@components/ui/${file.path}`
+              : path),
           source: SOURCES[`/${path}`] ?? "",
         };
       });

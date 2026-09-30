@@ -48,7 +48,9 @@ run(shadcn, ["build", "-o", out], root);
 // 2. Local dependencies.
 const catalog = JSON.parse(
   readFileSync(join(out, "registry.json"), "utf8"),
-) as { items: { name: string; type: string }[] };
+) as {
+  items: { name: string; type: string }[];
+};
 for (const { name } of catalog.items) {
   const file = join(out, `${name}.json`);
   const item = JSON.parse(readFileSync(file, "utf8")) as {
@@ -196,9 +198,16 @@ const PLACEHOLDER: Record<string, string> = {
 const expected: string[] = [];
 for (const { name } of catalog.items) {
   const item = JSON.parse(readFileSync(join(out, `${name}.json`), "utf8")) as {
-    files?: { target?: string }[];
+    type: string;
+    files?: { path: string; target?: string }[];
   };
-  for (const { target = "" } of item.files ?? []) {
+  for (const file of item.files ?? []) {
+    // A registry:ui file without a target lands in the ui alias.
+    const target =
+      file.target ??
+      (item.type === "registry:ui"
+        ? `@components/ui/${file.path.split("/").at(-1)}`
+        : "");
     const prefix = Object.keys(PLACEHOLDER).find((p) => target.startsWith(p));
     if (prefix && /\.tsx?$/.test(target))
       expected.push(
@@ -211,6 +220,16 @@ for (const spec of expected) {
   const base = join(app, "src", spec.slice(2));
   if (!existsSync(`${base}.ts`) && !existsSync(`${base}.tsx`))
     failures.push(`${spec} was not installed`);
+}
+// The forks replace shadcn's files, so a CLI that kept an existing upstream
+// copy would still build; check the installed files are the forks.
+for (const fork of ["input", "textarea", "select", "input-group"]) {
+  const file = join(app, "src", "components", "ui", `${fork}.tsx`);
+  if (
+    !existsSync(file) ||
+    !readFileSync(file, "utf8").includes("Eridanus fork of shadcn's")
+  )
+    failures.push(`components/ui/${fork}.tsx is not the Eridanus fork`);
 }
 if (!existsSync(join(app, ".claude", "skills", "eridanus-ui", "SKILL.md")))
   failures.push(".claude/skills/eridanus-ui/SKILL.md was not installed");
