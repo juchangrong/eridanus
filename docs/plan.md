@@ -36,12 +36,12 @@ src/components/eridanus/      published components, with their registry.json
 src/lib/eridanus/             published helpers, with their registry.json
 src/hooks/eridanus/           published hooks, with their registry.json
 skills/                       published agent guidelines, with their registry.json
-src/gallery/                  the gallery: every item with its install command and a live demo
+src/gallery/                  the docs site: a page per item and per shadcn primitive, with live examples
 scripts/                      install smoke test and release helpers
 docs/                         this plan
 ```
 
-Each item is defined in the `registry.json` beside its files, and the root file includes them. The gallery reads the same files, so an item missing from the gallery is one missing from the registry.
+Each item is defined in the `registry.json` beside its files, and the root file includes them. The docs site in `src/gallery/` reads the same files, so an item missing from the docs is one missing from the registry. Each page shows the item's description, a live demo with its code, the CLI and manual install steps and further examples; the examples live one per file in `src/gallery/examples/<item>/`, and the file a reader sees in the code tab is the file that renders the preview.
 
 The repository is itself a shadcn project (Vite, React, Tailwind CSS v4, `components.json` on the `base-rhea` style). Published files live where a consumer's copy will live, and they import through the same aliases a consumer has (`@/components/ui/*`, `@/components/eridanus/*`, `@/lib/*`, `@/hooks/*`), which the CLI rewrites to each consumer's configured aliases. Item files set `target` with the `@components/`, `@lib/` and `@hooks/` placeholders, so every install lands in an `eridanus/` folder beside the consumer's own code.
 

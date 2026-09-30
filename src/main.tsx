@@ -5,7 +5,7 @@ import { ThemeProvider } from "@/components/eridanus/theme-provider";
 import { AppToaster } from "@/components/eridanus/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 
-import { Gallery } from "./gallery/gallery";
+import { App } from "./gallery/app";
 import "./index.css";
 
 createRoot(document.getElementById("root")!).render(
@@ -13,7 +13,7 @@ createRoot(document.getElementById("root")!).render(
     <ThemeProvider storageKey="eridanus-gallery-theme">
       <TooltipProvider>
         <AppToaster>
-          <Gallery />
+          <App />
         </AppToaster>
       </TooltipProvider>
     </ThemeProvider>

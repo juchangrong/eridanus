@@ -8,7 +8,8 @@ export default defineConfig({
   resolve: {
     alias: { "@": fileURLToPath(new URL("./src", import.meta.url)) },
   },
-  // The gallery is one page that renders every item at once, so splitting its
-  // bundle would not load anything later.
-  build: { chunkSizeWarningLimit: 800 },
+  // The docs import every example, and the source text the code tabs and
+  // manual install steps show, up front so switching pages never waits; only
+  // Shiki loads on demand, in chunks of its own.
+  build: { chunkSizeWarningLimit: 1200 },
 });
