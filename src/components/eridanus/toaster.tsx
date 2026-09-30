@@ -45,8 +45,20 @@ function ToastList({ closeLabel }: { closeLabel: string }) {
   return toasts.map((t) => (
     <Toast key={t.id} toast={t}>
       <ToastContent>
-        {t.type === "success" ? <CheckCircleIcon weight="fill" className="size-4 shrink-0 text-success" aria-hidden /> : null}
-        {t.type === "error" ? <WarningCircleIcon weight="fill" className="size-4 shrink-0 text-destructive" aria-hidden /> : null}
+        {t.type === "success" ? (
+          <CheckCircleIcon
+            weight="fill"
+            className="size-4 shrink-0 text-success"
+            aria-hidden
+          />
+        ) : null}
+        {t.type === "error" ? (
+          <WarningCircleIcon
+            weight="fill"
+            className="size-4 shrink-0 text-destructive"
+            aria-hidden
+          />
+        ) : null}
         <div className="flex min-w-0 flex-1 flex-col gap-1">
           <ToastTitle />
           <ToastDescription className="[overflow-wrap:anywhere]" />
@@ -62,8 +74,17 @@ function ToastList({ closeLabel }: { closeLabel: string }) {
  * toasts are announced politely and close after 4 seconds; error toasts are
  * announced at once and stay until closed.
  */
-export function notify(title: string, options: { description?: string; type?: "success" | "error" } = {}) {
+export function notify(
+  title: string,
+  options: { description?: string; type?: "success" | "error" } = {},
+) {
   const type = options.type ?? "success";
   const error = type === "error";
-  toast.add({ title, description: options.description, type, timeout: error ? 0 : 4000, priority: error ? "high" : "low" });
+  toast.add({
+    title,
+    description: options.description,
+    type,
+    timeout: error ? 0 : 4000,
+    priority: error ? "high" : "low",
+  });
 }

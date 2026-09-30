@@ -18,7 +18,13 @@ export interface CatalogItem {
 
 export const REPOSITORY = "juchangrong/eridanus";
 
-export const catalog: CatalogItem[] = [root, lib, hooks, components, skills].flatMap((r) => r.items as CatalogItem[]);
+export const catalog: CatalogItem[] = [
+  root,
+  lib,
+  hooks,
+  components,
+  skills,
+].flatMap((r) => r.items as CatalogItem[]);
 
 /** The command that installs an item: the base starts a project, the rest add to one. */
 export function installCommand(item: CatalogItem): string {

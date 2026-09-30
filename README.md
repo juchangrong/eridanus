@@ -14,6 +14,7 @@ npx shadcn@latest add juchangrong/eridanus/time        # add an item to a shadcn
 pnpm install
 pnpm dev            # the gallery: every item with its install command and a live demo
 pnpm check          # type-check, lint, registry validation and the gallery build
+pnpm lint:fix       # format, sort imports and apply safe lint fixes with Biome
 pnpm test:install   # install every item into a fresh app and build it
 ```
 

@@ -1,5 +1,6 @@
 import {
   createContext,
+  type ReactNode,
   useCallback,
   useContext,
   useEffect,
@@ -7,7 +8,6 @@ import {
   useMemo,
   useState,
   useSyncExternalStore,
-  type ReactNode,
 } from "react";
 
 export type ThemePreference = "system" | "light" | "dark";
@@ -27,7 +27,9 @@ const ThemeContext = createContext<ThemeState | null>(null);
 function readStored(key: string, fallback: ThemePreference): ThemePreference {
   try {
     const value = localStorage.getItem(key);
-    return value === "system" || value === "light" || value === "dark" ? value : fallback;
+    return value === "system" || value === "light" || value === "dark"
+      ? value
+      : fallback;
   } catch {
     return fallback;
   }
@@ -45,7 +47,9 @@ const systemIsDark = () => window.matchMedia(DARK_QUERY).matches;
  * frame that applies it. */
 function withoutTransitions(apply: () => void) {
   const style = document.createElement("style");
-  style.append(document.createTextNode("*,*::before,*::after{transition:none !important}"));
+  style.append(
+    document.createTextNode("*,*::before,*::after{transition:none !important}"),
+  );
   document.head.append(style);
   apply();
   void document.body.offsetHeight;
@@ -70,9 +74,16 @@ export function ThemeProvider({
   defaultPreference?: ThemePreference;
   scoped?: boolean;
 }) {
-  const [preference, setPreferenceState] = useState(() => readStored(storageKey, defaultPreference));
-  const systemDark = useSyncExternalStore(subscribeSystem, systemIsDark, () => false);
-  const resolved: ResolvedTheme = preference === "system" ? (systemDark ? "dark" : "light") : preference;
+  const [preference, setPreferenceState] = useState(() =>
+    readStored(storageKey, defaultPreference),
+  );
+  const systemDark = useSyncExternalStore(
+    subscribeSystem,
+    systemIsDark,
+    () => false,
+  );
+  const resolved: ResolvedTheme =
+    preference === "system" ? (systemDark ? "dark" : "light") : preference;
 
   // A layout effect runs before other components' passive effects, so one
   // that reads resolved colors (a canvas, a chart) already sees the new theme.
@@ -109,8 +120,13 @@ export function ThemeProvider({
     [storageKey, defaultPreference],
   );
 
-  const value = useMemo(() => ({ preference, resolved, setPreference }), [preference, resolved, setPreference]);
-  return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>;
+  const value = useMemo(
+    () => ({ preference, resolved, setPreference }),
+    [preference, resolved, setPreference],
+  );
+  return (
+    <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>
+  );
 }
 
 /** The theme state from the nearest ThemeProvider. */

@@ -1,6 +1,13 @@
 import type { ReactNode } from "react";
 
-import { Empty, EmptyContent, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from "@/components/ui/empty";
+import {
+  Empty,
+  EmptyContent,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+} from "@/components/ui/empty";
 import { cn } from "@/lib/utils";
 
 /**
@@ -27,8 +34,12 @@ export function EmptyState({
     <Empty className={cn(size === "sm" && "gap-3 p-6", className)}>
       <EmptyHeader>
         {icon ? <EmptyMedia variant="icon">{icon}</EmptyMedia> : null}
-        <EmptyTitle className={cn(size === "sm" && "text-base")}>{title}</EmptyTitle>
-        {description ? <EmptyDescription>{description}</EmptyDescription> : null}
+        <EmptyTitle className={cn(size === "sm" && "text-base")}>
+          {title}
+        </EmptyTitle>
+        {description ? (
+          <EmptyDescription>{description}</EmptyDescription>
+        ) : null}
       </EmptyHeader>
       {contents ? <EmptyContent>{contents}</EmptyContent> : null}
     </Empty>

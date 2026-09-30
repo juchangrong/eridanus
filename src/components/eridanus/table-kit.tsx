@@ -48,9 +48,20 @@ export function TableScroll({
  * table scrolls. Its rule is an inset shadow, because a pinned row's border
  * stays behind as the rows scroll under it. Put TableHead cells inside.
  */
-export function TableHeaderRow({ children, className }: { children: ReactNode; className?: string }) {
+export function TableHeaderRow({
+  children,
+  className,
+}: {
+  children: ReactNode;
+  className?: string;
+}) {
   return (
-    <TableHeader className={cn("sticky top-0 z-10 bg-background [&_tr]:border-b-0", className)}>
+    <TableHeader
+      className={cn(
+        "sticky top-0 z-10 bg-background [&_tr]:border-b-0",
+        className,
+      )}
+    >
       <TableRow className="border-b-0 hover:bg-transparent [&_th]:h-9 [&_th]:text-xs [&_th]:text-muted-foreground [&_th]:shadow-[inset_0_-1px_0_var(--color-border)]">
         {children}
       </TableRow>
@@ -81,7 +92,10 @@ export function TableRows<T>({
   if (pending) {
     return (
       <TableRow className="hover:bg-transparent">
-        <TableCell colSpan={colSpan} className="py-10 text-center text-muted-foreground">
+        <TableCell
+          colSpan={colSpan}
+          className="py-10 text-center text-muted-foreground"
+        >
           {loadingLabel}
         </TableCell>
       </TableRow>
@@ -140,7 +154,9 @@ export function ClickableRow({
       aria-selected={selected || undefined}
       className={cn(
         "cursor-pointer",
-        selected ? "shadow-[inset_2px_0_0_var(--color-primary)]" : tone && ROW_TONE[tone],
+        selected
+          ? "shadow-[inset_2px_0_0_var(--color-primary)]"
+          : tone && ROW_TONE[tone],
         className,
       )}
       onClick={clickFirstControl}

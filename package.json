@@ -11,6 +11,7 @@
     "build": "tsc --noEmit && vite build",
     "typecheck": "tsc --noEmit",
     "lint": "biome check .",
+    "lint:fix": "biome check --write .",
     "registry:validate": "shadcn registry validate",
     "test:install": "node scripts/smoke.ts",
     "check": "pnpm typecheck && biome ci --error-on-warnings . && pnpm registry:validate && pnpm build"

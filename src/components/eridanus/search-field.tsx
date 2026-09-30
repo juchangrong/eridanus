@@ -1,6 +1,11 @@
 import { MagnifyingGlassIcon, XIcon } from "@phosphor-icons/react";
 
-import { InputGroup, InputGroupAddon, InputGroupButton, InputGroupInput } from "@/components/ui/input-group";
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupButton,
+  InputGroupInput,
+} from "@/components/ui/input-group";
 import { cn } from "@/lib/utils";
 
 /**
@@ -27,7 +32,9 @@ export function SearchField({
   className?: string;
 }) {
   return (
-    <InputGroup className={cn(size === "sm" ? "h-7" : "h-8", "w-full sm:w-72", className)}>
+    <InputGroup
+      className={cn(size === "sm" ? "h-7" : "h-8", "w-full sm:w-72", className)}
+    >
       <InputGroupAddon>
         <MagnifyingGlassIcon aria-hidden />
       </InputGroupAddon>
@@ -45,7 +52,11 @@ export function SearchField({
       />
       {value ? (
         <InputGroupAddon align="inline-end">
-          <InputGroupButton size="icon-xs" aria-label={clearLabel} onClick={() => onChange("")}>
+          <InputGroupButton
+            size="icon-xs"
+            aria-label={clearLabel}
+            onClick={() => onChange("")}
+          >
             <XIcon />
           </InputGroupButton>
         </InputGroupAddon>

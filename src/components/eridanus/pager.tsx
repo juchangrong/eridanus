@@ -1,9 +1,20 @@
-import { CaretDoubleLeftIcon, CaretDoubleRightIcon, CaretLeftIcon, CaretRightIcon } from "@phosphor-icons/react";
+import {
+  CaretDoubleLeftIcon,
+  CaretDoubleRightIcon,
+  CaretLeftIcon,
+  CaretRightIcon,
+} from "@phosphor-icons/react";
 import { useEffect, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 export interface PagerLabels {
   navigation: string;
@@ -29,7 +40,9 @@ export const defaultPagerLabels: PagerLabels = {
   pageSize: "每页条数",
   page: (pages) => `页码，共 ${pages} 页`,
   range: (first, last, total) =>
-    total === 0 ? "共 0 条" : `第 ${first.toLocaleString()}–${last.toLocaleString()} 条，共 ${total.toLocaleString()} 条`,
+    total === 0
+      ? "共 0 条"
+      : `第 ${first.toLocaleString()}–${last.toLocaleString()} 条，共 ${total.toLocaleString()} 条`,
   size: (size) => `${size} 条`,
 };
 
@@ -62,14 +75,34 @@ export function Pager({
     if (page >= pages) onPage(pages - 1);
   }, [page, pages, onPage]);
   const go = (next: number) => onPage(Math.min(pages - 1, Math.max(0, next)));
-  const sizes = pageSizes.map((n) => ({ value: String(n), label: labels.size(n) }));
+  const sizes = pageSizes.map((n) => ({
+    value: String(n),
+    label: labels.size(n),
+  }));
 
   return (
-    <nav aria-label={labels.navigation} className="flex shrink-0 flex-wrap items-center gap-x-4 gap-y-2 text-xs text-muted-foreground">
-      <span className="tabular-nums">{labels.range(page * pageSize + 1, Math.min(total, (page + 1) * pageSize), total)}</span>
+    <nav
+      aria-label={labels.navigation}
+      className="flex shrink-0 flex-wrap items-center gap-x-4 gap-y-2 text-xs text-muted-foreground"
+    >
+      <span className="tabular-nums">
+        {labels.range(
+          page * pageSize + 1,
+          Math.min(total, (page + 1) * pageSize),
+          total,
+        )}
+      </span>
       {onPageSize ? (
-        <Select value={String(pageSize)} items={sizes} onValueChange={(v) => onPageSize(Number(v))}>
-          <SelectTrigger size="sm" aria-label={labels.pageSize} className="text-xs">
+        <Select
+          value={String(pageSize)}
+          items={sizes}
+          onValueChange={(v) => onPageSize(Number(v))}
+        >
+          <SelectTrigger
+            size="sm"
+            aria-label={labels.pageSize}
+            className="text-xs"
+          >
             <SelectValue />
           </SelectTrigger>
           <SelectContent alignItemWithTrigger={false}>
@@ -83,17 +116,47 @@ export function Pager({
       ) : null}
       {total > 0 ? (
         <div className="ms-auto flex items-center gap-1">
-          <Button variant="ghost" size="icon-sm" aria-label={labels.first} disabled={page === 0} onClick={() => go(0)}>
+          <Button
+            variant="ghost"
+            size="icon-sm"
+            aria-label={labels.first}
+            disabled={page === 0}
+            onClick={() => go(0)}
+          >
             <CaretDoubleLeftIcon />
           </Button>
-          <Button variant="ghost" size="icon-sm" aria-label={labels.previous} disabled={page === 0} onClick={() => go(page - 1)}>
+          <Button
+            variant="ghost"
+            size="icon-sm"
+            aria-label={labels.previous}
+            disabled={page === 0}
+            onClick={() => go(page - 1)}
+          >
             <CaretLeftIcon />
           </Button>
-          <PageField key={page} page={page} pages={pages} label={labels.page(pages)} onJump={go} />
-          <Button variant="ghost" size="icon-sm" aria-label={labels.next} disabled={page >= pages - 1} onClick={() => go(page + 1)}>
+          <PageField
+            key={page}
+            page={page}
+            pages={pages}
+            label={labels.page(pages)}
+            onJump={go}
+          />
+          <Button
+            variant="ghost"
+            size="icon-sm"
+            aria-label={labels.next}
+            disabled={page >= pages - 1}
+            onClick={() => go(page + 1)}
+          >
             <CaretRightIcon />
           </Button>
-          <Button variant="ghost" size="icon-sm" aria-label={labels.last} disabled={page >= pages - 1} onClick={() => go(pages - 1)}>
+          <Button
+            variant="ghost"
+            size="icon-sm"
+            aria-label={labels.last}
+            disabled={page >= pages - 1}
+            onClick={() => go(pages - 1)}
+          >
             <CaretDoubleRightIcon />
           </Button>
         </div>
@@ -104,7 +167,17 @@ export function Pager({
 
 /** The current page as an editable field. Keyed on the page by its parent,
  * so it resets whenever the page changes. */
-function PageField({ page, pages, label, onJump }: { page: number; pages: number; label: string; onJump: (page: number) => void }) {
+function PageField({
+  page,
+  pages,
+  label,
+  onJump,
+}: {
+  page: number;
+  pages: number;
+  label: string;
+  onJump: (page: number) => void;
+}) {
   const [draft, setDraft] = useState(String(page + 1));
   const commit = () => {
     const n = Number(draft);

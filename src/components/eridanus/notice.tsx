@@ -1,10 +1,23 @@
-import { InfoIcon, WarningCircleIcon, WarningIcon } from "@phosphor-icons/react";
+import {
+  InfoIcon,
+  WarningCircleIcon,
+  WarningIcon,
+} from "@phosphor-icons/react";
 import type { ReactNode } from "react";
 
-import { Alert, AlertAction, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import {
+  Alert,
+  AlertAction,
+  AlertDescription,
+  AlertTitle,
+} from "@/components/ui/alert";
 import { cn } from "@/lib/utils";
 
-const ICON = { error: WarningCircleIcon, warning: WarningIcon, neutral: InfoIcon };
+const ICON = {
+  error: WarningCircleIcon,
+  warning: WarningIcon,
+  neutral: InfoIcon,
+};
 
 export type NoticeTone = keyof typeof ICON;
 
@@ -32,7 +45,11 @@ export function Notice({
     <Alert
       variant={tone === "error" ? "destructive" : "default"}
       role={tone === "error" ? "alert" : undefined}
-      className={cn("shrink-0", tone === "warning" && "*:[svg]:text-warning", className)}
+      className={cn(
+        "shrink-0",
+        tone === "warning" && "*:[svg]:text-warning",
+        className,
+      )}
     >
       <Icon weight={tone === "neutral" ? "regular" : "fill"} />
       {title ? <AlertTitle>{title}</AlertTitle> : null}

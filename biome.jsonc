@@ -18,8 +18,17 @@
       "!.claude"
     ]
   },
-  "formatter": { "enabled": false },
-  "assist": { "enabled": false },
+  // Indentation and line endings come from .editorconfig.
+  "formatter": {
+    "enabled": true,
+    "useEditorconfig": true,
+    // The shadcn CLI writes these and adds to index.css on later installs, so
+    // they keep its layout.
+    "includes": ["**", "!src/index.css", "!src/lib/utils.ts"]
+  },
+  "javascript": {
+    "formatter": { "quoteStyle": "double" }
+  },
   "css": {
     "parser": { "tailwindDirectives": true }
   },
@@ -31,12 +40,13 @@
       "style": {
         // noUncheckedIndexedAccess makes `!` the way to say an index exists.
         "noNonNullAssertion": "off"
-      },
-      "suspicious": {
-        // Fact lists and stat strips render caller-ordered items that have
-        // no id of their own.
-        "noArrayIndexKey": "off"
       }
+    }
+  },
+  "assist": {
+    "enabled": true,
+    "actions": {
+      "source": { "organizeImports": "on" }
     }
   }
 }

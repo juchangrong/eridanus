@@ -6,10 +6,7 @@
       "type": "registry:hook",
       "title": "useDebouncedValue",
       "description": "useDebouncedValue(value, ms = 250): the value once it has held still for ms milliseconds, so a search field stays instant while the request keyed on the debounced value waits for typing to settle.",
-      "categories": [
-        "hooks",
-        "search"
-      ],
+      "categories": ["hooks", "search"],
       "files": [
         {
           "path": "use-debounced-value.ts",
@@ -23,10 +20,7 @@
       "type": "registry:hook",
       "title": "usePaging",
       "description": "usePaging(filters, initialSize = 50): zero-based page state for a paged table that returns to the first page whenever a filter value changes. Returns page, pageSize, offset, query (limit=…&offset=…), onPage and onPageSize; spread it into Pager.",
-      "categories": [
-        "hooks",
-        "table"
-      ],
+      "categories": ["hooks", "table"],
       "files": [
         {
           "path": "use-paging.ts",

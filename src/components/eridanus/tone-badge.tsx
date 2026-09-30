@@ -3,7 +3,13 @@ import type { ComponentProps } from "react";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 
-export type Tone = "success" | "error" | "info" | "warning" | "neutral" | "outline";
+export type Tone =
+  | "success"
+  | "error"
+  | "info"
+  | "warning"
+  | "neutral"
+  | "outline";
 
 /** Tints for the states the badge has no variant for. With the base and
  * status-colors tokens the text keeps 4.5:1 or better on its own tint in both
@@ -22,7 +28,11 @@ const TONE_CLASS: Record<Tone, string> = {
  * repeats it, so the badge still reads without color. Map your own states
  * to tones where you render them, e.g. `failed` to `error`.
  */
-export function ToneBadge({ tone, className, ...props }: Omit<ComponentProps<typeof Badge>, "variant"> & { tone: Tone }) {
+export function ToneBadge({
+  tone,
+  className,
+  ...props
+}: Omit<ComponentProps<typeof Badge>, "variant"> & { tone: Tone }) {
   return (
     <Badge
       variant={tone === "outline" ? "outline" : "secondary"}

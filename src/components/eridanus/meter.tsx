@@ -31,7 +31,9 @@ export function Meter({
       className={cn("flex flex-col gap-1.5 text-sm", className)}
     >
       <div className="flex items-center justify-between gap-2">
-        <MeterPrimitive.Label className="text-muted-foreground">{label}</MeterPrimitive.Label>
+        <MeterPrimitive.Label className="text-muted-foreground">
+          {label}
+        </MeterPrimitive.Label>
         <span className="font-medium tabular-nums">{valueText}</span>
       </div>
       <MeterPrimitive.Track className="h-1.5 overflow-hidden rounded-full bg-muted">

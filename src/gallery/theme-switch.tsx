@@ -1,6 +1,9 @@
 import { DesktopIcon, MoonIcon, SunIcon } from "@phosphor-icons/react";
 
-import { useTheme, type ThemePreference } from "@/components/eridanus/theme-provider";
+import {
+  type ThemePreference,
+  useTheme,
+} from "@/components/eridanus/theme-provider";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 
 const OPTIONS = [
@@ -9,7 +12,8 @@ const OPTIONS = [
   { value: "dark", label: "深色", Icon: MoonIcon },
 ] as const;
 
-const isPreference = (value: unknown): value is ThemePreference => OPTIONS.some((o) => o.value === value);
+const isPreference = (value: unknown): value is ThemePreference =>
+  OPTIONS.some((o) => o.value === value);
 
 export function ThemeSwitch() {
   const { preference, setPreference } = useTheme();
@@ -26,7 +30,12 @@ export function ThemeSwitch() {
       }}
     >
       {OPTIONS.map(({ value, label, Icon }) => (
-        <ToggleGroupItem key={value} value={value} aria-label={label} title={label}>
+        <ToggleGroupItem
+          key={value}
+          value={value}
+          aria-label={label}
+          title={label}
+        >
           <Icon />
         </ToggleGroupItem>
       ))}
