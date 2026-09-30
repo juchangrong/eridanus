@@ -9,7 +9,17 @@ import { cn } from "@/lib/utils";
  * pager in view. `narrow` is for forms and settings, where full-width lines of
  * text stop being readable.
  */
-export function Page({ children, fill, narrow, className }: { children: ReactNode; fill?: boolean; narrow?: boolean; className?: string }) {
+export function Page({
+  children,
+  fill,
+  narrow,
+  className,
+}: {
+  children: ReactNode;
+  fill?: boolean;
+  narrow?: boolean;
+  className?: string;
+}) {
   return (
     <div
       className={cn(
@@ -40,7 +50,10 @@ export function PageHeader({
 }: {
   title: ReactNode;
   meta?: ReactNode;
-} & ({ hideTitle?: false; badges?: ReactNode; actions?: ReactNode } | { hideTitle: true; badges?: never; actions?: never })) {
+} & (
+  | { hideTitle?: false; badges?: ReactNode; actions?: ReactNode }
+  | { hideTitle: true; badges?: never; actions?: never }
+)) {
   if (hideTitle) {
     return (
       <>
@@ -54,12 +67,18 @@ export function PageHeader({
       {/* Keeps a readable width; narrower than that, the actions wrap under it. */}
       <div className="flex min-w-[min(100%,18rem)] flex-1 flex-col gap-1.5">
         <div className="flex min-w-0 flex-wrap items-center gap-x-3 gap-y-1.5">
-          <h1 className="min-w-0 font-heading text-xl font-medium tracking-tight text-balance [overflow-wrap:anywhere]">{title}</h1>
+          <h1 className="min-w-0 font-heading text-xl font-medium tracking-tight text-balance [overflow-wrap:anywhere]">
+            {title}
+          </h1>
           {badges}
         </div>
         {meta}
       </div>
-      {actions ? <div className="flex shrink-0 flex-wrap items-center gap-2">{actions}</div> : null}
+      {actions ? (
+        <div className="flex shrink-0 flex-wrap items-center gap-2">
+          {actions}
+        </div>
+      ) : null}
     </header>
   );
 }
@@ -88,9 +107,15 @@ export function Section({
       <div className="flex flex-wrap items-end justify-between gap-x-4 gap-y-2">
         <div className="flex min-w-0 flex-col gap-1">
           <h2 className="font-heading text-base font-medium">{title}</h2>
-          {description ? <p className="text-sm text-pretty text-muted-foreground">{description}</p> : null}
+          {description ? (
+            <p className="text-sm text-pretty text-muted-foreground">
+              {description}
+            </p>
+          ) : null}
         </div>
-        {actions ? <div className="flex shrink-0 items-center gap-2">{actions}</div> : null}
+        {actions ? (
+          <div className="flex shrink-0 items-center gap-2">{actions}</div>
+        ) : null}
       </div>
       {children}
     </section>
@@ -102,7 +127,13 @@ export function Section({
  * it, so a wrapped line starts on a fact. A fact too long for the line
  * truncates; give it a `title` so the full value stays one hover away.
  */
-export function FactLine({ children, className }: { children: ReactNode; className?: string }) {
+export function FactLine({
+  children,
+  className,
+}: {
+  children: ReactNode;
+  className?: string;
+}) {
   return (
     <p
       className={cn(
@@ -119,16 +150,39 @@ export function FactLine({ children, className }: { children: ReactNode; classNa
 
 /** Label over value for configuration facts, in two columns once there is
  * room. Values default to monospace, since they are usually machine text. */
-export function Facts({ items }: { items: { label: ReactNode; value: ReactNode; wide?: boolean; mono?: boolean }[] }) {
+export function Facts({
+  items,
+}: {
+  items: {
+    label: ReactNode;
+    value: ReactNode;
+    wide?: boolean;
+    mono?: boolean;
+  }[];
+}) {
   return (
     // Two columns once the list itself has 16rem, measured on its own box, so
     // a side column on a desktop behaves like a phone.
     <div className="@container">
       <dl className="grid grid-cols-1 gap-x-6 gap-y-4 @3xs:grid-cols-2">
         {items.map((item, i) => (
-          <div key={i} className={cn("flex min-w-0 flex-col gap-1", item.wide && "col-span-full")}>
+          <div
+            // biome-ignore lint/suspicious/noArrayIndexKey: items have no id and keep the caller's order
+            key={i}
+            className={cn(
+              "flex min-w-0 flex-col gap-1",
+              item.wide && "col-span-full",
+            )}
+          >
             <dt className="text-sm text-muted-foreground">{item.label}</dt>
-            <dd className={cn("m-0 min-w-0 [overflow-wrap:anywhere]", item.mono !== false && "font-mono text-[13px]")}>{item.value}</dd>
+            <dd
+              className={cn(
+                "m-0 min-w-0 [overflow-wrap:anywhere]",
+                item.mono !== false && "font-mono text-[13px]",
+              )}
+            >
+              {item.value}
+            </dd>
           </div>
         ))}
       </dl>
@@ -141,22 +195,36 @@ export function Facts({ items }: { items: { label: ReactNode; value: ReactNode; 
 export function StatStrip({
   items,
 }: {
-  items: { label: ReactNode; value: ReactNode; hint?: ReactNode; tone?: "danger" | "warning" }[];
+  items: {
+    label: ReactNode;
+    value: ReactNode;
+    hint?: ReactNode;
+    tone?: "danger" | "warning";
+  }[];
 }) {
   return (
     <dl className="m-0 grid shrink-0 grid-cols-[repeat(auto-fit,minmax(7rem,1fr))] gap-x-6 gap-y-4">
       {items.map((item, i) => (
+        // biome-ignore lint/suspicious/noArrayIndexKey: items have no id and keep the caller's order
         <div key={i} className="flex min-w-0 flex-col gap-1">
-          <dt className="truncate text-sm text-muted-foreground">{item.label}</dt>
+          <dt className="truncate text-sm text-muted-foreground">
+            {item.label}
+          </dt>
           <dd
             className={cn(
               "m-0 truncate font-heading text-2xl font-medium tracking-tight tabular-nums",
-              item.tone === "danger" ? "text-destructive" : item.tone === "warning" && "text-warning",
+              item.tone === "danger"
+                ? "text-destructive"
+                : item.tone === "warning" && "text-warning",
             )}
           >
             {item.value}
           </dd>
-          {item.hint ? <dd className="m-0 truncate text-xs text-muted-foreground">{item.hint}</dd> : null}
+          {item.hint ? (
+            <dd className="m-0 truncate text-xs text-muted-foreground">
+              {item.hint}
+            </dd>
+          ) : null}
         </div>
       ))}
     </dl>

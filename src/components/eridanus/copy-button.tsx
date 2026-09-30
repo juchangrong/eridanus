@@ -1,5 +1,5 @@
 import { CheckIcon, CopyIcon } from "@phosphor-icons/react";
-import { useEffect, useRef, useState, type ComponentProps } from "react";
+import { type ComponentProps, useEffect, useRef, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { copyText } from "@/lib/eridanus/clipboard";

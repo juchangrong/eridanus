@@ -20,13 +20,17 @@ export function toDate(value: TimeInput): Date | null {
 /** "YYYY-MM-DD" for the local calendar day. */
 export function localDay(value: TimeInput): string {
   const d = toDate(value);
-  return d ? `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}` : "";
+  return d
+    ? `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`
+    : "";
 }
 
 /** "YYYY-MM-DD HH:mm:ss" in local time. */
 export function timestamp(value: TimeInput): string {
   const d = toDate(value);
-  return d ? `${localDay(d)} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}` : "";
+  return d
+    ? `${localDay(d)} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`
+    : "";
 }
 
 /** "HH:mm:ss" in local time, for instants whose day is already on screen. */
@@ -52,7 +56,8 @@ export function relative(value: TimeInput, now: number = Date.now()): string {
   return `${Math.floor(s / 86_400)} 天${dir}`;
 }
 
-const dayNumber = (d: Date) => Math.floor((d.getTime() - d.getTimezoneOffset() * 60_000) / 86_400_000);
+const dayNumber = (d: Date) =>
+  Math.floor((d.getTime() - d.getTimezoneOffset() * 60_000) / 86_400_000);
 
 /**
  * An instant the way a person says it: relative within the hour ("12 分钟前"),
@@ -61,7 +66,10 @@ const dayNumber = (d: Date) => Math.floor((d.getTime() - d.getTimezoneOffset() *
  * clock and skips the relative form, for instants that need them, such as a
  * job's start and end.
  */
-export function friendly(value: TimeInput, options: { seconds?: boolean; now?: Date } = {}): string {
+export function friendly(
+  value: TimeInput,
+  options: { seconds?: boolean; now?: Date } = {},
+): string {
   const d = toDate(value);
   if (!d) return "";
   const now = options.now ?? new Date();
@@ -73,7 +81,8 @@ export function friendly(value: TimeInput, options: { seconds?: boolean; now?: D
   if (days === 0) return `今天 ${time}`;
   if (days === -1) return `昨天 ${time}`;
   if (days === 1) return `明天 ${time}`;
-  if (d.getFullYear() === now.getFullYear()) return `${d.getMonth() + 1}月${d.getDate()}日 ${time}`;
+  if (d.getFullYear() === now.getFullYear())
+    return `${d.getMonth() + 1}月${d.getDate()}日 ${time}`;
   return `${d.getFullYear()}年${d.getMonth() + 1}月${d.getDate()}日`;
 }
 
@@ -93,7 +102,9 @@ export function utcOffset(value: TimeInput): string {
  * millisecond with its offset, the same instant in UTC (what server logs
  * print), and how long ago it was.
  */
-export function exactTime(value: TimeInput): { local: string; utc: string; relative: string } | null {
+export function exactTime(
+  value: TimeInput,
+): { local: string; utc: string; relative: string } | null {
   const d = toDate(value);
   if (!d) return null;
   const iso = d.toISOString();

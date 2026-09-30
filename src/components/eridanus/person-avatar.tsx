@@ -23,7 +23,9 @@ export function PersonAvatar({
 }) {
   return (
     <Avatar size={size} aria-hidden className={className}>
-      {src ? <AvatarImage src={src} alt="" referrerPolicy="no-referrer" /> : null}
+      {src ? (
+        <AvatarImage src={src} alt="" referrerPolicy="no-referrer" />
+      ) : null}
       <AvatarFallback className="font-medium">{initials(name)}</AvatarFallback>
     </Avatar>
   );

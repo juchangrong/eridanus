@@ -1,6 +1,12 @@
-import { useMemo, type ReactNode } from "react";
+import { type ReactNode, useMemo } from "react";
 
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { cn } from "@/lib/utils";
 
 const ALL = "__all__";
@@ -29,15 +35,30 @@ export function FilterSelect({
   size?: "sm" | "default";
   className?: string;
 }) {
-  const items = useMemo(() => [{ value: ALL, label: allLabel }, ...options], [options, allLabel]);
+  const items = useMemo(
+    () => [{ value: ALL, label: allLabel }, ...options],
+    [options, allLabel],
+  );
   return (
-    <Select value={value || ALL} items={items} onValueChange={(next) => onChange(next === ALL || next == null ? "" : String(next))}>
-      <SelectTrigger size={size} aria-label={label} className={cn("min-w-32", className)}>
+    <Select
+      value={value || ALL}
+      items={items}
+      onValueChange={(next) =>
+        onChange(next === ALL || next == null ? "" : String(next))
+      }
+    >
+      <SelectTrigger
+        size={size}
+        aria-label={label}
+        className={cn("min-w-32", className)}
+      >
         <SelectValue>
           {(current: string) => (
             <span className="flex min-w-0 items-center gap-1.5">
               <span className="text-muted-foreground">{label}</span>
-              <span className="truncate">{items.find((i) => i.value === current)?.label ?? current}</span>
+              <span className="truncate">
+                {items.find((i) => i.value === current)?.label ?? current}
+              </span>
             </span>
           )}
         </SelectValue>

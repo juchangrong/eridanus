@@ -6,14 +6,8 @@
       "type": "registry:component",
       "title": "Time",
       "description": "Renders an instant as readable Chinese text (12 分钟前, 今天 14:05) inside a <time> element, with a tooltip giving the exact local time to the millisecond, the UTC time and the relative time; screen readers get the exact local time too. Props: value (Date | ISO string | epoch ms), clock (bare HH:mm:ss), seconds, placeholder, delay.",
-      "categories": [
-        "time",
-        "data-display"
-      ],
-      "registryDependencies": [
-        "tooltip",
-        "juchangrong/eridanus/format-time"
-      ],
+      "categories": ["time", "data-display"],
+      "registryDependencies": ["tooltip", "juchangrong/eridanus/format-time"],
       "files": [
         {
           "path": "time.tsx",
@@ -27,14 +21,8 @@
       "type": "registry:component",
       "title": "ToneBadge",
       "description": "Status badge with a tone: success, error, info, warning, neutral or outline. Tinted backgrounds keep the text at 4.5:1 or better in both themes; the word always states the status, so it never relies on color alone. Map domain states (failed, running, …) to tones at the call site.",
-      "categories": [
-        "status",
-        "data-display"
-      ],
-      "registryDependencies": [
-        "badge",
-        "juchangrong/eridanus/status-colors"
-      ],
+      "categories": ["status", "data-display"],
+      "registryDependencies": ["badge", "juchangrong/eridanus/status-colors"],
       "files": [
         {
           "path": "tone-badge.tsx",
@@ -48,16 +36,9 @@
       "type": "registry:component",
       "title": "Notice",
       "description": "Page-level notice built on Alert: tone error (announced as an alert), warning or neutral, with an optional title, description and one trailing action such as a retry button.",
-      "categories": [
-        "feedback"
-      ],
-      "dependencies": [
-        "@phosphor-icons/react"
-      ],
-      "registryDependencies": [
-        "alert",
-        "juchangrong/eridanus/status-colors"
-      ],
+      "categories": ["feedback"],
+      "dependencies": ["@phosphor-icons/react"],
+      "registryDependencies": ["alert", "juchangrong/eridanus/status-colors"],
       "files": [
         {
           "path": "notice.tsx",
@@ -71,12 +52,8 @@
       "type": "registry:component",
       "title": "EmptyState",
       "description": "Frameless empty, no-access or error panel built on Empty: icon, title, description and a contents slot for the way out. size=\"sm\" fits an empty table body or list.",
-      "categories": [
-        "feedback"
-      ],
-      "registryDependencies": [
-        "empty"
-      ],
+      "categories": ["feedback"],
+      "registryDependencies": ["empty"],
       "files": [
         {
           "path": "empty-state.tsx",
@@ -90,17 +67,9 @@
       "type": "registry:component",
       "title": "CopyButton",
       "description": "Icon-only copy button: copies text, cross-fades the copy icon to a check for 1.5 s and switches its accessible name to 已复制. Props: text, label (default 复制), copiedLabel, variant, size.",
-      "categories": [
-        "clipboard",
-        "actions"
-      ],
-      "dependencies": [
-        "@phosphor-icons/react"
-      ],
-      "registryDependencies": [
-        "button",
-        "juchangrong/eridanus/clipboard"
-      ],
+      "categories": ["clipboard", "actions"],
+      "dependencies": ["@phosphor-icons/react"],
+      "registryDependencies": ["button", "juchangrong/eridanus/clipboard"],
       "files": [
         {
           "path": "copy-button.tsx",
@@ -114,10 +83,7 @@
       "type": "registry:component",
       "title": "ThemeProvider",
       "description": "ThemeProvider and useTheme(): system, light or dark, remembered in localStorage (storageKey), applied as the dark class and data-theme on <html> with transitions suppressed during the switch. scoped removes both on unmount, for an app mounted inside a site with its own palette.",
-      "categories": [
-        "theme",
-        "setup"
-      ],
+      "categories": ["theme", "setup"],
       "files": [
         {
           "path": "theme-provider.tsx",
@@ -131,12 +97,8 @@
       "type": "registry:component",
       "title": "Meter",
       "description": "A labelled meter for a value against its ceiling, such as in-flight work against a cap: label and figures on one line, a thin track under them, role=meter with valueText as the spoken value.",
-      "categories": [
-        "data-display"
-      ],
-      "dependencies": [
-        "@base-ui/react"
-      ],
+      "categories": ["data-display"],
+      "dependencies": ["@base-ui/react"],
       "files": [
         {
           "path": "meter.tsx",
@@ -150,13 +112,8 @@
       "type": "registry:component",
       "title": "PersonAvatar",
       "description": "A person's picture, or up to two initials while it is missing or loading. Hidden from screen readers; render the name beside it.",
-      "categories": [
-        "data-display",
-        "people"
-      ],
-      "registryDependencies": [
-        "avatar"
-      ],
+      "categories": ["data-display", "people"],
+      "registryDependencies": ["avatar"],
       "files": [
         {
           "path": "person-avatar.tsx",
@@ -170,13 +127,8 @@
       "type": "registry:component",
       "title": "FormInput",
       "description": "A labelled text input with a hint and an error, both linked through aria-describedby, aria-invalid while there is an error, and a required marker. Accepts every input prop.",
-      "categories": [
-        "forms"
-      ],
-      "registryDependencies": [
-        "field",
-        "input"
-      ],
+      "categories": ["forms"],
+      "registryDependencies": ["field", "juchangrong/eridanus/input"],
       "files": [
         {
           "path": "form-input.tsx",
@@ -190,17 +142,9 @@
       "type": "registry:component",
       "title": "SearchField",
       "description": "A 28px toolbar search input with a magnifier and a clear button; Escape clears a non-empty field. label is the accessible name.",
-      "categories": [
-        "forms",
-        "search",
-        "toolbar"
-      ],
-      "dependencies": [
-        "@phosphor-icons/react"
-      ],
-      "registryDependencies": [
-        "input-group"
-      ],
+      "categories": ["forms", "search", "toolbar"],
+      "dependencies": ["@phosphor-icons/react"],
+      "registryDependencies": ["juchangrong/eridanus/input-group"],
       "files": [
         {
           "path": "search-field.tsx",
@@ -214,13 +158,8 @@
       "type": "registry:component",
       "title": "FilterSelect",
       "description": "A 28px select for filtering a list; the trigger reads \"<label> <choice>\" and the first option, allLabel (全部), means no filter (value \"\").",
-      "categories": [
-        "forms",
-        "toolbar"
-      ],
-      "registryDependencies": [
-        "select"
-      ],
+      "categories": ["forms", "toolbar"],
+      "registryDependencies": ["juchangrong/eridanus/select"],
       "files": [
         {
           "path": "filter-select.tsx",
@@ -234,17 +173,12 @@
       "type": "registry:component",
       "title": "Pager",
       "description": "Paging controls under a table: the range shown (第 1–50 条，共 173 条), an optional page-size select, first/previous/next/last buttons and a page field. Zero-based; folds back to the last page when the total shrinks. All text comes from the labels prop.",
-      "categories": [
-        "table",
-        "navigation"
-      ],
-      "dependencies": [
-        "@phosphor-icons/react"
-      ],
+      "categories": ["table", "navigation"],
+      "dependencies": ["@phosphor-icons/react"],
       "registryDependencies": [
         "button",
-        "input",
-        "select"
+        "juchangrong/eridanus/input",
+        "juchangrong/eridanus/select"
       ],
       "files": [
         {
@@ -259,10 +193,7 @@
       "type": "registry:component",
       "title": "Table kit",
       "description": "Helpers for open tables built on the shadcn table: TableScroll (scrolls both ways, no rules between body rows, pins the header), TableHeaderRow (compact muted pinned header), TableRows (loading, empty and rows states), ClickableRow (whole-row click forwarded to the row's first link or button, selected and warning/error tints) and clickFirstControl.",
-      "categories": [
-        "table",
-        "data-display"
-      ],
+      "categories": ["table", "data-display"],
       "registryDependencies": [
         "table",
         "juchangrong/eridanus/empty-state",
@@ -281,12 +212,8 @@
       "type": "registry:component",
       "title": "Page layout",
       "description": "Frameless page structure: Page (document or fill-height, optional narrow width), PageHeader (h1 with badges, actions and a meta line, or a screen-reader-only title), Section (heading over open content), FactLine (dot-separated facts), Facts (label over value) and StatStrip (headline figures, colored only when they need action).",
-      "categories": [
-        "layout"
-      ],
-      "registryDependencies": [
-        "juchangrong/eridanus/status-colors"
-      ],
+      "categories": ["layout"],
+      "registryDependencies": ["juchangrong/eridanus/status-colors"],
       "files": [
         {
           "path": "page-layout.tsx",
@@ -300,13 +227,8 @@
       "type": "registry:component",
       "title": "ConfirmDialog",
       "description": "An alert dialog for irreversible or outward-facing writes: title, description and a confirm button that repeats the verb. It stays open and cannot be dismissed while onConfirm runs, shows a rejection's message inside, and closes only on success.",
-      "categories": [
-        "feedback",
-        "forms"
-      ],
-      "dependencies": [
-        "@base-ui/react"
-      ],
+      "categories": ["feedback", "forms"],
+      "dependencies": ["@base-ui/react"],
       "registryDependencies": [
         "alert-dialog",
         "button",
@@ -326,16 +248,9 @@
       "type": "registry:component",
       "title": "AppToaster",
       "description": "AppToaster (a toast region with the region and close buttons named in Chinese) and notify(title, { description, type }) for success toasts that close after 4 s and error toasts that are announced at once and stay.",
-      "categories": [
-        "feedback"
-      ],
-      "dependencies": [
-        "@phosphor-icons/react"
-      ],
-      "registryDependencies": [
-        "toast",
-        "juchangrong/eridanus/status-colors"
-      ],
+      "categories": ["feedback"],
+      "dependencies": ["@phosphor-icons/react"],
+      "registryDependencies": ["toast", "juchangrong/eridanus/status-colors"],
       "files": [
         {
           "path": "toaster.tsx",

@@ -1,0 +1,36 @@
+/* Docs-only styles. Nothing here ships with a registry item. */
+
+:root {
+  --code: color-mix(in oklab, var(--muted) 60%, var(--background));
+}
+
+.dark {
+  --code: color-mix(in oklab, var(--muted) 45%, var(--background));
+}
+
+/* Shiki writes both themes' colors as variables; pick the one in effect. */
+.gallery-code pre {
+  margin: 0;
+  padding: 1rem;
+  overflow-x: auto;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  line-height: 1.6;
+  background: transparent;
+  tab-size: 2;
+}
+
+.gallery-code pre:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: -2px;
+}
+
+.gallery-code .shiki,
+.gallery-code .shiki span {
+  color: var(--shiki-light);
+}
+
+.dark .gallery-code .shiki,
+.dark .gallery-code .shiki span {
+  color: var(--shiki-dark);
+}

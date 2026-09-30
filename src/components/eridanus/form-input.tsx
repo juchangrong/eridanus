@@ -1,6 +1,11 @@
-import { useId, type ComponentProps, type ReactNode } from "react";
+import { type ComponentProps, type ReactNode, useId } from "react";
 
-import { Field, FieldDescription, FieldError, FieldLabel } from "@/components/ui/field";
+import {
+  Field,
+  FieldDescription,
+  FieldError,
+  FieldLabel,
+} from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 
 /**
@@ -25,12 +30,25 @@ export function FormInput({
 }) {
   const auto = useId();
   const inputId = id ?? auto;
-  const describedBy = [description ? `${inputId}-hint` : null, error ? `${inputId}-error` : null].filter(Boolean).join(" ");
+  const describedBy = [
+    description ? `${inputId}-hint` : null,
+    error ? `${inputId}-error` : null,
+  ]
+    .filter(Boolean)
+    .join(" ");
   return (
-    <Field data-invalid={error ? true : undefined} data-disabled={disabled || undefined} className="gap-2">
+    <Field
+      data-invalid={error ? true : undefined}
+      data-disabled={disabled || undefined}
+      className="gap-2"
+    >
       <FieldLabel htmlFor={inputId}>
         {label}
-        {required ? <span aria-hidden className="text-destructive">*</span> : null}
+        {required ? (
+          <span aria-hidden className="text-destructive">
+            *
+          </span>
+        ) : null}
       </FieldLabel>
       <Input
         id={inputId}
@@ -41,7 +59,11 @@ export function FormInput({
         aria-describedby={describedBy || undefined}
         {...props}
       />
-      {description ? <FieldDescription id={`${inputId}-hint`}>{description}</FieldDescription> : null}
+      {description ? (
+        <FieldDescription id={`${inputId}-hint`}>
+          {description}
+        </FieldDescription>
+      ) : null}
       {error ? <FieldError id={`${inputId}-error`}>{error}</FieldError> : null}
     </Field>
   );

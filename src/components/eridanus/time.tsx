@@ -1,7 +1,17 @@
 import type { ReactNode } from "react";
 
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
-import { clock, exactTime, friendly, toDate, type TimeInput } from "@/lib/eridanus/format-time";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import {
+  clock,
+  exactTime,
+  friendly,
+  type TimeInput,
+  toDate,
+} from "@/lib/eridanus/format-time";
 import { cn } from "@/lib/utils";
 
 /**
@@ -33,14 +43,24 @@ export function Time({
 }) {
   const date = toDate(value);
   const exact = exactTime(date);
-  if (!date || !exact) return <span className={cn("text-muted-foreground", className)}>{placeholder}</span>;
+  if (!date || !exact)
+    return (
+      <span className={cn("text-muted-foreground", className)}>
+        {placeholder}
+      </span>
+    );
   return (
     <Tooltip>
       <TooltipTrigger
         delay={delay}
         // relative: the containing block for the visually hidden text, which
         // is absolutely positioned and would otherwise stretch a scroll area.
-        render={<time dateTime={date.toISOString()} className={cn("relative whitespace-nowrap tabular-nums", className)} />}
+        render={
+          <time
+            dateTime={date.toISOString()}
+            className={cn("relative whitespace-nowrap tabular-nums", className)}
+          />
+        }
       >
         {bare ? clock(date) : friendly(date, { seconds })}
         <span className="sr-only">（{exact.local}）</span>

@@ -1,5 +1,5 @@
 import type { AlertDialog as AlertDialogPrimitive } from "@base-ui/react/alert-dialog";
-import { useState, type ReactNode } from "react";
+import { type ReactNode, useState } from "react";
 
 import { Notice } from "@/components/eridanus/notice";
 import {
@@ -75,12 +75,20 @@ export function ConfirmDialog({
           <AlertDialogTitle>{title}</AlertDialogTitle>
           <AlertDialogDescription>{description}</AlertDialogDescription>
         </AlertDialogHeader>
-        {error ? <Notice tone="error" description={`${failurePrefix}${error}`} /> : null}
+        {error ? (
+          <Notice tone="error" description={`${failurePrefix}${error}`} />
+        ) : null}
         <AlertDialogFooter>
           <AlertDialogCancel size="sm" disabled={pending}>
             {cancelLabel}
           </AlertDialogCancel>
-          <Button size="sm" variant={destructive ? "destructive" : "default"} disabled={pending} aria-busy={pending || undefined} onClick={() => void confirm()}>
+          <Button
+            size="sm"
+            variant={destructive ? "destructive" : "default"}
+            disabled={pending}
+            aria-busy={pending || undefined}
+            onClick={() => void confirm()}
+          >
             {pending ? <Spinner data-icon="inline-start" aria-hidden /> : null}
             {confirmLabel}
           </Button>

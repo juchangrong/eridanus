@@ -31,23 +31,25 @@ Two rules of GitHub registries shape the source:
 
 ```text
 registry.json                 root: name, homepage, the base items, include
-src/components/ui/            shadcn primitives, exactly as the CLI writes them
+src/components/ui/            shadcn primitives as the CLI writes them, and the four forks with their registry.json
 src/components/eridanus/      published components, with their registry.json
 src/lib/eridanus/             published helpers, with their registry.json
 src/hooks/eridanus/           published hooks, with their registry.json
 skills/                       published agent guidelines, with their registry.json
-src/gallery/                  the gallery: every item with its install command and a live demo
+src/gallery/                  the docs site: a page per item and per shadcn primitive, with live examples
 scripts/                      install smoke test and release helpers
 docs/                         this plan
 ```
 
-Each item is defined in the `registry.json` beside its files, and the root file includes them. The gallery reads the same files, so an item missing from the gallery is one missing from the registry.
+Each item is defined in the `registry.json` beside its files, and the root file includes them. The docs site in `src/gallery/` reads the same files, so an item missing from the docs is one missing from the registry. Each page shows the item's description, a live demo with its code, the CLI and manual install steps and further examples; the examples live one per file in `src/gallery/examples/<item>/`, and the file a reader sees in the code tab is the file that renders the preview.
 
-The repository is itself a shadcn project (Vite, React, Tailwind CSS v4, `components.json` on the `base-rhea` style). Published files live where a consumer's copy will live, and they import through the same aliases a consumer has (`@/components/ui/*`, `@/components/eridanus/*`, `@/lib/*`, `@/hooks/*`), which the CLI rewrites to each consumer's configured aliases. Item files set `target` with the `@components/`, `@lib/` and `@hooks/` placeholders, so every install lands in an `eridanus/` folder beside the consumer's own code.
+The repository is itself a shadcn project (Vite, React, Tailwind CSS v4, `components.json` on the `base-rhea` style). Published files live where a consumer's copy will live, and they import through the same aliases a consumer has (`@/components/ui/*`, `@/components/eridanus/*`, `@/lib/*`, `@/hooks/*`), which the CLI rewrites to each consumer's configured aliases. Item files set `target` with the `@components/`, `@lib/` and `@hooks/` placeholders, so every install lands in an `eridanus/` folder beside the consumer's own code. The forks are the exception: they are `registry:ui` items without a target, so they land in the consumer's ui alias in place of shadcn's files.
 
 ## Conventions
 
-- `src/components/ui/` stays exactly as the shadcn CLI writes it, so the primitives can be regenerated. Adjustments belong in Eridanus components or their `className` props.
+- `src/components/ui/` stays exactly as the shadcn CLI writes it, so the primitives can be regenerated, except the forks: `input`, `textarea`, `select` and `input-group`. Other adjustments belong in Eridanus components or their `className` props.
+- A fork keeps shadcn's API and formatting and changes only what Eridanus needs; a JSDoc on its main component says what (the CLI drops a file's leading comment, so the note sits there). The fork's changes are the focus and error style: no ring, a `muted-foreground` border on focus and a solid `destructive` border when invalid. When updating primitives, leave the forks out of `add --overwrite`, read `add <fork> --diff` against upstream, and merge by hand. Eridanus items depend on the forks by full address, `juchangrong/eridanus/input`, never the bare name.
+- Consumers get the forks with `init …/base`. A later `shadcn add` of an upstream item that depends on `input` asks before overwriting the fork, and the answer is no; `--overwrite` would replace it without asking.
 - Consumers do not edit installed Eridanus files; they wrap them. Upgrades are `add --diff` then `add --overwrite`.
 - User-visible text defaults to Chinese, because the first consumers are Chinese-language tools. Every visible string can be replaced through props.
 - Every item has a `title`, a `description` that says what it is for and what it needs, and `categories`. An item whose install needs a follow-up step says so in `docs`, which the CLI prints.
@@ -57,7 +59,8 @@ The repository is itself a shadcn project (Vite, React, Tailwind CSS v4, `compon
 
 | Item | Type | What it carries |
 |---|---|---|
-| `base` | base | `base-rhea` on zinc with Phosphor and Inter, JetBrains Mono for code, the status colors, `color-scheme` per theme, AA values for `muted-foreground` and `destructive` |
+| `base` | base | `base-rhea` on zinc with Phosphor and Inter, JetBrains Mono for code, the status colors, `color-scheme` per theme, the forked fields, AA values for `muted-foreground` and `destructive` |
+| `input`, `textarea`, `select`, `input-group` | ui | forks of shadcn's, installed in their place: no focus ring, a `muted-foreground` focus border and a solid `destructive` border when invalid |
 | `status-colors` | theme | `success`, `warning` and `info` tokens for projects that keep another base |
 | `format-time` | lib | readable times in Chinese (`刚刚`, `今天 14:05`) and the exact local, UTC and relative forms |
 | `clipboard` | lib | copy text with a fallback for pages without the async clipboard |
@@ -84,7 +87,7 @@ The repository is itself a shadcn project (Vite, React, Tailwind CSS v4, `compon
 
 Every push runs:
 
-1. `tsc` and ESLint over the whole repository.
+1. `tsc` and Biome's linter over the whole repository.
 2. `shadcn registry validate`: the schemas, the includes and every referenced file.
 3. The gallery build, which renders every published component.
 4. The install smoke test: `shadcn build` the items, point their Eridanus dependencies at the built files, create a fresh Vite app, `init` it from the built `base`, `add` every item, then type-check and build that app. This catches missing dependencies and import paths that only break after the CLI rewrites them.

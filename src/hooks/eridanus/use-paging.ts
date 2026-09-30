@@ -19,7 +19,10 @@ export interface Paging {
  * because page 4 of one filter is not page 4 of another and an out-of-range
  * page reads as "nothing here". Filters are compared by their JSON form.
  */
-export function usePaging(filters: readonly unknown[], initialSize = 50): Paging {
+export function usePaging(
+  filters: readonly unknown[],
+  initialSize = 50,
+): Paging {
   const key = JSON.stringify(filters);
   const [pageSize, setPageSize] = useState(initialSize);
   const [at, setAt] = useState({ key, page: 0 });
