@@ -1,0 +1,42 @@
+{
+  "$schema": "./node_modules/@biomejs/biome/configuration_schema.json",
+  // .gitignore already covers dist and .smoke, the throwaway app the install
+  // test builds.
+  "vcs": {
+    "enabled": true,
+    "clientKind": "git",
+    "useIgnoreFile": true,
+    "defaultBranch": "main"
+  },
+  "files": {
+    // components/ui and hooks/use-mobile.ts are the shadcn CLI's output and
+    // stay as written. .claude holds local tool settings.
+    "includes": [
+      "**",
+      "!src/components/ui",
+      "!src/hooks/use-mobile.ts",
+      "!.claude"
+    ]
+  },
+  "formatter": { "enabled": false },
+  "assist": { "enabled": false },
+  "css": {
+    "parser": { "tailwindDirectives": true }
+  },
+  "linter": {
+    "enabled": true,
+    "domains": { "react": "recommended" },
+    "rules": {
+      "preset": "recommended",
+      "style": {
+        // noUncheckedIndexedAccess makes `!` the way to say an index exists.
+        "noNonNullAssertion": "off"
+      },
+      "suspicious": {
+        // Fact lists and stat strips render caller-ordered items that have
+        // no id of their own.
+        "noArrayIndexKey": "off"
+      }
+    }
+  }
+}

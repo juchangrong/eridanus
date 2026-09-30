@@ -84,7 +84,7 @@ The repository is itself a shadcn project (Vite, React, Tailwind CSS v4, `compon
 
 Every push runs:
 
-1. `tsc` and ESLint over the whole repository.
+1. `tsc` and Biome's linter over the whole repository.
 2. `shadcn registry validate`: the schemas, the includes and every referenced file.
 3. The gallery build, which renders every published component.
 4. The install smoke test: `shadcn build` the items, point their Eridanus dependencies at the built files, create a fresh Vite app, `init` it from the built `base`, `add` every item, then type-check and build that app. This catches missing dependencies and import paths that only break after the CLI rewrites them.
