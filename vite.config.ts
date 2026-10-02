@@ -10,6 +10,6 @@ export default defineConfig({
   },
   // The docs import every example, and the source text the code tabs and
   // manual install steps show, up front so switching pages never waits; only
-  // Shiki loads on demand, in chunks of its own.
+  // gpu-lexer loads on demand, in a chunk of its own.
   build: { chunkSizeWarningLimit: 1200 },
 });

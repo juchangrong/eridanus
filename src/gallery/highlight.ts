@@ -1,63 +1,33 @@
 import { useEffect, useState } from "react";
-import type { HighlighterCore } from "shiki/core";
 
-export type Lang = "tsx" | "bash" | "css" | "markdown" | "json";
+type SyntaxSpan = Awaited<ReturnType<typeof import("gpu-lexer").parse>>[number];
 
-let highlighter: Promise<HighlighterCore> | undefined;
+let lexer: Promise<typeof import("gpu-lexer").parse> | undefined;
 
-/** Shiki with only the grammars the docs use and the JavaScript regex engine,
- * loaded on first use so the first paint does not wait for it. */
+/** gpu-lexer, loaded on first use so the first paint does not wait for it.
+ * One model covers every language, so there is nothing to pick per block. */
 function load() {
-  highlighter ??= Promise.all([
-    import("shiki/core"),
-    import("shiki/engine/javascript"),
-  ]).then(([{ createHighlighterCore }, { createJavaScriptRegexEngine }]) =>
-    createHighlighterCore({
-      themes: [
-        import("shiki/themes/github-light-default.mjs"),
-        import("shiki/themes/github-dark-default.mjs"),
-      ],
-      langs: [
-        import("shiki/langs/tsx.mjs"),
-        import("shiki/langs/bash.mjs"),
-        import("shiki/langs/css.mjs"),
-        import("shiki/langs/markdown.mjs"),
-        import("shiki/langs/json.mjs"),
-      ],
-      engine: createJavaScriptRegexEngine(),
-    }),
-  );
-  return highlighter;
+  lexer ??= import("gpu-lexer").then((m) => m.parse);
+  return lexer;
 }
 
-/** Highlighted HTML for both themes at once (colors in --shiki-light and
- * --shiki-dark), or undefined until the highlighter has loaded. */
-export function useHighlighted(code: string, lang: Lang): string | undefined {
-  const [html, setHtml] = useState<{
-    code: string;
-    lang: Lang;
-    html: string;
-  }>();
+/** Syntax spans for `code`, or undefined until they are ready. Stays
+ * undefined where WebGPU is unavailable, so the code shows as plain text. */
+export function useHighlighted(code: string): SyntaxSpan[] | undefined {
+  const [result, setResult] = useState<{ code: string; spans: SyntaxSpan[] }>();
   useEffect(() => {
     let live = true;
-    load().then((h) => {
-      if (!live) return;
-      setHtml({
-        code,
-        lang,
-        html: h.codeToHtml(code, {
-          lang,
-          themes: {
-            light: "github-light-default",
-            dark: "github-dark-default",
-          },
-          defaultColor: false,
-        }),
-      });
-    });
+    load()
+      .then((parse) => parse(code))
+      .then(
+        (spans) => {
+          if (live) setResult({ code, spans });
+        },
+        () => {},
+      );
     return () => {
       live = false;
     };
-  }, [code, lang]);
-  return html?.code === code && html.lang === lang ? html.html : undefined;
+  }, [code]);
+  return result?.code === code ? result.spans : undefined;
 }

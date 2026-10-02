@@ -4,18 +4,27 @@ import { CopyButton } from "@/components/eridanus/copy-button";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
-import { type Lang, useHighlighted } from "../highlight";
+import { useHighlighted } from "../highlight";
 
-/** Plain text until Shiki has loaded, so the code is readable at once. */
-export function Highlighted({ code, lang }: { code: string; lang: Lang }) {
-  const html = useHighlighted(code, lang);
-  return html ? (
-    // biome-ignore lint/security/noDangerouslySetInnerHtml: Shiki escapes the code it highlights
-    <div className="gallery-code" dangerouslySetInnerHTML={{ __html: html }} />
-  ) : (
+/** Plain text until gpu-lexer has labeled it, so the code is readable at once. */
+export function Highlighted({ code }: { code: string }) {
+  const spans = useHighlighted(code);
+  return (
     <div className="gallery-code">
       <pre>
-        <code>{code}</code>
+        <code>
+          {spans
+            ? spans.map((s) =>
+                s.type === "plain" ? (
+                  code.slice(s.start, s.end)
+                ) : (
+                  <span key={s.start} className={`tok-${s.type}`}>
+                    {code.slice(s.start, s.end)}
+                  </span>
+                ),
+              )
+            : code}
+        </code>
       </pre>
     </div>
   );
@@ -25,13 +34,11 @@ export function Highlighted({ code, lang }: { code: string; lang: Lang }) {
  * start collapsed with a button to show the rest. */
 export function CodeBlock({
   code,
-  lang = "tsx",
   title,
   collapsible = false,
   className,
 }: {
   code: string;
-  lang?: Lang;
   title?: string;
   collapsible?: boolean;
   className?: string;
@@ -69,7 +76,7 @@ export function CodeBlock({
             : "max-h-[32rem] overflow-y-auto",
         )}
       >
-        <Highlighted code={code} lang={lang} />
+        <Highlighted code={code} />
       </div>
       {long ? (
         <div
