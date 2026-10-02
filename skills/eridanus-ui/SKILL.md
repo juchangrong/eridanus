@@ -16,7 +16,7 @@ Installed files live in `components/eridanus/`, `lib/eridanus/` and `hooks/erida
 ## Rules
 
 1. **Open layout.** Sections, tables and figures sit on the page ground, separated by space, headings and padding. Do not wrap page content in cards or bordered boxes, and do not draw rules between table or list rows. Cards are for self-contained panels such as a sidebar status box.
-2. **Exact on demand.** Show times with `Time` (readable on the surface, exact in the tooltip and for screen readers). A shortened ID, name or value keeps its full form one hover away (`title` or a tooltip).
+2. **Exact on demand.** Show times with `Time` (readable on the surface, exact in the tooltip and for screen readers). A shortened ID, name or value keeps its full form one hover away: `IdText` for identifiers, `title` or a tooltip otherwise.
 3. **Status never relies on color alone.** Use `ToneBadge` with the status word. Color marks only what needs action: failures (`error`, `text-destructive`), backlog or stale work (`warning`, `text-warning`). Everything else stays neutral.
 4. **Contrast.** Text keeps 4.5:1 in both themes. Use the tokens (`text-muted-foreground`, `text-success`, `bg-warning/10`, …), never raw palette colors, and check any new tint.
 5. **One control height.** Buttons use `size="sm"` (28px); `SearchField`, `FilterSelect` and the `Pager` match it. The default (near-black) button variant marks the single main action of a page, form or dialog; other actions use `secondary`, destructive ones `destructive`, inline and icon controls `ghost`.
@@ -33,9 +33,14 @@ Installed files live in `components/eridanus/`, `lib/eridanus/` and `hooks/erida
 | Time as text | `format-time` | `friendly()`, `exactTime()`, `clock()`, `relative()` |
 | Status | `tone-badge` | `<ToneBadge tone="error">failed</ToneBadge>` |
 | Page frame | `page-layout` | `Page`, `PageHeader`, `Section`, `FactLine`, `Facts`, `StatStrip` |
+| Long IDs | `id-text` | `<IdText value={id} copy />`, shortened in the middle |
 | Tables | `table-kit` | `TableScroll` › `Table` › `TableHeaderRow` + `TableBody` › `TableRows` / `ClickableRow` |
+| Sorting | `table-sort` | `SortableHead` in the header row; `formatSort(sort)` for the API |
+| Bulk actions | `table-selection` | `useRowSelection(ids, [filters])`, `SelectAllHead`, `SelectCell`, `SelectionBar` |
 | Paging | `pager`, `use-paging` | `usePaging([filters])` feeds `<Pager {...paging} total={n} />` |
-| Filters | `search-field`, `filter-select`, `use-debounced-value` | debounce the search value before querying |
+| Filters | `search-field`, `filter-select`, `multi-filter`, `use-debounced-value` | debounce the search value before querying |
+| Time filter | `time-range-picker`, `time-range` | `resolveTimeRange(range)` for the query's from/to |
+| Filters in the URL | `use-url-state` | `useUrlState("q")`, `useUrlListState("status")`, so views reload and share |
 | Nothing to show | `empty-state` | also for no-access and failed pages |
 | Notices | `notice` | `tone="error"` for failed reads with a retry `action` |
 | Forms | `form-input` | label, hint and error wired for screen readers |

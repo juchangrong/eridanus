@@ -5,7 +5,7 @@
       "name": "time",
       "type": "registry:component",
       "title": "Time",
-      "description": "Renders an instant as readable Chinese text (12 分钟前, 今天 14:05) inside a <time> element, with a tooltip giving the exact local time to the millisecond, the UTC time and the relative time; screen readers get the exact local time too. Props: value (Date | ISO string | epoch ms), clock (bare HH:mm:ss), seconds, placeholder, delay.",
+      "description": "Renders an instant as readable Chinese text (12 分钟前, 今天 14:05) inside a <time> element, with a tooltip giving the exact local time to the millisecond, the UTC time and the relative time; screen readers get the exact local time too. Within the hour the relative form (12 分钟前) keeps itself current on one shared timer. Props: value (Date | ISO string | epoch ms), clock (bare HH:mm:ss), seconds, placeholder, delay.",
       "categories": ["time", "data-display"],
       "registryDependencies": ["tooltip", "juchangrong/eridanus/format-time"],
       "files": [
@@ -256,6 +256,95 @@
           "path": "toaster.tsx",
           "type": "registry:component",
           "target": "@components/eridanus/toaster.tsx"
+        }
+      ]
+    },
+    {
+      "name": "id-text",
+      "type": "registry:component",
+      "title": "IdText",
+      "description": "A long identifier shortened in the middle (run_8f3a2c…c91e), monospace, with the full value in a tooltip and for screen readers, and an optional copy button. Props: value, head, tail, copy, copyLabel.",
+      "categories": ["data-display"],
+      "registryDependencies": ["tooltip", "juchangrong/eridanus/copy-button"],
+      "files": [
+        {
+          "path": "id-text.tsx",
+          "type": "registry:component",
+          "target": "@components/eridanus/id-text.tsx"
+        }
+      ]
+    },
+    {
+      "name": "multi-filter",
+      "type": "registry:component",
+      "title": "MultiFilter",
+      "description": "Toolbar filter that takes several values (状态 failed, running): a 28px trigger naming what it filters with up to two chosen labels or a count, and a menu of checkbox items, with optional per-value counts, that stays open while values are toggled and ends with a clear item. Value is a string array; [] means no filter. Pairs with useUrlListState.",
+      "categories": ["filter", "form"],
+      "dependencies": ["@phosphor-icons/react"],
+      "registryDependencies": ["badge", "button", "dropdown-menu"],
+      "files": [
+        {
+          "path": "multi-filter.tsx",
+          "type": "registry:component",
+          "target": "@components/eridanus/multi-filter.tsx"
+        }
+      ]
+    },
+    {
+      "name": "time-range-picker",
+      "type": "registry:component",
+      "title": "TimeRangePicker",
+      "description": "Time filter for log, run and metrics pages: trailing presets (最近 15 分钟 … 最近 30 天) that apply on one click, and a Chinese calendar for a span of whole days, applied with a button; future days are disabled. Value is a time-range TimeRange; store it in the URL with formatTimeRange/parseTimeRange.",
+      "categories": ["filter", "time"],
+      "dependencies": ["@phosphor-icons/react", "react-day-picker"],
+      "registryDependencies": [
+        "button",
+        "calendar",
+        "popover",
+        "juchangrong/eridanus/format-time",
+        "juchangrong/eridanus/time-range"
+      ],
+      "files": [
+        {
+          "path": "time-range-picker.tsx",
+          "type": "registry:component",
+          "target": "@components/eridanus/time-range-picker.tsx"
+        }
+      ]
+    },
+    {
+      "name": "table-sort",
+      "type": "registry:component",
+      "title": "TableSort",
+      "description": "Sortable column headers for table-kit tables: SortableHead (a button in the header cell, with aria-sort) cycles a column through its first direction, the reverse and the table's own order. SortState with formatSort/parseSort (sort=-createdAt) for URLs and queries. Sorting the rows stays with their owner, usually the server.",
+      "categories": ["table"],
+      "dependencies": ["@phosphor-icons/react"],
+      "registryDependencies": ["table"],
+      "files": [
+        {
+          "path": "table-sort.tsx",
+          "type": "registry:component",
+          "target": "@components/eridanus/table-sort.tsx"
+        }
+      ]
+    },
+    {
+      "name": "table-selection",
+      "type": "registry:component",
+      "title": "TableSelection",
+      "description": "Row selection and bulk actions for table-kit tables: useRowSelection(visibleIds, filters) keeps selected ids across pages and clears them when a filter changes; SelectAllHead (with a mixed state), SelectCell and SelectionBar (count, bulk actions, clear; shown in place of the toolbar while rows are selected) render it.",
+      "categories": ["table"],
+      "registryDependencies": [
+        "button",
+        "checkbox",
+        "table",
+        "juchangrong/eridanus/table-kit"
+      ],
+      "files": [
+        {
+          "path": "table-selection.tsx",
+          "type": "registry:component",
+          "target": "@components/eridanus/table-selection.tsx"
         }
       ]
     }

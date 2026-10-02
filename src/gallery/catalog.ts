@@ -69,7 +69,14 @@ const GROUPS = [
   },
   {
     title: "展示",
-    names: ["time", "tone-badge", "person-avatar", "meter", "copy-button"],
+    names: [
+      "time",
+      "tone-badge",
+      "id-text",
+      "person-avatar",
+      "meter",
+      "copy-button",
+    ],
   },
   {
     title: "反馈",
@@ -81,12 +88,34 @@ const GROUPS = [
   },
   {
     title: "表单与筛选",
-    names: ["form-input", "search-field", "filter-select"],
+    names: [
+      "form-input",
+      "search-field",
+      "filter-select",
+      "multi-filter",
+      "time-range-picker",
+    ],
   },
-  { title: "表格与页面", names: ["table-kit", "pager", "page-layout"] },
+  {
+    title: "表格与页面",
+    names: [
+      "table-kit",
+      "table-sort",
+      "table-selection",
+      "pager",
+      "page-layout",
+    ],
+  },
   {
     title: "函数与 Hook",
-    names: ["format-time", "clipboard", "use-debounced-value", "use-paging"],
+    names: [
+      "format-time",
+      "time-range",
+      "clipboard",
+      "use-debounced-value",
+      "use-paging",
+      "use-url-state",
+    ],
   },
 ];
 const OTHER = "其他";

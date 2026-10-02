@@ -28,6 +28,20 @@
           "target": "@hooks/eridanus/use-paging.ts"
         }
       ]
+    },
+    {
+      "name": "use-url-state",
+      "type": "registry:hook",
+      "title": "useUrlState",
+      "description": "useUrlState(key, fallback = \"\") keeps a string in the address bar's query, so filters, sort and paging survive a reload and can be shared as a link; useUrlListState(key) does the same for a comma-separated list. Writes replace the history entry, the fallback is left out of the URL, and every hook on the same key stays in sync. For apps whose router owns the query, use the router's API instead.",
+      "categories": ["hooks", "filter", "url"],
+      "files": [
+        {
+          "path": "use-url-state.ts",
+          "type": "registry:hook",
+          "target": "@hooks/eridanus/use-url-state.ts"
+        }
+      ]
     }
   ]
 }

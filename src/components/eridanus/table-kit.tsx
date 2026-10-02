@@ -116,16 +116,20 @@ export function TableRows<T>({
 /**
  * The mouse shortcut on a row that opens something. The row's first link or
  * button is the real control for keyboards and screen readers, and a click
- * anywhere else on the row goes to it. A click on a control of its own, a
- * click that ends a text selection, and a click React bubbles up from a
- * portal (a menu opened from the row) are left alone.
+ * anywhere else on the row goes to it. A click on a control of its own (a
+ * link, a button, a field, or a Base UI checkbox or switch, which are not
+ * buttons), a click that ends a text selection, and a click React bubbles up
+ * from a portal (a menu opened from the row) are left alone.
  */
 export function clickFirstControl(e: MouseEvent<HTMLElement>) {
   if (!e.currentTarget.contains(e.target as Node)) return;
-  if ((e.target as HTMLElement).closest("a, button")) return;
+  if ((e.target as HTMLElement).closest(CONTROLS)) return;
   if (window.getSelection()?.toString()) return;
   e.currentTarget.querySelector<HTMLElement>("a[href], button")?.click();
 }
+
+const CONTROLS =
+  "a, button, input, select, textarea, label, [role=checkbox], [role=switch], [role=radio], [contenteditable]";
 
 const ROW_TONE = {
   error: "bg-destructive/5 hover:bg-destructive/10",

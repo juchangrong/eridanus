@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import { type ReactNode, useSyncExternalStore } from "react";
 
 import {
   Tooltip,
@@ -9,6 +9,7 @@ import {
   clock,
   exactTime,
   friendly,
+  isRelative,
   type TimeInput,
   toDate,
 } from "@/lib/eridanus/format-time";
@@ -23,6 +24,10 @@ import { cn } from "@/lib/utils";
  *
  * `clock` shows a bare "HH:mm:ss" for instants whose day is already on screen,
  * and `seconds` keeps the seconds on the readable form.
+ *
+ * Within the hour the readable form is relative ("12 分钟前") and keeps
+ * itself current: one shared one-second timer runs while any such Time is
+ * mounted, and a Time renders again only when its text changes.
  */
 export function Time({
   value,
@@ -42,6 +47,14 @@ export function Time({
   className?: string;
 }) {
   const date = toDate(value);
+  const label = () =>
+    !date ? "" : bare ? clock(date) : friendly(date, { seconds });
+  const live = !bare && isRelative(date, { seconds });
+  const text = useSyncExternalStore(
+    live ? subscribeTick : subscribeNever,
+    label,
+    label,
+  );
   const exact = exactTime(date);
   if (!date || !exact)
     return (
@@ -62,7 +75,7 @@ export function Time({
           />
         }
       >
-        {bare ? clock(date) : friendly(date, { seconds })}
+        {text}
         <span className="sr-only">（{exact.local}）</span>
       </TooltipTrigger>
       <TooltipContent>
@@ -75,3 +88,23 @@ export function Time({
     </Tooltip>
   );
 }
+
+const ticks = new Set<() => void>();
+let timer: number | undefined;
+
+/** One timer for every live Time on the page, running only while one is. */
+function subscribeTick(onTick: () => void) {
+  ticks.add(onTick);
+  timer ??= window.setInterval(() => {
+    for (const tick of ticks) tick();
+  }, 1000);
+  return () => {
+    ticks.delete(onTick);
+    if (ticks.size === 0) {
+      window.clearInterval(timer);
+      timer = undefined;
+    }
+  };
+}
+
+const subscribeNever = () => () => {};

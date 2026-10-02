@@ -80,6 +80,11 @@ The repository is itself a shadcn project (Vite, React, Tailwind CSS v4, `compon
 | `table-kit` | component | open tables: scroll area, pinned header row, loading and empty rows, clickable rows |
 | `page-layout` | component | page container, header, section, fact lists and stat strip |
 | `toaster` | component | toast region with Chinese labels and a `notify` helper |
+| `id-text` | component | long identifiers shortened in the middle, full value on hover and for screen readers, optional copy |
+| `multi-filter` | component | toolbar filter for several values, with per-value counts |
+| `time-range-picker`, `time-range` | component, lib | trailing presets and whole-day spans, with a short text form for URLs |
+| `table-sort`, `table-selection` | component | sortable headers with aria-sort; row selection across pages with a bulk-action bar |
+| `use-url-state` | hook | filters, sort and paging kept in the address bar's query |
 | `app-shell` | block | sidebar, top bar, breadcrumb slot and account menu with the theme choice |
 | `ui-guidelines` | file | a Claude Code skill with the design rules and the item catalog |
 
