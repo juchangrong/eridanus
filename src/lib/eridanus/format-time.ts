@@ -73,9 +73,7 @@ export function friendly(
   const d = toDate(value);
   if (!d) return "";
   const now = options.now ?? new Date();
-  if (!options.seconds && Math.abs(now.getTime() - d.getTime()) < 3_600_000) {
-    return relative(d, now.getTime());
-  }
+  if (isRelative(d, { ...options, now })) return relative(d, now.getTime());
   const time = `${pad(d.getHours())}:${pad(d.getMinutes())}${options.seconds ? `:${pad(d.getSeconds())}` : ""}`;
   const days = dayNumber(d) - dayNumber(now);
   if (days === 0) return `今天 ${time}`;
@@ -84,6 +82,21 @@ export function friendly(
   if (d.getFullYear() === now.getFullYear())
     return `${d.getMonth() + 1}月${d.getDate()}日 ${time}`;
   return `${d.getFullYear()}年${d.getMonth() + 1}月${d.getDate()}日`;
+}
+
+/**
+ * Whether friendly() shows the instant in its relative form ("12 分钟前"),
+ * which changes as time passes: within the hour, unless `seconds` is set.
+ */
+export function isRelative(
+  value: TimeInput,
+  options: { seconds?: boolean; now?: Date } = {},
+): boolean {
+  const d = toDate(value);
+  const now = options.now ?? new Date();
+  return (
+    !!d && !options.seconds && Math.abs(now.getTime() - d.getTime()) < 3_600_000
+  );
 }
 
 /** "UTC+8", "UTC-3:30" or "UTC" for the local offset at an instant. */

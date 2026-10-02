@@ -28,6 +28,20 @@
           "target": "@lib/eridanus/clipboard.ts"
         }
       ]
+    },
+    {
+      "name": "time-range",
+      "type": "registry:lib",
+      "title": "time-range",
+      "description": "Time ranges for filtering logs, runs and metrics: { last: \"1h\" } for a trailing range that moves with the clock, or { from, to } for whole local days (both included). formatTimeRange()/parseTimeRange() give the short text form for URLs (\"1h\", \"2026-09-28..2026-10-01\"), resolveTimeRange() the instants to query (from inclusive, to exclusive), describeTimeRange() the Chinese label (最近 1 小时), and TIME_RANGE_PRESETS the usual choices.",
+      "categories": ["time", "filter"],
+      "files": [
+        {
+          "path": "time-range.ts",
+          "type": "registry:lib",
+          "target": "@lib/eridanus/time-range.ts"
+        }
+      ]
     }
   ]
 }
