@@ -85,7 +85,7 @@ export function CommandBlock({ run, add }: { run?: string; add?: string[] }) {
       </div>
       {MANAGERS.map((m) => (
         <TabsContent key={m} value={m}>
-          <Highlighted code={command(m)} lang="bash" />
+          <Highlighted code={command(m)} />
         </TabsContent>
       ))}
     </Tabs>
@@ -167,7 +167,7 @@ export function Installation({ entry }: { entry: DocEntry }) {
           ) : null}
           {entry.cssVars ? (
             <Step title="把这些变量加进全局 CSS">
-              <CodeBlock code={cssOf(entry.cssVars)} lang="css" collapsible />
+              <CodeBlock code={cssOf(entry.cssVars)} collapsible />
             </Step>
           ) : null}
           {entry.files.map((file) => (
@@ -181,7 +181,6 @@ export function Installation({ entry }: { entry: DocEntry }) {
             >
               <CodeBlock
                 code={file.source.trim()}
-                lang={file.path.endsWith(".md") ? "markdown" : "tsx"}
                 title={file.target}
                 collapsible
               />

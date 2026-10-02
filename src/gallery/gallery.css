@@ -8,7 +8,6 @@
   --code: color-mix(in oklab, var(--muted) 45%, var(--background));
 }
 
-/* Shiki writes both themes' colors as variables; pick the one in effect. */
 .gallery-code pre {
   margin: 0;
   padding: 1rem;
@@ -25,12 +24,48 @@
   outline-offset: -2px;
 }
 
-.gallery-code .shiki,
-.gallery-code .shiki span {
-  color: var(--shiki-light);
+/* gpu-lexer labels each span with one of nine classes; these are the GitHub
+ * default colors for them. Plain text and operators keep the inherited
+ * foreground: the model labels every brace and comma an operator, and coloring
+ * them all buries the code. */
+.gallery-code {
+  --tok-comment: #59636e;
+  --tok-string: #0a3069;
+  --tok-number: #0550ae;
+  --tok-constant: #0550ae;
+  --tok-keyword: #cf222e;
+  --tok-type: #953800;
+  --tok-function: #8250df;
 }
 
-.dark .gallery-code .shiki,
-.dark .gallery-code .shiki span {
-  color: var(--shiki-dark);
+.dark .gallery-code {
+  --tok-comment: #9198a1;
+  --tok-string: #a5d6ff;
+  --tok-number: #79c0ff;
+  --tok-constant: #79c0ff;
+  --tok-keyword: #ff7b72;
+  --tok-type: #ffa657;
+  --tok-function: #d2a8ff;
+}
+
+.tok-comment {
+  color: var(--tok-comment);
+}
+.tok-string {
+  color: var(--tok-string);
+}
+.tok-number {
+  color: var(--tok-number);
+}
+.tok-constant {
+  color: var(--tok-constant);
+}
+.tok-keyword {
+  color: var(--tok-keyword);
+}
+.tok-type {
+  color: var(--tok-type);
+}
+.tok-function {
+  color: var(--tok-function);
 }
