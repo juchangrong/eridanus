@@ -114,7 +114,27 @@ const PRIMITIVES: Record<string, { title: string; description: string }> = {
     title: "Button",
     description: "触发操作的按钮，提供多种强调程度和尺寸。",
   },
+  calendar: {
+    title: "Calendar",
+    description: "选择单个日期或日期范围的日历，基于 react-day-picker。",
+  },
   card: { title: "Card", description: "带标题、正文和操作区的内容容器。" },
+  checkbox: {
+    title: "Checkbox",
+    description: "勾选或取消一个选项，也用于表格行的多选。",
+  },
+  combobox: {
+    title: "Combobox",
+    description: "可输入搜索的下拉选择，支持单选和多选标签。",
+  },
+  command: {
+    title: "Command",
+    description: "可搜索的命令列表，放进对话框即是 ⌘K 命令面板。",
+  },
+  dialog: {
+    title: "Dialog",
+    description: "覆盖在页面上的模态窗口，用于不离开当前页的表单或详情。",
+  },
   "dropdown-menu": {
     title: "Dropdown Menu",
     description: "点击触发的操作菜单，可包含分组、快捷键和勾选项。",
@@ -129,6 +149,14 @@ const PRIMITIVES: Record<string, { title: string; description: string }> = {
       "表单字段的结构：标签、控件、说明和错误信息，并为读屏器关联好。",
   },
   label: { title: "Label", description: "表单控件的可点击标签。" },
+  popover: {
+    title: "Popover",
+    description: "点击触发、锚定在控件旁的浮层，可以放交互内容。",
+  },
+  "radio-group": {
+    title: "Radio Group",
+    description: "一组互斥选项，同一时间只能选中一个。",
+  },
   separator: {
     title: "Separator",
     description: "在视觉或语义上分隔内容的分割线。",
@@ -139,6 +167,10 @@ const PRIMITIVES: Record<string, { title: string; description: string }> = {
   },
   skeleton: { title: "Skeleton", description: "内容加载时的占位骨架。" },
   spinner: { title: "Spinner", description: "表示正在进行中的加载指示器。" },
+  switch: {
+    title: "Switch",
+    description: "立即生效的开关，用于启用或停用一项设置。",
+  },
   table: { title: "Table", description: "展示结构化数据的表格。" },
   tabs: { title: "Tabs", description: "在同一区域内切换多个相关视图。" },
   toast: { title: "Toast", description: "操作完成后短暂出现的通知。" },
