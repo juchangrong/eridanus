@@ -32,6 +32,7 @@ Installed files live in `components/eridanus/`, `lib/eridanus/` and `hooks/erida
 | Time on screen | `time` | `<Time value={iso} />`, `clock` for HH:mm:ss, `seconds` |
 | Time as text | `format-time` | `friendly()`, `exactTime()`, `clock()`, `relative()` |
 | Status | `tone-badge` | `<ToneBadge tone="error">failed</ToneBadge>` |
+| App frame | `app-shell` | `<AppShell brand nav account breadcrumb renderLink={(href) => <Link to={href} />}>`; inside `ThemeProvider` |
 | Page frame | `page-layout` | `Page`, `PageHeader`, `Section`, `FactLine`, `Facts`, `StatStrip` |
 | Long IDs | `id-text` | `<IdText value={id} copy />`, shortened in the middle |
 | Tables | `table-kit` | `TableScroll` › `Table` › `TableHeaderRow` + `TableBody` › `TableRows` / `ClickableRow` |
@@ -53,6 +54,24 @@ Installed files live in `components/eridanus/`, `lib/eridanus/` and `hooks/erida
 | Theme | `theme-provider` | `ThemeProvider`, `useTheme()`; the `dark` class on `<html>` |
 
 ## Patterns
+
+The app frame, once at the root; each route renders its `Page` as the children:
+
+```tsx
+<ThemeProvider>
+  <AppToaster>
+    <AppShell
+      brand={{ name: "运营台", logo: <PlanetIcon weight="fill" /> }}
+      nav={[{ items: [{ label: "运行记录", href: "/runs", icon: <ListChecksIcon />, active: path.startsWith("/runs") }] }]}
+      account={{ name: user.name, email: user.email, onSignOut: signOut }}
+      breadcrumb={<Breadcrumb>…</Breadcrumb>}
+      renderLink={(href) => <Link to={href} />}
+    >
+      <Outlet />
+    </AppShell>
+  </AppToaster>
+</ThemeProvider>
+```
 
 A list page:
 

@@ -347,6 +347,30 @@
           "target": "@components/eridanus/table-selection.tsx"
         }
       ]
+    },
+    {
+      "name": "app-shell",
+      "type": "registry:block",
+      "title": "AppShell",
+      "description": "The frame of a console app: a sidebar with the product, grouped navigation (icon, label, badge, current page) and an account menu with the system/light/dark theme choice and sign-out, and a top bar with the sidebar toggle, a breadcrumb slot and page-wide actions. Collapses to icons with tooltips on desktop (⌘B or the rail) and remembers it; opens as a sheet under 768px. The content area scrolls by itself, so Page fill gets an exact height. Needs a ThemeProvider above it; renderLink plugs in the router's links.",
+      "categories": ["layout", "navigation"],
+      "dependencies": ["@phosphor-icons/react"],
+      "registryDependencies": [
+        "button",
+        "dropdown-menu",
+        "separator",
+        "sidebar",
+        "juchangrong/eridanus/person-avatar",
+        "juchangrong/eridanus/theme-provider"
+      ],
+      "docs": "AppShell reads the theme from ThemeProvider: wrap the app in <ThemeProvider> (and <TooltipProvider> for the collapsed sidebar's tooltips). shadcn's sidebar depends on input; if the CLI asks to overwrite components/ui/input.tsx, answer no to keep the Eridanus fork.",
+      "files": [
+        {
+          "path": "app-shell.tsx",
+          "type": "registry:component",
+          "target": "@components/eridanus/app-shell.tsx"
+        }
+      ]
     }
   ]
 }

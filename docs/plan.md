@@ -108,7 +108,7 @@ Releases are git tags `vX.Y.Z` with a `CHANGELOG.md` entry. Consumers pin with `
 0. **Foundation** (done). Repository, this plan, the Vite project initialised with `shadcn init --base base --preset beqC918K`, lint and type-check scripts, CI. Done when the gallery builds and CI is green.
 1. **Base and first items** (done). `base`, `status-colors`, `format-time`, `clipboard`, `time`, `tone-badge`, `notice`, `empty-state`, `copy-button`, and the smoke test. Done when `init` from `base` in a fresh Vite app matches a `--preset beqC918K` project plus the status colors, and `add time` compiles there.
 2. **Remaining components** (done). Hooks, `theme-provider`, `confirm-dialog`, `form-input`, `search-field`, `filter-select`, `pager`, `table-kit`, `page-layout`, `person-avatar`, `meter`, `toaster`, `ui-guidelines`. Done when every item installs and builds in the smoke test and the gallery shows each one.
-3. **Shell and release.** `app-shell`, the release script that pins dependencies, `v0.1.0`.
+3. **Shell and release.** `app-shell` (done), the release script that pins dependencies, `v0.1.0`.
 4. **Adoption.** First consumers, and a scheduled job that diffs the shadcn primitives against upstream.
 
 ## Open questions

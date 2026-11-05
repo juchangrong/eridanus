@@ -99,6 +99,7 @@ const GROUPS = [
   {
     title: "表格与页面",
     names: [
+      "app-shell",
       "table-kit",
       "table-sort",
       "table-selection",
@@ -122,7 +123,7 @@ const OTHER = "其他";
 export const PRIMITIVES_GROUP = "shadcn 原语";
 
 /** The shadcn primitives with a page. sidebar is left out: it only makes
- * sense as a whole app frame, which app-shell will show. input, textarea,
+ * sense as a whole app frame, which app-shell shows. input, textarea,
  * select and input-group are Eridanus forks, listed with the Eridanus items. */
 const PRIMITIVES: Record<string, { title: string; description: string }> = {
   "alert-dialog": {

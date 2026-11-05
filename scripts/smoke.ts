@@ -29,11 +29,16 @@ const out = join(root, ".smoke", "r");
 const app = join(root, ".smoke", "app");
 const shadcn = join(root, "node_modules", ".bin", "shadcn");
 
-function run(cmd: string, args: string[], cwd: string) {
+/** `answers` is typed into the command's prompts, one per line. */
+function run(cmd: string, args: string[], cwd: string, answers?: string[]) {
   console.log(
     `\n$ ${cmd === shadcn ? "shadcn" : cmd} ${args.map((a) => (a.startsWith(root) ? relative(cwd, a) || "." : a)).join(" ")}`,
   );
-  execFileSync(cmd, args, { cwd, stdio: ["ignore", "inherit", "inherit"] });
+  execFileSync(cmd, args, {
+    cwd,
+    stdio: [answers ? "pipe" : "ignore", "inherit", "inherit"],
+    input: answers ? `${answers.join("\n")}\n` : undefined,
+  });
 }
 
 function write(path: string, content: string) {
@@ -156,7 +161,15 @@ run(shadcn, ["init", join(out, "base.json"), "--yes"], app);
 const rest = catalog.items
   .filter((i) => i.type !== "registry:base")
   .map((i) => join(out, `${i.name}.json`));
-run(shadcn, ["add", ...rest, "--yes"], app);
+// An upstream item that depends on a forked primitive (sidebar on input)
+// makes the CLI ask before overwriting the fork. Consumers answer no, and so
+// does the test; the fork check below proves the forks survived.
+run(
+  shadcn,
+  ["add", ...rest, "--yes"],
+  app,
+  Array.from({ length: 10 }, () => "n"),
+);
 
 // 4. The promises the base makes, then a full type-check and build.
 const failures: string[] = [];
