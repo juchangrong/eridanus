@@ -50,6 +50,14 @@ import {
 } from "@/components/ui/sidebar";
 import { cn } from "@/lib/utils";
 
+/** The product name and mark at the top of the sidebar, a link home. */
+export interface AppBrand {
+  name: string;
+  logo?: ReactNode;
+  /** Where the mark links; defaults to "/". */
+  href?: string;
+}
+
 export interface AppNavItem {
   label: string;
   href: string;
@@ -140,8 +148,7 @@ export function AppShell({
   className,
   children,
 }: {
-  /** The product name and mark at the top of the sidebar, usually a link home. */
-  brand: { name: string; logo?: ReactNode; href?: string };
+  brand: AppBrand;
   nav: AppNavGroup[];
   account?: AppAccount;
   /** A Breadcrumb for the current page. */
@@ -248,6 +255,7 @@ export function AppShell({
  * following a link closes it. */
 function NavButton({
   link,
+  onClick,
   ...props
 }: Omit<ComponentProps<typeof SidebarMenuButton>, "render"> & {
   link: ReactElement;
@@ -257,7 +265,10 @@ function NavButton({
     <SidebarMenuButton
       {...props}
       render={link}
-      onClick={() => setOpenMobile(false)}
+      onClick={(event) => {
+        onClick?.(event);
+        setOpenMobile(false);
+      }}
     />
   );
 }
@@ -280,9 +291,9 @@ function ToggleButton({ label }: { label: string }) {
 }
 
 const THEME_OPTIONS = [
-  { value: "system", label: "system", Icon: DesktopIcon },
-  { value: "light", label: "light", Icon: SunIcon },
-  { value: "dark", label: "dark", Icon: MoonIcon },
+  { value: "system", Icon: DesktopIcon },
+  { value: "light", Icon: SunIcon },
+  { value: "dark", Icon: MoonIcon },
 ] as const;
 
 const isPreference = (value: unknown): value is ThemePreference =>
@@ -352,10 +363,10 @@ function AccountMenu({
                   if (isPreference(next)) setPreference(next);
                 }}
               >
-                {THEME_OPTIONS.map(({ value, label, Icon }) => (
+                {THEME_OPTIONS.map(({ value, Icon }) => (
                   <DropdownMenuRadioItem key={value} value={value}>
                     <Icon />
-                    {labels[label]}
+                    {labels[value]}
                   </DropdownMenuRadioItem>
                 ))}
               </DropdownMenuRadioGroup>

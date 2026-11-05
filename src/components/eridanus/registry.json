@@ -363,7 +363,7 @@
         "juchangrong/eridanus/person-avatar",
         "juchangrong/eridanus/theme-provider"
       ],
-      "docs": "AppShell reads the theme from ThemeProvider: wrap the app in <ThemeProvider> (and <TooltipProvider> for the collapsed sidebar's tooltips). shadcn's sidebar depends on input; if the CLI asks to overwrite components/ui/input.tsx, answer no to keep the Eridanus fork.",
+      "docs": "AppShell reads the theme from ThemeProvider: wrap the app in <ThemeProvider>. shadcn's sidebar depends on input; if the CLI asks to overwrite components/ui/input.tsx, answer no to keep the Eridanus fork.",
       "files": [
         {
           "path": "app-shell.tsx",

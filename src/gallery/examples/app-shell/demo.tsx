@@ -36,17 +36,10 @@ export default function AppShellDemo() {
   // In an app the router knows the current page; here a click sets it.
   const [current, setCurrent] = useState("/runs");
   const page = PAGES.find((p) => p.href === current)!;
+  const items = PAGES.map((p) => ({ ...p, active: p.href === current }));
   const nav: AppNavGroup[] = [
-    {
-      items: PAGES.slice(0, 3).map((p) => ({
-        ...p,
-        active: p.href === current,
-      })),
-    },
-    {
-      title: "管理",
-      items: PAGES.slice(3).map((p) => ({ ...p, active: p.href === current })),
-    },
+    { items: items.slice(0, 3) },
+    { title: "管理", items: items.slice(3) },
   ];
 
   return (

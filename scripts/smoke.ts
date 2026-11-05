@@ -16,6 +16,7 @@ import { execFileSync } from "node:child_process";
 import {
   existsSync,
   mkdirSync,
+  readdirSync,
   readFileSync,
   rmSync,
   writeFileSync,
@@ -163,12 +164,14 @@ const rest = catalog.items
   .map((i) => join(out, `${i.name}.json`));
 // An upstream item that depends on a forked primitive (sidebar on input)
 // makes the CLI ask before overwriting the fork. Consumers answer no, and so
-// does the test; the fork check below proves the forks survived.
+// does the test; the fork check below proves the forks survived. Only a file
+// that already exists can prompt, so one answer per file in src is enough.
+const existing = readdirSync(join(app, "src"), { recursive: true }).length;
 run(
   shadcn,
   ["add", ...rest, "--yes"],
   app,
-  Array.from({ length: 10 }, () => "n"),
+  Array.from({ length: existing }, () => "n"),
 );
 
 // 4. The promises the base makes, then a full type-check and build.
