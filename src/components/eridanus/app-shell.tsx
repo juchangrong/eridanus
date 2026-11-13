@@ -8,6 +8,8 @@ import {
 } from "@phosphor-icons/react";
 import {
   type ComponentProps,
+  cloneElement,
+  isValidElement,
   type ReactElement,
   type ReactNode,
   useState,
@@ -61,8 +63,9 @@ export interface AppBrand {
 export interface AppNavItem {
   label: string;
   href: string;
-  /** A Phosphor icon element, such as <ListChecksIcon />. Collapsed to icons,
-   * the sidebar shows only this, with the label in a tooltip. */
+  /** A Phosphor icon element, such as <ListChecksIcon />, in its outline
+   * weight; the current page's icon switches to the fill weight. Collapsed to
+   * icons, the sidebar shows only this, with the label in a tooltip. */
   icon?: ReactNode;
   /** The current page. The consumer's router decides; the shell marks it
    * with aria-current. */
@@ -116,6 +119,13 @@ function storedOpen(): boolean | undefined {
   if (typeof document === "undefined") return undefined;
   const value = document.cookie.match(/(?:^|;\s*)sidebar_state=(true|false)/);
   return value ? value[1] === "true" : undefined;
+}
+
+/** The fill weight of a Phosphor icon element, which marks the current page. */
+function filled(icon: ReactNode): ReactNode {
+  return isValidElement<{ weight?: string }>(icon)
+    ? cloneElement(icon, { weight: "fill" })
+    : icon;
 }
 
 // A render element: the menu button supplies its children.
@@ -179,7 +189,10 @@ export function AppShell({
                 link={renderLink(brand.href ?? "/")}
               >
                 {brand.logo ? (
-                  <span className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-primary text-primary-foreground [&_svg]:size-4">
+                  // Concentric with the button (rounded-xl): its radius less
+                  // the 8px inset, and the same radius once collapsed leaves
+                  // no inset.
+                  <span className="flex size-8 shrink-0 items-center justify-center rounded-[calc(var(--radius)*1.4-0.5rem)] bg-primary text-primary-foreground group-data-[collapsible=icon]:rounded-xl [&_svg]:size-4">
                     {brand.logo}
                   </span>
                 ) : null}
@@ -204,7 +217,7 @@ export function AppShell({
                         tooltip={item.label}
                         link={renderLink(item.href)}
                       >
-                        {item.icon}
+                        {item.active ? filled(item.icon) : item.icon}
                         <span>{item.label}</span>
                       </NavButton>
                       {item.badge != null ? (
