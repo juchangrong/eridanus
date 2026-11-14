@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 import { useHighlighted } from "../highlight";
+import { useT } from "../i18n";
 
 /** Plain text until gpu-lexer has labeled it, so the code is readable at once. */
 export function Highlighted({ code }: { code: string }) {
@@ -43,6 +44,7 @@ export function CodeBlock({
   collapsible?: boolean;
   className?: string;
 }) {
+  const t = useT();
   const long = collapsible && code.split("\n").length > 16;
   const [open, setOpen] = useState(false);
   const collapsed = long && !open;
@@ -58,14 +60,14 @@ export function CodeBlock({
           <span className="min-w-0 flex-1 truncate">{title}</span>
           <CopyButton
             text={code}
-            label="复制代码"
+            label={t("复制代码", "Copy code")}
             className="hover:bg-background dark:hover:bg-background/60"
           />
         </figcaption>
       ) : (
         <CopyButton
           text={code}
-          label="复制代码"
+          label={t("复制代码", "Copy code")}
           className="absolute top-2 right-2 z-10 bg-(--code) hover:bg-background dark:hover:bg-background/60"
         />
       )}
@@ -92,7 +94,7 @@ export function CodeBlock({
             onClick={() => setOpen(!open)}
             aria-expanded={open}
           >
-            {open ? "收起" : "展开全部代码"}
+            {open ? t("收起", "Collapse") : t("展开全部代码", "Show all code")}
           </Button>
         </div>
       ) : null}

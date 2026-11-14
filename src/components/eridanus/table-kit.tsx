@@ -1,8 +1,15 @@
 import type { MouseEvent, ReactNode } from "react";
 
 import { EmptyState } from "@/components/eridanus/empty-state";
+import { useMessages } from "@/components/eridanus/locale-provider";
 import { TableCell, TableHeader, TableRow } from "@/components/ui/table";
+import type { Locale } from "@/lib/eridanus/locale";
 import { cn } from "@/lib/utils";
+
+const MESSAGES: Record<Locale, { loading: string }> = {
+  "zh-CN": { loading: "加载中…" },
+  "en-US": { loading: "Loading…" },
+};
 
 /**
  * The area a table scrolls in, open on the page rather than in a card. It
@@ -78,7 +85,7 @@ export function TableRows<T>({
   pending,
   rows,
   empty,
-  loadingLabel = "加载中…",
+  loadingLabel,
   children,
 }: {
   /** The number of columns, so the loading and empty rows span the table. */
@@ -89,6 +96,7 @@ export function TableRows<T>({
   loadingLabel?: ReactNode;
   children: (row: T, index: number) => ReactNode;
 }) {
+  const t = useMessages(MESSAGES);
   if (pending) {
     return (
       <TableRow className="hover:bg-transparent">
@@ -96,7 +104,7 @@ export function TableRows<T>({
           colSpan={colSpan}
           className="py-10 text-center text-muted-foreground"
         >
-          {loadingLabel}
+          {loadingLabel ?? t.loading}
         </TableCell>
       </TableRow>
     );

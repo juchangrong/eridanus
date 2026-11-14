@@ -3,12 +3,15 @@
  * files the CLI reads, so the docs list exactly what can be installed; the
  * shadcn primitives are the files in components/ui, the look `base` gives.
  */
+
+import type { Locale } from "@/lib/eridanus/locale";
 import root from "../../registry.json";
 import skills from "../../skills/registry.json";
 import components from "../components/eridanus/registry.json";
 import forks from "../components/ui/registry.json";
 import hooks from "../hooks/eridanus/registry.json";
 import lib from "../lib/eridanus/registry.json";
+import type { Localized } from "./i18n";
 
 export const REPOSITORY = "juchangrong/eridanus";
 
@@ -35,11 +38,12 @@ export interface DocEntry {
   name: string;
   kind: "eridanus" | "primitive";
   title: string;
-  /** Registry descriptions are English and mark code with backticks. */
-  description: string;
-  lang: "en" | "zh-CN";
+  /** Registry descriptions are English only and mark code with backticks;
+   * the primitives have both languages. */
+  description: Partial<Localized> & { "en-US": string };
   /** registry:component and the like, without the prefix. */
   type: string;
+  /** The id of the group the entry is listed under. */
   group: string;
   install: string;
   dependencies: string[];
@@ -61,14 +65,22 @@ const SOURCES = import.meta.glob<string>(
   { eager: true, query: "?raw", import: "default" },
 );
 
-/** Sidebar and page order. An Eridanus item not listed here shows under 其他. */
-const GROUPS = [
+/** Sidebar and page order. An Eridanus item not listed here shows under Other. */
+const GROUPS: { id: string; title: Localized; names: string[] }[] = [
   {
-    title: "起步",
-    names: ["base", "status-colors", "theme-provider", "ui-guidelines"],
+    id: "start",
+    title: { "zh-CN": "起步", "en-US": "Get started" },
+    names: [
+      "base",
+      "status-colors",
+      "theme-provider",
+      "locale-provider",
+      "ui-guidelines",
+    ],
   },
   {
-    title: "展示",
+    id: "display",
+    title: { "zh-CN": "展示", "en-US": "Display" },
     names: [
       "time",
       "tone-badge",
@@ -79,15 +91,31 @@ const GROUPS = [
     ],
   },
   {
-    title: "反馈",
+    id: "feedback",
+    title: { "zh-CN": "反馈", "en-US": "Feedback" },
     names: ["notice", "empty-state", "toaster", "confirm-dialog"],
   },
   {
-    title: "输入控件",
-    names: ["input", "textarea", "select", "input-group"],
+    id: "inputs",
+    title: { "zh-CN": "基础控件", "en-US": "Controls" },
+    names: [
+      "input",
+      "textarea",
+      "select",
+      "input-group",
+      "combobox",
+      "dropdown-menu",
+      "command",
+      "button",
+      "toggle",
+      "toggle-group",
+      "tabs",
+      "badge",
+    ],
   },
   {
-    title: "表单与筛选",
+    id: "forms",
+    title: { "zh-CN": "表单与筛选", "en-US": "Forms and filters" },
     names: [
       "form-input",
       "search-field",
@@ -97,7 +125,8 @@ const GROUPS = [
     ],
   },
   {
-    title: "表格与页面",
+    id: "tables",
+    title: { "zh-CN": "表格与页面", "en-US": "Tables and pages" },
     names: [
       "app-shell",
       "table-kit",
@@ -108,10 +137,12 @@ const GROUPS = [
     ],
   },
   {
-    title: "函数与 Hook",
+    id: "functions",
+    title: { "zh-CN": "函数与 Hook", "en-US": "Functions and hooks" },
     names: [
       "format-time",
       "time-range",
+      "locale",
       "clipboard",
       "use-debounced-value",
       "use-paging",
@@ -119,97 +150,176 @@ const GROUPS = [
     ],
   },
 ];
-const OTHER = "其他";
-export const PRIMITIVES_GROUP = "shadcn 原语";
+const OTHER = { id: "other", title: { "zh-CN": "其他", "en-US": "Other" } };
+const PRIMITIVES = {
+  id: "primitives",
+  title: { "zh-CN": "shadcn 原语", "en-US": "shadcn primitives" },
+};
 
 /** The shadcn primitives with a page. sidebar is left out: it only makes
  * sense as a whole app frame, which app-shell shows. input, textarea,
- * select and input-group are Eridanus forks, listed with the Eridanus items. */
-const PRIMITIVES: Record<string, { title: string; description: string }> = {
+ * select, input-group and the other forks are listed with the Eridanus items. */
+const PRIMITIVE_PAGES: Record<
+  string,
+  { title: string; description: Localized }
+> = {
   "alert-dialog": {
     title: "Alert Dialog",
-    description: "打断当前操作、要求用户明确确认的模态对话框。",
+    description: {
+      "zh-CN": "打断当前操作、要求用户明确确认的模态对话框。",
+      "en-US":
+        "A modal dialog that interrupts the task and asks for an explicit confirmation.",
+    },
   },
   alert: {
     title: "Alert",
-    description: "页面内的提示条，用于说明状态或需要注意的信息。",
+    description: {
+      "zh-CN": "页面内的提示条，用于说明状态或需要注意的信息。",
+      "en-US":
+        "An inline banner for a status or something that needs attention.",
+    },
   },
-  avatar: { title: "Avatar", description: "头像图片，加载失败时显示缩写。" },
-  badge: { title: "Badge", description: "短标签，用于标记状态、类别或数量。" },
+  avatar: {
+    title: "Avatar",
+    description: {
+      "zh-CN": "头像图片，加载失败时显示缩写。",
+      "en-US":
+        "A profile picture that falls back to initials when it fails to load.",
+    },
+  },
   breadcrumb: {
     title: "Breadcrumb",
-    description: "显示当前页面在层级中的位置，并提供返回上级的链接。",
-  },
-  button: {
-    title: "Button",
-    description: "触发操作的按钮，提供多种强调程度和尺寸。",
+    description: {
+      "zh-CN": "显示当前页面在层级中的位置，并提供返回上级的链接。",
+      "en-US":
+        "Shows where the page sits in the hierarchy, with links back up.",
+    },
   },
   calendar: {
     title: "Calendar",
-    description: "选择单个日期或日期范围的日历，基于 react-day-picker。",
+    description: {
+      "zh-CN": "选择单个日期或日期范围的日历，基于 react-day-picker。",
+      "en-US": "Picks one date or a range of dates; built on react-day-picker.",
+    },
   },
-  card: { title: "Card", description: "带标题、正文和操作区的内容容器。" },
+  card: {
+    title: "Card",
+    description: {
+      "zh-CN": "带标题、正文和操作区的内容容器。",
+      "en-US": "A container with a title, body and an action area.",
+    },
+  },
   checkbox: {
     title: "Checkbox",
-    description: "勾选或取消一个选项，也用于表格行的多选。",
-  },
-  combobox: {
-    title: "Combobox",
-    description: "可输入搜索的下拉选择，支持单选和多选标签。",
-  },
-  command: {
-    title: "Command",
-    description: "可搜索的命令列表，放进对话框即是 ⌘K 命令面板。",
+    description: {
+      "zh-CN": "勾选或取消一个选项，也用于表格行的多选。",
+      "en-US": "Turns one option on or off; also selects table rows.",
+    },
   },
   dialog: {
     title: "Dialog",
-    description: "覆盖在页面上的模态窗口，用于不离开当前页的表单或详情。",
-  },
-  "dropdown-menu": {
-    title: "Dropdown Menu",
-    description: "点击触发的操作菜单，可包含分组、快捷键和勾选项。",
+    description: {
+      "zh-CN": "覆盖在页面上的模态窗口，用于不离开当前页的表单或详情。",
+      "en-US":
+        "A modal window over the page, for a form or details without leaving it.",
+    },
   },
   empty: {
     title: "Empty",
-    description: "没有内容时的占位区域：图标、标题、说明和下一步操作。",
+    description: {
+      "zh-CN": "没有内容时的占位区域：图标、标题、说明和下一步操作。",
+      "en-US":
+        "The placeholder for no content: an icon, a title, a description and a next step.",
+    },
   },
   field: {
     title: "Field",
-    description:
-      "表单字段的结构：标签、控件、说明和错误信息，并为读屏器关联好。",
+    description: {
+      "zh-CN": "表单字段的结构：标签、控件、说明和错误信息，并为读屏器关联好。",
+      "en-US":
+        "The structure of a form field: label, control, description and error, wired for screen readers.",
+    },
   },
-  label: { title: "Label", description: "表单控件的可点击标签。" },
+  label: {
+    title: "Label",
+    description: {
+      "zh-CN": "表单控件的可点击标签。",
+      "en-US": "A clickable label for a form control.",
+    },
+  },
   popover: {
     title: "Popover",
-    description: "点击触发、锚定在控件旁的浮层，可以放交互内容。",
+    description: {
+      "zh-CN": "点击触发、锚定在控件旁的浮层，可以放交互内容。",
+      "en-US":
+        "A floating panel anchored to a control, opened by a click; it can hold interactive content.",
+    },
   },
   "radio-group": {
     title: "Radio Group",
-    description: "一组互斥选项，同一时间只能选中一个。",
+    description: {
+      "zh-CN": "一组互斥选项，同一时间只能选中一个。",
+      "en-US": "A set of mutually exclusive options; only one can be chosen.",
+    },
   },
   separator: {
     title: "Separator",
-    description: "在视觉或语义上分隔内容的分割线。",
+    description: {
+      "zh-CN": "在视觉或语义上分隔内容的分割线。",
+      "en-US": "A line that separates content visually or semantically.",
+    },
   },
   sheet: {
     title: "Sheet",
-    description: "从屏幕边缘滑出的面板，用于补充内容或次要表单。",
+    description: {
+      "zh-CN": "从屏幕边缘滑出的面板，用于补充内容或次要表单。",
+      "en-US":
+        "A panel that slides in from the edge of the screen, for extra content or a secondary form.",
+    },
   },
-  skeleton: { title: "Skeleton", description: "内容加载时的占位骨架。" },
-  spinner: { title: "Spinner", description: "表示正在进行中的加载指示器。" },
+  skeleton: {
+    title: "Skeleton",
+    description: {
+      "zh-CN": "内容加载时的占位骨架。",
+      "en-US": "A placeholder shape while content loads.",
+    },
+  },
+  spinner: {
+    title: "Spinner",
+    description: {
+      "zh-CN": "表示正在进行中的加载指示器。",
+      "en-US": "A loading indicator for work in progress.",
+    },
+  },
   switch: {
     title: "Switch",
-    description: "立即生效的开关，用于启用或停用一项设置。",
+    description: {
+      "zh-CN": "立即生效的开关，用于启用或停用一项设置。",
+      "en-US":
+        "A toggle that takes effect at once, for turning a setting on or off.",
+    },
   },
-  table: { title: "Table", description: "展示结构化数据的表格。" },
-  tabs: { title: "Tabs", description: "在同一区域内切换多个相关视图。" },
-  toast: { title: "Toast", description: "操作完成后短暂出现的通知。" },
-  "toggle-group": {
-    title: "Toggle Group",
-    description: "一组可单选或多选的切换按钮。",
+  table: {
+    title: "Table",
+    description: {
+      "zh-CN": "展示结构化数据的表格。",
+      "en-US": "Displays structured data in rows and columns.",
+    },
   },
-  toggle: { title: "Toggle", description: "有按下和未按下两种状态的按钮。" },
-  tooltip: { title: "Tooltip", description: "悬停或聚焦时显示的简短说明。" },
+  toast: {
+    title: "Toast",
+    description: {
+      "zh-CN": "操作完成后短暂出现的通知。",
+      "en-US": "A brief notification after an action finishes.",
+    },
+  },
+  tooltip: {
+    title: "Tooltip",
+    description: {
+      "zh-CN": "悬停或聚焦时显示的简短说明。",
+      "en-US": "A short hint shown on hover or focus.",
+    },
+  },
 };
 
 function eridanusEntries(): DocEntry[] {
@@ -222,7 +332,7 @@ function eridanusEntries(): DocEntry[] {
     { dir: "skills/", items: skills.items },
   ];
   const groupOf = new Map(
-    GROUPS.flatMap((g) => g.names.map((name) => [name, g.title])),
+    GROUPS.flatMap((g) => g.names.map((name) => [name, g.id])),
   );
   return registries.flatMap(({ dir, items }) =>
     (items as RegistryItem[]).map((item) => {
@@ -244,10 +354,9 @@ function eridanusEntries(): DocEntry[] {
         name: item.name,
         kind: "eridanus",
         title: item.title ?? item.name,
-        description: item.description ?? "",
-        lang: "en",
+        description: { "en-US": item.description ?? "" },
         type: item.type.replace(/^registry:/, ""),
-        group: groupOf.get(item.name) ?? OTHER,
+        group: groupOf.get(item.name) ?? OTHER.id,
         install:
           item.type === "registry:base"
             ? `shadcn@latest init ${REPOSITORY}/${item.name}`
@@ -284,7 +393,7 @@ function importsOf(source: string) {
 }
 
 function primitiveEntries(): DocEntry[] {
-  return Object.entries(PRIMITIVES)
+  return Object.entries(PRIMITIVE_PAGES)
     .sort(([a], [b]) => a.localeCompare(b))
     .map(([name, { title, description }]) => {
       const path = `src/components/ui/${name}.tsx`;
@@ -295,9 +404,8 @@ function primitiveEntries(): DocEntry[] {
         kind: "primitive",
         title,
         description,
-        lang: "zh-CN",
         type: "ui",
-        group: PRIMITIVES_GROUP,
+        group: PRIMITIVES.id,
         install: `shadcn@latest add ${name}`,
         dependencies: packages,
         registryDependencies: primitives,
@@ -313,15 +421,16 @@ export const ENTRIES: DocEntry[] = [
 ];
 
 /** Entries grouped in sidebar order. */
-export const NAV: { title: string; entries: DocEntry[] }[] = [
-  ...GROUPS.map((g) => g.title),
+export const NAV: { id: string; title: Localized; entries: DocEntry[] }[] = [
+  ...GROUPS,
   OTHER,
-  PRIMITIVES_GROUP,
+  PRIMITIVES,
 ]
-  .map((title) => {
-    const inGroup = ENTRIES.filter((e) => e.group === title);
-    const order = GROUPS.find((g) => g.title === title)?.names;
+  .map(({ id, title, ...group }) => {
+    const inGroup = ENTRIES.filter((e) => e.group === id);
+    const order = "names" in group ? (group.names as string[]) : undefined;
     return {
+      id,
       title,
       entries: order
         ? inGroup.sort((a, b) => order.indexOf(a.name) - order.indexOf(b.name))
@@ -329,6 +438,18 @@ export const NAV: { title: string; entries: DocEntry[] }[] = [
     };
   })
   .filter((g) => g.entries.length > 0);
+
+export const groupTitle = (id: string, locale: Locale) =>
+  NAV.find((g) => g.id === id)?.title[locale] ?? id;
+
+/** An entry's description in the docs language, with its lang: the
+ * registry's English when there is no Chinese. */
+export function describe(entry: DocEntry, locale: Locale) {
+  const text = entry.description[locale];
+  return text
+    ? { text, lang: locale === "zh-CN" ? "zh-CN" : "en" }
+    : { text: entry.description["en-US"], lang: "en" };
+}
 
 /** Every entry in reading order, for previous and next links. */
 export const ORDER: DocEntry[] = NAV.flatMap((g) => g.entries);

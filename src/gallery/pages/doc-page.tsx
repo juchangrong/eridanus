@@ -1,6 +1,7 @@
 import { CaretLeftIcon, CaretRightIcon } from "@phosphor-icons/react";
 import type { ReactNode } from "react";
 
+import { useLocale } from "@/components/eridanus/locale-provider";
 import { Badge } from "@/components/ui/badge";
 import {
   Breadcrumb,
@@ -12,13 +13,20 @@ import {
 } from "@/components/ui/breadcrumb";
 import { Button } from "@/components/ui/button";
 
-import { type DocEntry, exportedNames, ORDER } from "../catalog";
+import {
+  type DocEntry,
+  describe,
+  exportedNames,
+  groupTitle,
+  ORDER,
+} from "../catalog";
 import { CodeBlock } from "../components/code-block";
 import { ComponentPreview } from "../components/component-preview";
 import { Installation } from "../components/installation";
 import { Prose } from "../components/prose";
 import { TableOfContents, type TocItem } from "../components/toc";
-import { examplesFor } from "../examples";
+import { exampleIn, examplesFor } from "../examples";
+import { useT } from "../i18n";
 import { docHref } from "../router";
 
 const HEADING =
@@ -47,9 +55,10 @@ function Pager({ entry }: { entry: DocEntry }) {
   const index = ORDER.indexOf(entry);
   const previous = ORDER[index - 1];
   const next = ORDER[index + 1];
+  const t = useT();
   return (
     <nav
-      aria-label="上一页和下一页"
+      aria-label={t("上一页和下一页", "Previous and next")}
       className="flex items-center justify-between gap-4 pt-6"
     >
       {previous ? (
@@ -60,7 +69,7 @@ function Pager({ entry }: { entry: DocEntry }) {
           render={<a href={docHref(previous.name)} />}
         >
           <CaretLeftIcon data-icon="inline-start" />
-          <span className="sr-only">上一页：</span>
+          <span className="sr-only">{t("上一页：", "Previous: ")}</span>
           {previous.title}
         </Button>
       ) : (
@@ -73,7 +82,7 @@ function Pager({ entry }: { entry: DocEntry }) {
           nativeButton={false}
           render={<a href={docHref(next.name)} />}
         >
-          <span className="sr-only">下一页：</span>
+          <span className="sr-only">{t("下一页：", "Next: ")}</span>
           {next.title}
           <CaretRightIcon data-icon="inline-end" />
         </Button>
@@ -85,17 +94,22 @@ function Pager({ entry }: { entry: DocEntry }) {
 export function DocPage({ entry }: { entry: DocEntry }) {
   const { demo, more } = examplesFor(entry.name);
   const usage = usageOf(entry);
+  const locale = useLocale();
+  const t = useT();
+  const description = describe(entry, locale);
   const toc: TocItem[] = [
-    { id: "installation", title: "安装", depth: 2 },
-    ...(usage ? [{ id: "usage", title: "用法", depth: 2 } as const] : []),
+    { id: "installation", title: t("安装", "Installation"), depth: 2 },
+    ...(usage
+      ? [{ id: "usage", title: t("用法", "Usage"), depth: 2 } as const]
+      : []),
     ...(more.length
       ? [
-          { id: "examples", title: "示例", depth: 2 } as const,
+          { id: "examples", title: t("示例", "Examples"), depth: 2 } as const,
           ...more.map(
             (e) =>
               ({
                 id: `example-${e.name}`,
-                title: e.title ?? e.name,
+                title: exampleIn(e, locale).title,
                 depth: 3,
               }) as const,
           ),
@@ -110,10 +124,12 @@ export function DocPage({ entry }: { entry: DocEntry }) {
           <Breadcrumb>
             <BreadcrumbList>
               <BreadcrumbItem>
-                <BreadcrumbLink href={docHref()}>文档</BreadcrumbLink>
+                <BreadcrumbLink href={docHref()}>
+                  {t("文档", "Docs")}
+                </BreadcrumbLink>
               </BreadcrumbItem>
               <BreadcrumbSeparator />
-              <BreadcrumbItem>{entry.group}</BreadcrumbItem>
+              <BreadcrumbItem>{groupTitle(entry.group, locale)}</BreadcrumbItem>
               <BreadcrumbSeparator />
               <BreadcrumbItem>
                 <BreadcrumbPage>{entry.title}</BreadcrumbPage>
@@ -129,51 +145,58 @@ export function DocPage({ entry }: { entry: DocEntry }) {
             </Badge>
           </div>
           <p
-            lang={entry.lang}
+            lang={description.lang}
             className="m-0 max-w-2xl text-base text-pretty text-muted-foreground"
           >
-            <Prose text={entry.description} />
+            <Prose text={description.text} />
           </p>
         </header>
 
         {demo ? <ComponentPreview example={demo} /> : null}
 
         <section aria-labelledby="installation" className="flex flex-col gap-5">
-          <H2 id="installation">安装</H2>
+          <H2 id="installation">{t("安装", "Installation")}</H2>
           <Installation entry={entry} />
         </section>
 
         {usage ? (
           <section aria-labelledby="usage" className="flex flex-col gap-5">
-            <H2 id="usage">用法</H2>
+            <H2 id="usage">{t("用法", "Usage")}</H2>
             <CodeBlock code={usage} />
           </section>
         ) : null}
 
         {more.length ? (
           <section aria-labelledby="examples" className="flex flex-col gap-10">
-            <H2 id="examples">示例</H2>
-            {more.map((example) => (
-              <section
-                key={example.name}
-                aria-labelledby={`example-${example.name}`}
-                className="flex flex-col gap-3"
-              >
-                <h3
-                  id={`example-${example.name}`}
-                  tabIndex={-1}
-                  className={`${HEADING} text-lg`}
+            <H2 id="examples">{t("示例", "Examples")}</H2>
+            {more.map((example) => {
+              const text = exampleIn(example, locale);
+              return (
+                <section
+                  key={example.name}
+                  aria-labelledby={`example-${example.name}`}
+                  className="flex flex-col gap-3"
                 >
-                  {example.title ?? example.name}
-                </h3>
-                {example.description ? (
-                  <p className="m-0 max-w-2xl text-sm text-pretty text-muted-foreground">
-                    {example.description}
-                  </p>
-                ) : null}
-                <ComponentPreview example={example} />
-              </section>
-            ))}
+                  <h3
+                    id={`example-${example.name}`}
+                    tabIndex={-1}
+                    lang={text.lang}
+                    className={`${HEADING} text-lg`}
+                  >
+                    {text.title}
+                  </h3>
+                  {text.description ? (
+                    <p
+                      lang={text.lang}
+                      className="m-0 max-w-2xl text-sm text-pretty text-muted-foreground"
+                    >
+                      {text.description}
+                    </p>
+                  ) : null}
+                  <ComponentPreview example={example} />
+                </section>
+              );
+            })}
           </section>
         ) : null}
 

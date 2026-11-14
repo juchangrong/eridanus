@@ -1,6 +1,7 @@
 import { CheckCircleIcon, WarningCircleIcon } from "@phosphor-icons/react";
 import type { ReactNode } from "react";
 
+import { useMessages } from "@/components/eridanus/locale-provider";
 import {
   Toast,
   ToastClose,
@@ -13,27 +14,34 @@ import {
   toast,
   useToastManager,
 } from "@/components/ui/toast";
+import type { Locale } from "@/lib/eridanus/locale";
+
+const MESSAGES: Record<Locale, { region: string; close: string }> = {
+  "zh-CN": { region: "通知", close: "关闭通知" },
+  "en-US": { region: "Notifications", close: "Dismiss notification" },
+};
 
 /**
  * The app's toast region, wrapping everything that may call `notify`. The
- * region and each close button are named in Chinese by default; the stock
- * toast list names them in English.
+ * region and each close button are named in the LocaleProvider language
+ * (Chinese by default); the stock toast list names them in English only.
  */
 export function AppToaster({
   children,
-  regionLabel = "通知",
-  closeLabel = "关闭通知",
+  regionLabel,
+  closeLabel,
 }: {
   children: ReactNode;
   regionLabel?: string;
   closeLabel?: string;
 }) {
+  const t = useMessages(MESSAGES);
   return (
     <ToastProvider toastManager={toast}>
       {children}
       <ToastPortal>
-        <ToastViewport aria-label={regionLabel}>
-          <ToastList closeLabel={closeLabel} />
+        <ToastViewport aria-label={regionLabel ?? t.region}>
+          <ToastList closeLabel={closeLabel ?? t.close} />
         </ToastViewport>
       </ToastPortal>
     </ToastProvider>

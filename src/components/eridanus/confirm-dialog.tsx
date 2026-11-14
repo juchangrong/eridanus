@@ -1,6 +1,7 @@
 import type { AlertDialog as AlertDialogPrimitive } from "@base-ui/react/alert-dialog";
 import { type ReactNode, useState } from "react";
 
+import { useMessages } from "@/components/eridanus/locale-provider";
 import { Notice } from "@/components/eridanus/notice";
 import {
   AlertDialog,
@@ -14,6 +15,12 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
+import type { Locale } from "@/lib/eridanus/locale";
+
+const MESSAGES: Record<Locale, { cancel: string; failure: string }> = {
+  "zh-CN": { cancel: "取消", failure: "操作失败：" },
+  "en-US": { cancel: "Cancel", failure: "Couldn't complete this: " },
+};
 
 /**
  * The confirmation for an irreversible or outward-facing write. It says what
@@ -27,8 +34,8 @@ export function ConfirmDialog({
   title,
   description,
   confirmLabel,
-  cancelLabel = "取消",
-  failurePrefix = "操作失败：",
+  cancelLabel,
+  failurePrefix,
   destructive,
   onConfirm,
 }: {
@@ -43,6 +50,7 @@ export function ConfirmDialog({
   /** Reject to keep the dialog open; the error's message is shown in it. */
   onConfirm: () => Promise<unknown>;
 }) {
+  const t = useMessages(MESSAGES);
   const [open, setOpen] = useState(false);
   const [pending, setPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -76,11 +84,14 @@ export function ConfirmDialog({
           <AlertDialogDescription>{description}</AlertDialogDescription>
         </AlertDialogHeader>
         {error ? (
-          <Notice tone="error" description={`${failurePrefix}${error}`} />
+          <Notice
+            tone="error"
+            description={`${failurePrefix ?? t.failure}${error}`}
+          />
         ) : null}
         <AlertDialogFooter>
           <AlertDialogCancel size="sm" disabled={pending}>
-            {cancelLabel}
+            {cancelLabel ?? t.cancel}
           </AlertDialogCancel>
           <Button
             size="sm"

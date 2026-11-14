@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 
 import { cn } from "@/lib/utils";
 
+import { useT } from "../i18n";
+
 export interface TocItem {
   id: string;
   title: string;
@@ -56,10 +58,14 @@ export function scrollToHeading(id: string) {
 
 export function TableOfContents({ items }: { items: TocItem[] }) {
   const active = useActiveId(items.map((i) => i.id));
+  const t = useT();
   if (items.length === 0) return null;
   return (
-    <nav aria-label="本页内容" className="flex flex-col gap-2 text-sm">
-      <p className="m-0 font-medium">本页内容</p>
+    <nav
+      aria-label={t("本页内容", "On this page")}
+      className="flex flex-col gap-2 text-sm"
+    >
+      <p className="m-0 font-medium">{t("本页内容", "On this page")}</p>
       <ul className="m-0 flex list-none flex-col ps-0">
         {items.map((item) => (
           <li key={item.id}>

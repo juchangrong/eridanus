@@ -12,11 +12,10 @@
  *
  * Needs network access for npm packages and shadcn's own primitives.
  */
-import { execFileSync } from "node:child_process";
+import { execFileSync, spawn } from "node:child_process";
 import {
   existsSync,
   mkdirSync,
-  readdirSync,
   readFileSync,
   rmSync,
   writeFileSync,
@@ -31,14 +30,42 @@ const app = join(root, ".smoke", "app");
 const shadcn = join(root, "node_modules", ".bin", "shadcn");
 
 /** `answers` is typed into the command's prompts, one per line. */
-function run(cmd: string, args: string[], cwd: string, answers?: string[]) {
+function echo(cmd: string, args: string[], cwd: string) {
   console.log(
     `\n$ ${cmd === shadcn ? "shadcn" : cmd} ${args.map((a) => (a.startsWith(root) ? relative(cwd, a) || "." : a)).join(" ")}`,
   );
-  execFileSync(cmd, args, {
-    cwd,
-    stdio: [answers ? "pipe" : "ignore", "inherit", "inherit"],
-    input: answers ? `${answers.join("\n")}\n` : undefined,
+}
+
+function run(cmd: string, args: string[], cwd: string) {
+  echo(cmd, args, cwd);
+  execFileSync(cmd, args, { cwd, stdio: ["ignore", "inherit", "inherit"] });
+}
+
+/** Runs the CLI and answers no to every "overwrite?" question as it is
+ * asked; answers piped up front reach only the first question. Questions
+ * arrive on stdout and the file summary on stderr; stdin closes after the
+ * summary, which follows the last question, or the CLI would wait on it. */
+function runDecliningOverwrites(cmd: string, args: string[], cwd: string) {
+  echo(cmd, args, cwd);
+  return new Promise<void>((resolve, reject) => {
+    const child = spawn(cmd, args, { cwd, stdio: ["pipe", "pipe", "pipe"] });
+    let seen = "";
+    let answered = 0;
+    const read = (into: NodeJS.WriteStream) => (chunk: Buffer) => {
+      into.write(chunk);
+      // biome-ignore lint/suspicious/noControlCharactersInRegex: strips ANSI
+      seen += chunk.toString().replace(/\x1b\[[0-9;?]*[A-Za-z]/g, "");
+      const asked = seen.split("(y/N)").length - 1;
+      for (; answered < asked; answered++) child.stdin.write("n");
+      if (/(Created|Updated|Skipped) \d+ files?/.test(seen)) child.stdin.end();
+    };
+    child.stdout.on("data", read(process.stdout));
+    child.stderr.on("data", read(process.stderr));
+    child.on("error", reject);
+    // "exit", not "close": a process the CLI starts can hold stdout open.
+    child.on("exit", (code) =>
+      code === 0 ? resolve() : reject(new Error(`${cmd} exited with ${code}`)),
+    );
   });
 }
 
@@ -162,17 +189,11 @@ run(shadcn, ["init", join(out, "base.json"), "--yes"], app);
 const rest = catalog.items
   .filter((i) => i.type !== "registry:base")
   .map((i) => join(out, `${i.name}.json`));
-// An upstream item that depends on a forked primitive (sidebar on input)
-// makes the CLI ask before overwriting the fork. Consumers answer no, and so
-// does the test; the fork check below proves the forks survived. Only a file
-// that already exists can prompt, so one answer per file in src is enough.
-const existing = readdirSync(join(app, "src"), { recursive: true }).length;
-run(
-  shadcn,
-  ["add", ...rest, "--yes"],
-  app,
-  Array.from({ length: existing }, () => "n"),
-);
+// An upstream item that depends on a forked primitive (sidebar on input,
+// dialog on button) makes the CLI ask before overwriting the fork. Consumers
+// answer no, and so does the test; the fork check below proves the forks
+// survived.
+await runDecliningOverwrites(shadcn, ["add", ...rest, "--yes"], app);
 
 // 4. The promises the base makes, then a full type-check and build.
 const failures: string[] = [];
@@ -239,7 +260,20 @@ for (const spec of expected) {
 }
 // The forks replace shadcn's files, so a CLI that kept an existing upstream
 // copy would still build; check the installed files are the forks.
-for (const fork of ["input", "textarea", "select", "input-group"]) {
+for (const fork of [
+  "input",
+  "textarea",
+  "select",
+  "input-group",
+  "dropdown-menu",
+  "combobox",
+  "button",
+  "toggle",
+  "toggle-group",
+  "badge",
+  "tabs",
+  "command",
+]) {
   const file = join(app, "src", "components", "ui", `${fork}.tsx`);
   if (
     !existsSync(file) ||

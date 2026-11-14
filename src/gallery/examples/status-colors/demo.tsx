@@ -35,7 +35,7 @@ export default function StatusColorsDemo() {
           </span>
           <span className={`font-medium ${ink}`}>{sample}</span>
           <span
-            className={`w-fit rounded-md px-2 py-0.5 text-xs font-medium ${ink} ${tint}`}
+            className={`w-fit rounded-full px-2 py-0.5 text-xs font-medium ${ink} ${tint}`}
           >
             {sample}
           </span>

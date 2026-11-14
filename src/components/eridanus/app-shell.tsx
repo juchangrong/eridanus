@@ -15,6 +15,7 @@ import {
   useState,
 } from "react";
 
+import { useMessages } from "@/components/eridanus/locale-provider";
 import { PersonAvatar } from "@/components/eridanus/person-avatar";
 import {
   type ThemePreference,
@@ -50,6 +51,7 @@ import {
   SidebarRail,
   useSidebar,
 } from "@/components/ui/sidebar";
+import type { Locale } from "@/lib/eridanus/locale";
 import { cn } from "@/lib/utils";
 
 /** The product name and mark at the top of the sidebar, a link home. */
@@ -84,16 +86,17 @@ export interface AppAccount {
   name: string;
   email?: string;
   avatar?: string;
-  /** Extra DropdownMenuItem elements above the theme choice, such as 个人设置. */
+  /** Extra DropdownMenuItem elements above the theme choice, such as a profile link. */
   items?: ReactNode;
-  /** Shows 退出登录 at the end of the menu. */
+  /** Shows a sign-out item at the end of the menu. */
   onSignOut?: () => void;
 }
 
 export interface AppShellLabels {
   toggleSidebar: string;
   navigation: string;
-  account: string;
+  /** The account button's accessible name, given the person's name. */
+  account: (name: string) => string;
   theme: string;
   system: string;
   light: string;
@@ -101,15 +104,28 @@ export interface AppShellLabels {
   signOut: string;
 }
 
-const LABELS: AppShellLabels = {
-  toggleSidebar: "切换侧边栏",
-  navigation: "主导航",
-  account: "账号菜单",
-  theme: "主题",
-  system: "跟随系统",
-  light: "浅色",
-  dark: "深色",
-  signOut: "退出登录",
+/** The built-in text in each locale. */
+export const appShellLabels: Record<Locale, AppShellLabels> = {
+  "zh-CN": {
+    toggleSidebar: "切换侧边栏",
+    navigation: "主导航",
+    account: (name) => `账号菜单：${name}`,
+    theme: "主题",
+    system: "跟随系统",
+    light: "浅色",
+    dark: "深色",
+    signOut: "退出登录",
+  },
+  "en-US": {
+    toggleSidebar: "Toggle sidebar",
+    navigation: "Main navigation",
+    account: (name) => `Account menu: ${name}`,
+    theme: "Theme",
+    system: "System",
+    light: "Light",
+    dark: "Dark",
+    signOut: "Sign out",
+  },
 };
 
 /** shadcn's sidebar writes its open state to the sidebar_state cookie on every
@@ -172,7 +188,7 @@ export function AppShell({
   className?: string;
   children: ReactNode;
 }) {
-  const labels = { ...LABELS, ...labelOverrides };
+  const labels = { ...useMessages(appShellLabels), ...labelOverrides };
   const [initialOpen] = useState(() => storedOpen() ?? defaultOpen ?? true);
   return (
     <SidebarProvider
@@ -187,12 +203,13 @@ export function AppShell({
                 size="lg"
                 tooltip={brand.name}
                 link={renderLink(brand.href ?? "/")}
+                className="px-2"
               >
                 {brand.logo ? (
-                  // Concentric with the button (rounded-xl): its radius less
-                  // the 8px inset, and the same radius once collapsed leaves
-                  // no inset.
-                  <span className="flex size-8 shrink-0 items-center justify-center rounded-[calc(var(--radius)*1.4-0.5rem)] bg-primary text-primary-foreground group-data-[collapsible=icon]:rounded-xl [&_svg]:size-4">
+                  // A circle, concentric with the pill button around it: the
+                  // button's 24px radius less its 8px inset on every side is
+                  // the tile's 16.
+                  <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground [&_svg]:size-4">
                     {brand.logo}
                   </span>
                 ) : null}
@@ -221,7 +238,9 @@ export function AppShell({
                         <span>{item.label}</span>
                       </NavButton>
                       {item.badge != null ? (
-                        <SidebarMenuBadge>{item.badge}</SidebarMenuBadge>
+                        <SidebarMenuBadge className="rounded-full">
+                          {item.badge}
+                        </SidebarMenuBadge>
                       ) : null}
                     </SidebarMenuItem>
                   ))}
@@ -241,13 +260,16 @@ export function AppShell({
         />
       </Sidebar>
       <SidebarInset className="min-w-0 overflow-hidden">
-        <div className="flex h-12 shrink-0 items-center gap-2 border-b px-3 sm:px-4">
+        {/* As tall as the sidebar's brand row, expanded or collapsed, so the
+            two read as one band; inset like a Page, so the toggle's icon
+            lines up with the page's text. */}
+        <div className="flex h-12 shrink-0 items-center gap-2 border-b px-4 transition-[height] duration-200 ease-linear sm:px-6 md:h-16 md:group-has-data-[collapsible=icon]/sidebar-wrapper:h-12">
           <ToggleButton label={labels.toggleSidebar} />
           {breadcrumb ? (
             <>
               <Separator
                 orientation="vertical"
-                className="data-[orientation=vertical]:h-4"
+                className="data-vertical:h-4 data-vertical:self-center"
               />
               <div className="min-w-0 flex-1 truncate">{breadcrumb}</div>
             </>
@@ -264,11 +286,12 @@ export function AppShell({
   );
 }
 
-/** A sidebar link. On a phone the sidebar is a sheet over the page, and
- * following a link closes it. */
+/** A sidebar link, a pill like every Eridanus control. On a phone the
+ * sidebar is a sheet over the page, and following a link closes it. */
 function NavButton({
   link,
   onClick,
+  className,
   ...props
 }: Omit<ComponentProps<typeof SidebarMenuButton>, "render"> & {
   link: ReactElement;
@@ -277,6 +300,7 @@ function NavButton({
   return (
     <SidebarMenuButton
       {...props}
+      className={cn("rounded-full", className)}
       render={link}
       onClick={(event) => {
         onClick?.(event);
@@ -296,7 +320,7 @@ function ToggleButton({ label }: { label: string }) {
       aria-label={label}
       title={label}
       onClick={toggleSidebar}
-      className="-ml-1"
+      className="-ml-1.5"
     >
       <SidebarSimpleIcon />
     </Button>
@@ -330,11 +354,15 @@ function AccountMenu({
               the trigger's element to open. */}
           <SidebarMenuButton
             size="lg"
-            aria-label={`${labels.account}：${account.name}`}
-            className="data-popup-open:bg-sidebar-accent data-popup-open:text-sidebar-accent-foreground"
+            aria-label={labels.account(account.name)}
+            className="rounded-full px-2 data-popup-open:bg-sidebar-accent data-popup-open:text-sidebar-accent-foreground"
             render={<DropdownMenuTrigger />}
           >
-            <PersonAvatar name={account.name} src={account.avatar} />
+            <PersonAvatar
+              name={account.name}
+              src={account.avatar}
+              size="default"
+            />
             <span className="grid min-w-0 flex-1 text-left leading-tight">
               <span className="truncate font-medium">{account.name}</span>
               {account.email ? (

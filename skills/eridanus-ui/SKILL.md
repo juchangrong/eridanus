@@ -21,7 +21,7 @@ Installed files live in `components/eridanus/`, `lib/eridanus/` and `hooks/erida
 4. **Contrast.** Text keeps 4.5:1 in both themes. Use the tokens (`text-muted-foreground`, `text-success`, `bg-warning/10`, …), never raw palette colors, and check any new tint.
 5. **One control height.** Buttons use `size="sm"` (28px); `SearchField`, `FilterSelect` and the `Pager` match it. The default (near-black) button variant marks the single main action of a page, form or dialog; other actions use `secondary`, destructive ones `destructive`, inline and icon controls `ghost`.
 6. **Writes confirm.** Irreversible or outward-facing writes go through `ConfirmDialog`, which stays open and shows the error until the write succeeds. Report success with `notify()`.
-7. **Copy.** Visible text is short plain Chinese. Identifiers and paths are monospace. Every Eridanus component takes its visible strings as props when another language is needed.
+7. **Copy.** Visible text is short and plain, in Chinese by default. Wrap the app in `LocaleProvider locale="en-US"` for English; components switch their built-in labels, times and ranges, and pass the locale to `friendly()`, `relative()` and `describeTimeRange()` yourself. Identifiers and paths are monospace. Props replace any built-in string.
 
 ## Catalog
 
@@ -52,6 +52,7 @@ Installed files live in `components/eridanus/`, `lib/eridanus/` and `hooks/erida
 | Capacity | `meter` | in-flight work against a cap |
 | People | `person-avatar` | decorative; show the name beside it |
 | Theme | `theme-provider` | `ThemeProvider`, `useTheme()`; the `dark` class on `<html>` |
+| Language | `locale-provider` | `<LocaleProvider locale="zh-CN" \| "en-US">`, `useLocale()`; the app owns the choice and sets `<html lang>` |
 
 ## Patterns
 
@@ -59,17 +60,19 @@ The app frame, once at the root; each route renders its `Page` as the children:
 
 ```tsx
 <ThemeProvider>
-  <AppToaster>
-    <AppShell
-      brand={{ name: "运营台", logo: <PlanetIcon weight="fill" /> }}
-      nav={[{ items: [{ label: "运行记录", href: "/runs", icon: <ListChecksIcon />, active: path.startsWith("/runs") }] }]}
-      account={{ name: user.name, email: user.email, onSignOut: signOut }}
-      breadcrumb={<Breadcrumb>…</Breadcrumb>}
-      renderLink={(href) => <Link to={href} />}
-    >
-      <Outlet />
-    </AppShell>
-  </AppToaster>
+  <LocaleProvider locale={locale}>
+    <AppToaster>
+      <AppShell
+        brand={{ name: "运营台", logo: <PlanetIcon weight="fill" /> }}
+        nav={[{ items: [{ label: "运行记录", href: "/runs", icon: <ListChecksIcon />, active: path.startsWith("/runs") }] }]}
+        account={{ name: user.name, email: user.email, onSignOut: signOut }}
+        breadcrumb={<Breadcrumb>…</Breadcrumb>}
+        renderLink={(href) => <Link to={href} />}
+      >
+        <Outlet />
+      </AppShell>
+    </AppToaster>
+  </LocaleProvider>
 </ThemeProvider>
 ```
 

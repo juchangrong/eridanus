@@ -1,9 +1,16 @@
 import { CheckIcon, CopyIcon } from "@phosphor-icons/react";
 import { type ComponentProps, useEffect, useRef, useState } from "react";
 
+import { useMessages } from "@/components/eridanus/locale-provider";
 import { Button } from "@/components/ui/button";
 import { copyText } from "@/lib/eridanus/clipboard";
+import type { Locale } from "@/lib/eridanus/locale";
 import { cn } from "@/lib/utils";
+
+const MESSAGES: Record<Locale, { copy: string; copied: string }> = {
+  "zh-CN": { copy: "复制", copied: "已复制" },
+  "en-US": { copy: "Copy", copied: "Copied" },
+};
 
 /**
  * An icon-only copy control. After a copy the icon cross-fades to a check for
@@ -12,8 +19,8 @@ import { cn } from "@/lib/utils";
  */
 export function CopyButton({
   text,
-  label = "复制",
-  copiedLabel = "已复制",
+  label,
+  copiedLabel,
   variant = "ghost",
   size = "icon-sm",
   className,
@@ -28,7 +35,8 @@ export function CopyButton({
   const [copied, setCopied] = useState(false);
   const timer = useRef<number | undefined>(undefined);
   useEffect(() => () => window.clearTimeout(timer.current), []);
-  const name = copied ? copiedLabel : label;
+  const t = useMessages(MESSAGES);
+  const name = copied ? (copiedLabel ?? t.copied) : (label ?? t.copy);
 
   return (
     <Button

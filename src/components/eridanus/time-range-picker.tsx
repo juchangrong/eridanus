@@ -1,8 +1,9 @@
 import { ClockIcon } from "@phosphor-icons/react";
 import { useState } from "react";
 import type { DateRange } from "react-day-picker";
-import { zhCN } from "react-day-picker/locale";
+import { enUS, zhCN } from "react-day-picker/locale";
 
+import { useLocale } from "@/components/eridanus/locale-provider";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import {
@@ -11,6 +12,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { localDay } from "@/lib/eridanus/format-time";
+import type { Locale } from "@/lib/eridanus/locale";
 import {
   describeTimeRange,
   parseDay,
@@ -19,20 +21,29 @@ import {
 } from "@/lib/eridanus/time-range";
 import { cn } from "@/lib/utils";
 
+const MESSAGES: Record<
+  Locale,
+  { label: string; custom: string; apply: string; calendar: typeof zhCN }
+> = {
+  "zh-CN": { label: "时间", custom: "按日期", apply: "应用", calendar: zhCN },
+  "en-US": { label: "Time", custom: "Dates", apply: "Apply", calendar: enUS },
+};
+
 /**
  * The time filter of a log, run or metrics page: trailing presets ("最近
  * 1 小时") that pick and close on one click, and a calendar for a span of
  * whole days, applied with a button (one chosen day is a one-day span). Days after
  * today cannot be picked. The trigger names what it filters, like
- * FilterSelect, and is sized to sit beside it.
+ * FilterSelect, and is sized to sit beside it. Text and the calendar follow
+ * LocaleProvider; the label props replace the built-in text.
  */
 export function TimeRangePicker({
   value,
   onChange,
   presets = TIME_RANGE_PRESETS,
-  label = "时间",
-  customLabel = "按日期",
-  applyLabel = "应用",
+  label,
+  customLabel,
+  applyLabel,
   className,
 }: {
   value: TimeRange;
@@ -44,6 +55,8 @@ export function TimeRangePicker({
   applyLabel?: string;
   className?: string;
 }) {
+  const locale = useLocale();
+  const t = MESSAGES[locale];
   const [open, setOpen] = useState(false);
   const [draft, setDraft] = useState<DateRange | undefined>();
   const pick = (next: TimeRange) => {
@@ -77,8 +90,8 @@ export function TimeRangePicker({
         }
       >
         <ClockIcon data-icon="inline-start" className="text-muted-foreground" />
-        <span className="text-muted-foreground">{label}</span>
-        <span className="tabular-nums">{describeTimeRange(value)}</span>
+        <span className="text-muted-foreground">{label ?? t.label}</span>
+        <span className="tabular-nums">{describeTimeRange(value, locale)}</span>
       </PopoverTrigger>
       <PopoverContent
         align="start"
@@ -99,14 +112,14 @@ export function TimeRangePicker({
                 )}
                 onClick={() => pick({ last: p })}
               >
-                {describeTimeRange({ last: p })}
+                {describeTimeRange({ last: p }, locale)}
               </Button>
             );
           })}
         </div>
         <div className="flex flex-col gap-2 p-2">
           <span className="px-2 pt-1 text-xs text-muted-foreground">
-            {customLabel}
+            {customLabel ?? t.custom}
           </span>
           <Calendar
             mode="range"
@@ -114,7 +127,7 @@ export function TimeRangePicker({
             onSelect={setDraft}
             defaultMonth={draft?.from}
             disabled={{ after: new Date() }}
-            locale={zhCN}
+            locale={t.calendar}
             className="p-1"
           />
           <Button
@@ -129,7 +142,7 @@ export function TimeRangePicker({
                 });
             }}
           >
-            {applyLabel}
+            {applyLabel ?? t.apply}
           </Button>
         </div>
       </PopoverContent>

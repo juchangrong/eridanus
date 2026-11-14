@@ -1,3 +1,4 @@
+import { useLocale } from "@/components/eridanus/locale-provider";
 import { timestamp } from "@/lib/eridanus/format-time";
 import {
   describeTimeRange,
@@ -16,6 +17,8 @@ const TEXTS = [
 ];
 
 export default function TimeRangeDemo() {
+  // The docs language, so the label switches with it.
+  const locale = useLocale();
   return (
     <div className="w-full overflow-x-auto">
       <table className="w-full font-mono text-[13px]">
@@ -36,7 +39,7 @@ export default function TimeRangeDemo() {
                   {range ? formatTimeRange(range) : text}
                 </td>
                 <td className="py-1 pe-6 font-sans">
-                  {range ? describeTimeRange(range) : "null"}
+                  {range ? describeTimeRange(range, locale) : "null"}
                 </td>
                 <td className="py-1 whitespace-nowrap text-muted-foreground">
                   {span

@@ -1,10 +1,28 @@
 import type { ReactNode } from "react";
 import { useState } from "react";
 
+import { useMessages } from "@/components/eridanus/locale-provider";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { TableCell, TableHead } from "@/components/ui/table";
+import type { Locale } from "@/lib/eridanus/locale";
 import { cn } from "@/lib/utils";
+
+const MESSAGES: Record<
+  Locale,
+  { all: string; clear: string; count: (count: number) => string }
+> = {
+  "zh-CN": {
+    all: "选择本页全部",
+    clear: "取消选择",
+    count: (n) => `已选 ${n.toLocaleString()} 项`,
+  },
+  "en-US": {
+    all: "Select all on this page",
+    clear: "Clear selection",
+    count: (n) => `${n.toLocaleString()} selected`,
+  },
+};
 
 export interface RowSelection {
   /** The selected ids, across pages. */
@@ -61,15 +79,16 @@ const EMPTY: ReadonlySet<string> = new Set();
  * dash while only some are selected. */
 export function SelectAllHead({
   selection,
-  label = "选择本页全部",
+  label,
 }: {
   selection: RowSelection;
   label?: string;
 }) {
+  const t = useMessages(MESSAGES);
   return (
     <TableHead className="w-8">
       <Checkbox
-        aria-label={label}
+        aria-label={label ?? t.all}
         checked={selection.visible === "all"}
         indeterminate={selection.visible === "some"}
         onCheckedChange={selection.toggleVisible}
@@ -114,8 +133,8 @@ export function SelectCell({
 export function SelectionBar({
   selection,
   children,
-  countLabel = (n) => `已选 ${n.toLocaleString()} 项`,
-  clearLabel = "取消选择",
+  countLabel,
+  clearLabel,
   className,
 }: {
   selection: RowSelection;
@@ -125,6 +144,7 @@ export function SelectionBar({
   clearLabel?: string;
   className?: string;
 }) {
+  const t = useMessages(MESSAGES);
   return (
     <div
       className={cn(
@@ -133,7 +153,7 @@ export function SelectionBar({
       )}
     >
       <span role="status" className="font-medium tabular-nums">
-        {countLabel(selection.selected.size)}
+        {(countLabel ?? t.count)(selection.selected.size)}
       </span>
       {children}
       <Button
@@ -142,7 +162,7 @@ export function SelectionBar({
         className="ms-auto"
         onClick={selection.clear}
       >
-        {clearLabel}
+        {clearLabel ?? t.clear}
       </Button>
     </div>
   );

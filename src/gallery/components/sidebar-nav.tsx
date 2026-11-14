@@ -1,8 +1,11 @@
+import { useLocale } from "@/components/eridanus/locale-provider";
+
 import { NAV } from "../catalog";
+import { useT } from "../i18n";
 import { docHref } from "../router";
 
 const LINK =
-  "flex h-8 items-center truncate rounded-lg px-2 text-sm text-foreground/80 hover:bg-muted hover:text-foreground aria-[current=page]:bg-muted aria-[current=page]:font-medium aria-[current=page]:text-foreground";
+  "flex h-8 items-center truncate rounded-full px-3 text-sm text-foreground/80 hover:bg-muted hover:text-foreground aria-[current=page]:bg-muted aria-[current=page]:font-medium aria-[current=page]:text-foreground";
 
 /** Every page, grouped. `onNavigate` lets the mobile sheet close itself. */
 export function SidebarNav({
@@ -12,11 +15,13 @@ export function SidebarNav({
   current?: string;
   onNavigate?: () => void;
 }) {
+  const locale = useLocale();
+  const t = useT();
   return (
     <div className="flex flex-col gap-6">
       <div className="flex flex-col gap-0.5">
-        <p className="m-0 px-2 pb-1 text-xs font-medium text-muted-foreground">
-          开始
+        <p className="m-0 px-3 pb-1 text-xs font-medium text-muted-foreground">
+          {t("开始", "Start")}
         </p>
         <a
           href={docHref()}
@@ -24,13 +29,13 @@ export function SidebarNav({
           onClick={onNavigate}
           className={LINK}
         >
-          介绍
+          {t("介绍", "Introduction")}
         </a>
       </div>
       {NAV.map((group) => (
-        <div key={group.title} className="flex flex-col gap-0.5">
-          <p className="m-0 px-2 pb-1 text-xs font-medium text-muted-foreground">
-            {group.title}
+        <div key={group.id} className="flex flex-col gap-0.5">
+          <p className="m-0 px-3 pb-1 text-xs font-medium text-muted-foreground">
+            {group.title[locale]}
           </p>
           <ul className="m-0 flex list-none flex-col gap-0.5 ps-0">
             {group.entries.map((entry) => (

@@ -1,10 +1,22 @@
 import { Component, type ErrorInfo, type ReactNode } from "react";
-
+import { useLocale } from "@/components/eridanus/locale-provider";
 import { Notice } from "@/components/eridanus/notice";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
-import type { Example } from "../examples";
+import { type Example, exampleIn } from "../examples";
+import { useT } from "../i18n";
 import { CodeBlock } from "./code-block";
+
+function Failure({ error }: { error: Error }) {
+  const t = useT();
+  return (
+    <Notice
+      tone="error"
+      title={t("示例渲染失败", "This example failed to render")}
+      description={error.message}
+    />
+  );
+}
 
 /** Keeps one broken example from taking the whole page down. */
 class ExampleBoundary extends Component<
@@ -20,26 +32,23 @@ class ExampleBoundary extends Component<
   }
   render() {
     return this.state.error ? (
-      <Notice
-        tone="error"
-        title="示例渲染失败"
-        description={this.state.error.message}
-      />
+      <Failure error={this.state.error} />
     ) : (
       this.props.children
     );
   }
 }
 
-/** An example with a 预览 tab and a 代码 tab. The preview stays mounted while
+/** An example with a preview tab and a code tab. The preview stays mounted while
  * the code shows, so a demo keeps its state across switches. */
 export function ComponentPreview({ example }: { example: Example }) {
-  const { Component: Demo, code } = example;
+  const { Component: Demo, code } = exampleIn(example, useLocale());
+  const t = useT();
   return (
     <Tabs defaultValue="preview" className="gap-3">
-      <TabsList variant="line" aria-label="示例视图">
-        <TabsTrigger value="preview">预览</TabsTrigger>
-        <TabsTrigger value="code">代码</TabsTrigger>
+      <TabsList variant="line" aria-label={t("示例视图", "Example view")}>
+        <TabsTrigger value="preview">{t("预览", "Preview")}</TabsTrigger>
+        <TabsTrigger value="code">{t("代码", "Code")}</TabsTrigger>
       </TabsList>
       <TabsContent value="preview" keepMounted>
         {/* Links in examples point at the consumer's own routes; following

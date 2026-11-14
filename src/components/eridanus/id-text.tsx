@@ -17,16 +17,17 @@ export function IdText({
   head = 8,
   tail = 4,
   copy,
-  copyLabel = "复制",
+  copyLabel,
   className,
 }: {
   value: string;
+  /** The copy button's name; CopyButton's own label when unset. */
+  copyLabel?: string;
   /** Characters kept at the start. */
   head?: number;
   /** Characters kept at the end. */
   tail?: number;
   copy?: boolean;
-  copyLabel?: string;
   className?: string;
 }) {
   const short =

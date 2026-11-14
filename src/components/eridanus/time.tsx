@@ -1,5 +1,6 @@
 import { type ReactNode, useSyncExternalStore } from "react";
 
+import { useLocale } from "@/components/eridanus/locale-provider";
 import {
   Tooltip,
   TooltipContent,
@@ -25,6 +26,9 @@ import { cn } from "@/lib/utils";
  * `clock` shows a bare "HH:mm:ss" for instants whose day is already on screen,
  * and `seconds` keeps the seconds on the readable form.
  *
+ * The readable and relative forms follow LocaleProvider ("12 minutes ago",
+ * "Today 14:05" in English).
+ *
  * Within the hour the readable form is relative ("12 分钟前") and keeps
  * itself current: one shared one-second timer runs while any such Time is
  * mounted, and a Time renders again only when its text changes.
@@ -46,16 +50,17 @@ export function Time({
   delay?: number;
   className?: string;
 }) {
+  const locale = useLocale();
   const date = toDate(value);
   const label = () =>
-    !date ? "" : bare ? clock(date) : friendly(date, { seconds });
+    !date ? "" : bare ? clock(date) : friendly(date, { seconds, locale });
   const live = !bare && isRelative(date, { seconds });
   const text = useSyncExternalStore(
     live ? subscribeTick : subscribeNever,
     label,
     label,
   );
-  const exact = exactTime(date);
+  const exact = exactTime(date, locale);
   if (!date || !exact)
     return (
       <span className={cn("text-muted-foreground", className)}>
@@ -76,7 +81,9 @@ export function Time({
         }
       >
         {text}
-        <span className="sr-only">（{exact.local}）</span>
+        <span className="sr-only">
+          {locale === "zh-CN" ? `（${exact.local}）` : ` (${exact.local})`}
+        </span>
       </TooltipTrigger>
       <TooltipContent>
         <span className="flex flex-col gap-0.5 font-mono tabular-nums">

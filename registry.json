@@ -41,7 +41,14 @@
         "juchangrong/eridanus/input",
         "juchangrong/eridanus/textarea",
         "juchangrong/eridanus/select",
-        "juchangrong/eridanus/input-group"
+        "juchangrong/eridanus/input-group",
+        "juchangrong/eridanus/dropdown-menu",
+        "juchangrong/eridanus/combobox",
+        "juchangrong/eridanus/button",
+        "juchangrong/eridanus/toggle",
+        "juchangrong/eridanus/toggle-group",
+        "juchangrong/eridanus/badge",
+        "juchangrong/eridanus/tabs"
       ],
       "cssVars": {
         "theme": {
@@ -129,6 +136,9 @@
           },
           "code, kbd, samp, pre": {
             "@apply font-mono": {}
+          },
+          "button:not(:disabled, [aria-disabled=\"true\"]), [role=\"button\"]:not([aria-disabled=\"true\"]), [role=\"tab\"], [role=\"checkbox\"], [role=\"radio\"], [role=\"switch\"], [role=\"option\"], [role=\"menuitem\"], [role=\"menuitemcheckbox\"], [role=\"menuitemradio\"], summary": {
+            "cursor": "pointer"
           },
           ":root": {
             "color-scheme": "light"
