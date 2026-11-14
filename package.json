@@ -2,19 +2,16 @@
   "name": "eridanus",
   "private": true,
   "type": "module",
-  "packageManager": "pnpm@10.28.1",
-  "engines": {
-    "node": ">=22.18"
-  },
+  "packageManager": "bun@1.3.9",
   "scripts": {
-    "dev": "vite",
-    "build": "tsc --noEmit && vite build",
-    "typecheck": "tsc --noEmit",
+    "dev": "bun --bun vite",
+    "build": "bun --bun vite build",
+    "typecheck": "bun --bun tsc --noEmit",
     "lint": "biome check .",
     "lint:fix": "biome check --write .",
-    "registry:validate": "shadcn registry validate",
-    "test:install": "node scripts/smoke.ts",
-    "check": "pnpm typecheck && biome ci --error-on-warnings . && pnpm registry:validate && pnpm build"
+    "registry:validate": "bun --bun shadcn registry validate",
+    "test:install": "bun scripts/smoke.ts",
+    "check": "bun run typecheck && biome ci --error-on-warnings . && bun run registry:validate && bun run build"
   },
   "dependencies": {
     "@base-ui/react": "^1.8.0",
@@ -33,7 +30,7 @@
   "devDependencies": {
     "@biomejs/biome": "2.5.14",
     "@tailwindcss/vite": "^4.3.3",
-    "@types/node": "^24.0.0",
+    "@types/bun": "^1.3.9",
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",
     "@vitejs/plugin-react": "^6.1.1",

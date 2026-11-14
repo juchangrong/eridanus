@@ -11,7 +11,7 @@
     "skipLibCheck": true,
     "verbatimModuleSyntax": true,
     "allowImportingTsExtensions": true,
-    "types": ["vite/client", "node"],
+    "types": ["vite/client", "bun"],
     "resolveJsonModule": true,
     "paths": {
       "@/*": ["./src/*"]

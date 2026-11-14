@@ -93,6 +93,8 @@ The repository is itself a shadcn project (Vite, React, Tailwind CSS v4, `compon
 
 ## Quality gates
 
+Bun is the only toolchain: it installs (`bun.lock`; the project `.npmrc` pins the public registry over any mirror in a user's own `~/.npmrc`), runs the scripts, and runs Vite and the shadcn CLI on its own runtime, so no Node install is needed. Biome lints and formats; `tsc` only type-checks.
+
 Every push runs:
 
 1. `tsc` and Biome's linter over the whole repository.

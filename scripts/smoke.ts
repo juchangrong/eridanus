@@ -29,16 +29,23 @@ const out = join(root, ".smoke", "r");
 const app = join(root, ".smoke", "app");
 const shadcn = join(root, "node_modules", ".bin", "shadcn");
 
-/** `answers` is typed into the command's prompts, one per line. */
 function echo(cmd: string, args: string[], cwd: string) {
   console.log(
     `\n$ ${cmd === shadcn ? "shadcn" : cmd} ${args.map((a) => (a.startsWith(root) ? relative(cwd, a) || "." : a)).join(" ")}`,
   );
 }
 
+/** Runs a package's bin, or the shadcn CLI, on Bun's runtime rather than
+ * the Node its shebang asks for. */
+const viaBun = (cmd: string, args: string[]) =>
+  cmd === "bun" ? args : ["--bun", cmd, ...args];
+
 function run(cmd: string, args: string[], cwd: string) {
   echo(cmd, args, cwd);
-  execFileSync(cmd, args, { cwd, stdio: ["ignore", "inherit", "inherit"] });
+  execFileSync("bun", viaBun(cmd, args), {
+    cwd,
+    stdio: ["ignore", "inherit", "inherit"],
+  });
 }
 
 /** Runs the CLI and answers no to every "overwrite?" question as it is
@@ -48,7 +55,10 @@ function run(cmd: string, args: string[], cwd: string) {
 function runDecliningOverwrites(cmd: string, args: string[], cwd: string) {
   echo(cmd, args, cwd);
   return new Promise<void>((resolve, reject) => {
-    const child = spawn(cmd, args, { cwd, stdio: ["pipe", "pipe", "pipe"] });
+    const child = spawn("bun", viaBun(cmd, args), {
+      cwd,
+      stdio: ["pipe", "pipe", "pipe"],
+    });
     let seen = "";
     let answered = 0;
     const read = (into: NodeJS.WriteStream) => (chunk: Buffer) => {
@@ -115,7 +125,7 @@ write(
       dependencies: pick(pkg.dependencies, ["react", "react-dom"]),
       devDependencies: pick(pkg.devDependencies, [
         "@tailwindcss/vite",
-        "@types/node",
+        "@types/bun",
         "@types/react",
         "@types/react-dom",
         "@vitejs/plugin-react",
@@ -142,7 +152,7 @@ write(
         noEmit: true,
         skipLibCheck: true,
         verbatimModuleSyntax: true,
-        types: ["vite/client", "node"],
+        types: ["vite/client", "bun"],
         paths: { "@/*": ["./src/*"] },
       },
       include: ["src", "vite.config.ts"],
@@ -183,7 +193,7 @@ createRoot(document.getElementById("root")!).render(<pre>{Object.keys(modules).j
 `,
 );
 write(join(app, "src", "all.ts"), "export const modules = {};\n");
-run("pnpm", ["install"], app);
+run("bun", ["install"], app);
 
 run(shadcn, ["init", join(out, "base.json"), "--yes"], app);
 const rest = catalog.items
@@ -298,8 +308,8 @@ if (failures.length) {
   );
   process.exit(1);
 }
-run("pnpm", ["exec", "tsc", "--noEmit"], app);
-run("pnpm", ["exec", "vite", "build"], app);
+run("tsc", ["--noEmit"], app);
+run("vite", ["build"], app);
 console.log(
   `\nsmoke: ${catalog.items.length} items, ${expected.length} modules installed and built`,
 );
