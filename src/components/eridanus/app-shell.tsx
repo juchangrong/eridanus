@@ -7,8 +7,8 @@ import {
   SunIcon,
 } from "@phosphor-icons/react";
 import {
-  type ComponentProps,
   cloneElement,
+  type ComponentProps,
   isValidElement,
   type ReactElement,
   type ReactNode,
@@ -145,7 +145,7 @@ function filled(icon: ReactNode): ReactNode {
 }
 
 // A render element: the menu button supplies its children.
-// biome-ignore lint/a11y/useAnchorContent: the label is rendered into it
+// eslint-disable-next-line jsx-a11y/anchor-has-content -- the label is rendered into it
 const defaultLink = (href: string) => <a href={href} />;
 
 /**

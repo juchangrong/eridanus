@@ -57,47 +57,47 @@ The repository is itself a shadcn project (Vite, React, Tailwind CSS v4, `compon
 
 ## Items for v0.1
 
-| Item | Type | What it carries |
-|---|---|---|
-| `base` | base | `base-rhea` on zinc with Phosphor and Inter, JetBrains Mono for code, the status colors, `color-scheme` per theme, the forked fields, AA values for `muted-foreground` and `destructive` |
-| `input`, `textarea`, `select`, `input-group` | ui | forks of shadcn's, installed in their place: no focus ring, a `muted-foreground` focus border and a solid `destructive` border when invalid |
-| `dropdown-menu`, `combobox`, `command` (and `select`) | ui | forks of shadcn's dropdowns: pill highlights in concentric popups |
-| `button`, `toggle`, `toggle-group`, `tabs`, `badge` | ui | forks of shadcn's controls, made pills |
-| `status-colors` | theme | `success`, `warning` and `info` tokens for projects that keep another base |
-| `locale`, `locale-provider` | lib, component | the `zh-CN` and `en-US` locales and the provider that sets the language of every component inside it |
-| `format-time` | lib | readable times in Chinese or English (`刚刚`, `今天 14:05`; `just now`, `Today 14:05`) and the exact local, UTC and relative forms |
-| `clipboard` | lib | copy text with a fallback for pages without the async clipboard |
-| `use-debounced-value`, `use-paging` | hook | settled search input; page state that resets when filters change |
-| `theme-provider` | component | system, light and dark with a stored choice and no transition smear on switch |
-| `time` | component | a readable time with the exact value in a tooltip and for screen readers |
-| `tone-badge` | component | status badges on AA-checked tints (success, error, info, warning, neutral, outline) |
-| `notice` | component | error, warning and neutral notices with an optional action |
-| `empty-state` | component | nothing-here panels without a frame |
-| `copy-button` | component | icon-only copy control with a copied state |
-| `person-avatar` | component | picture or initials, decorative beside the name |
-| `meter` | component | a value against its ceiling, such as in-flight work against a cap |
-| `confirm-dialog` | component | confirmation for irreversible writes; stays open and shows the error until the write succeeds |
-| `form-input` | component | labelled input with its hint and error wired for screen readers |
-| `search-field`, `filter-select` | component | 28px toolbar controls |
-| `pager` | component | range, page size, first/previous/next/last and a page field |
-| `table-kit` | component | open tables: scroll area, pinned header row, loading and empty rows, clickable rows |
-| `page-layout` | component | page container, header, section, fact lists and stat strip |
-| `toaster` | component | toast region with localized labels and a `notify` helper |
-| `id-text` | component | long identifiers shortened in the middle, full value on hover and for screen readers, optional copy |
-| `multi-filter` | component | toolbar filter for several values, with per-value counts |
-| `time-range-picker`, `time-range` | component, lib | trailing presets and whole-day spans, with a short text form for URLs |
-| `table-sort`, `table-selection` | component | sortable headers with aria-sort; row selection across pages with a bulk-action bar |
-| `use-url-state` | hook | filters, sort and paging kept in the address bar's query |
-| `app-shell` | block | sidebar, top bar, breadcrumb slot and account menu with the theme choice |
-| `ui-guidelines` | file | a Claude Code skill with the design rules and the item catalog |
+| Item                                                  | Type           | What it carries                                                                                                                                                                          |
+| ----------------------------------------------------- | -------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `base`                                                | base           | `base-rhea` on zinc with Phosphor and Inter, JetBrains Mono for code, the status colors, `color-scheme` per theme, the forked fields, AA values for `muted-foreground` and `destructive` |
+| `input`, `textarea`, `select`, `input-group`          | ui             | forks of shadcn's, installed in their place: no focus ring, a `muted-foreground` focus border and a solid `destructive` border when invalid                                              |
+| `dropdown-menu`, `combobox`, `command` (and `select`) | ui             | forks of shadcn's dropdowns: pill highlights in concentric popups                                                                                                                        |
+| `button`, `toggle`, `toggle-group`, `tabs`, `badge`   | ui             | forks of shadcn's controls, made pills                                                                                                                                                   |
+| `status-colors`                                       | theme          | `success`, `warning` and `info` tokens for projects that keep another base                                                                                                               |
+| `locale`, `locale-provider`                           | lib, component | the `zh-CN` and `en-US` locales and the provider that sets the language of every component inside it                                                                                     |
+| `format-time`                                         | lib            | readable times in Chinese or English (`刚刚`, `今天 14:05`; `just now`, `Today 14:05`) and the exact local, UTC and relative forms                                                       |
+| `clipboard`                                           | lib            | copy text with a fallback for pages without the async clipboard                                                                                                                          |
+| `use-debounced-value`, `use-paging`                   | hook           | settled search input; page state that resets when filters change                                                                                                                         |
+| `theme-provider`                                      | component      | system, light and dark with a stored choice and no transition smear on switch                                                                                                            |
+| `time`                                                | component      | a readable time with the exact value in a tooltip and for screen readers                                                                                                                 |
+| `tone-badge`                                          | component      | status badges on AA-checked tints (success, error, info, warning, neutral, outline)                                                                                                      |
+| `notice`                                              | component      | error, warning and neutral notices with an optional action                                                                                                                               |
+| `empty-state`                                         | component      | nothing-here panels without a frame                                                                                                                                                      |
+| `copy-button`                                         | component      | icon-only copy control with a copied state                                                                                                                                               |
+| `person-avatar`                                       | component      | picture or initials, decorative beside the name                                                                                                                                          |
+| `meter`                                               | component      | a value against its ceiling, such as in-flight work against a cap                                                                                                                        |
+| `confirm-dialog`                                      | component      | confirmation for irreversible writes; stays open and shows the error until the write succeeds                                                                                            |
+| `form-input`                                          | component      | labelled input with its hint and error wired for screen readers                                                                                                                          |
+| `search-field`, `filter-select`                       | component      | 28px toolbar controls                                                                                                                                                                    |
+| `pager`                                               | component      | range, page size, first/previous/next/last and a page field                                                                                                                              |
+| `table-kit`                                           | component      | open tables: scroll area, pinned header row, loading and empty rows, clickable rows                                                                                                      |
+| `page-layout`                                         | component      | page container, header, section, fact lists and stat strip                                                                                                                               |
+| `toaster`                                             | component      | toast region with localized labels and a `notify` helper                                                                                                                                 |
+| `id-text`                                             | component      | long identifiers shortened in the middle, full value on hover and for screen readers, optional copy                                                                                      |
+| `multi-filter`                                        | component      | toolbar filter for several values, with per-value counts                                                                                                                                 |
+| `time-range-picker`, `time-range`                     | component, lib | trailing presets and whole-day spans, with a short text form for URLs                                                                                                                    |
+| `table-sort`, `table-selection`                       | component      | sortable headers with aria-sort; row selection across pages with a bulk-action bar                                                                                                       |
+| `use-url-state`                                       | hook           | filters, sort and paging kept in the address bar's query                                                                                                                                 |
+| `app-shell`                                           | block          | sidebar, top bar, breadcrumb slot and account menu with the theme choice                                                                                                                 |
+| `ui-guidelines`                                       | file           | a Claude Code skill with the design rules and the item catalog                                                                                                                           |
 
 ## Quality gates
 
-Bun is the only toolchain: it installs (`bun.lock`; the project `.npmrc` pins the public registry over any mirror in a user's own `~/.npmrc`), runs the scripts, and runs Vite and the shadcn CLI on its own runtime, so no Node install is needed. Biome lints and formats; `tsc` only type-checks.
+Bun is the only toolchain, on its canary channel until `bun lint` reaches a stable release. It installs (`bun.lock`; the project `.npmrc` pins the public registry over any mirror in a user's own `~/.npmrc`), runs the scripts, runs Vite and the shadcn CLI on its own runtime, and formats (`bun fmt`), lints (`bun lint`) and type-checks (`bun check`) with the settings in `bunfig.toml`. There is no Node, TypeScript, Biome or ESLint install.
 
 Every push runs:
 
-1. `tsc` and Biome's linter over the whole repository.
+1. `bun check`, `bun lint` (no warnings allowed) and `bun fmt --check` over the whole repository.
 2. `shadcn registry validate`: the schemas, the includes and every referenced file.
 3. The gallery build, which renders every published component.
 4. The install smoke test: `shadcn build` the items, point their Eridanus dependencies at the built files, create a fresh Vite app, `init` it from the built `base`, `add` every item, then type-check and build that app. This catches missing dependencies and import paths that only break after the CLI rewrites them.

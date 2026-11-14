@@ -1,4 +1,5 @@
 import { Component, type ErrorInfo, type ReactNode } from "react";
+
 import { useLocale } from "@/components/eridanus/locale-provider";
 import { Notice } from "@/components/eridanus/notice";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";

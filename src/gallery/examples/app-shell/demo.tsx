@@ -51,7 +51,7 @@ export default function AppShellDemo() {
         brand={{ name: "运营台", logo: <PlanetIcon weight="fill" /> }}
         nav={nav}
         renderLink={(href) => (
-          // biome-ignore lint/a11y/useAnchorContent: the shell renders the label into it
+          // eslint-disable-next-line jsx-a11y/anchor-has-content -- the shell renders the label into it
           <a
             href={href}
             onClick={(e) => {

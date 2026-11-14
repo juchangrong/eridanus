@@ -4,6 +4,7 @@ import type { ReactNode } from "react";
 import { useMessages } from "@/components/eridanus/locale-provider";
 import {
   Toast,
+  toast,
   ToastClose,
   ToastContent,
   ToastDescription,
@@ -11,7 +12,6 @@ import {
   ToastProvider,
   ToastTitle,
   ToastViewport,
-  toast,
   useToastManager,
 } from "@/components/ui/toast";
 import type { Locale } from "@/lib/eridanus/locale";

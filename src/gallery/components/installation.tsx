@@ -49,7 +49,9 @@ function useManager() {
     manager = next;
     try {
       localStorage.setItem(STORAGE_KEY, next);
-    } catch {}
+    } catch {
+      // Storage can be off, as in a private window; the choice lasts the visit.
+    }
     for (const l of listeners) l();
   };
   return [value, set] as const;

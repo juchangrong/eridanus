@@ -63,7 +63,7 @@ function runDecliningOverwrites(cmd: string, args: string[], cwd: string) {
     let answered = 0;
     const read = (into: NodeJS.WriteStream) => (chunk: Buffer) => {
       into.write(chunk);
-      // biome-ignore lint/suspicious/noControlCharactersInRegex: strips ANSI
+      // eslint-disable-next-line no-control-regex -- strips ANSI
       seen += chunk.toString().replace(/\x1b\[[0-9;?]*[A-Za-z]/g, "");
       const asked = seen.split("(y/N)").length - 1;
       for (; answered < asked; answered++) child.stdin.write("n");
@@ -130,7 +130,6 @@ write(
         "@types/react-dom",
         "@vitejs/plugin-react",
         "tailwindcss",
-        "typescript",
         "vite",
       ]),
     },
@@ -308,7 +307,7 @@ if (failures.length) {
   );
   process.exit(1);
 }
-run("tsc", ["--noEmit"], app);
+run("bun", ["check"], app);
 run("vite", ["build"], app);
 console.log(
   `\nsmoke: ${catalog.items.length} items, ${expected.length} modules installed and built`,

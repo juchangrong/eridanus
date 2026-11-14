@@ -13,7 +13,10 @@
       // page does not flash light while the app loads.
       try {
         const stored = localStorage.getItem("eridanus-gallery-theme");
-        const dark = stored === "dark" || (stored !== "light" && matchMedia("(prefers-color-scheme: dark)").matches);
+        const dark =
+          stored === "dark" ||
+          (stored !== "light" &&
+            matchMedia("(prefers-color-scheme: dark)").matches);
         document.documentElement.classList.toggle("dark", dark);
         document.documentElement.dataset.theme = dark ? "dark" : "light";
       } catch {}

@@ -167,7 +167,7 @@ export function Facts({
       <dl className="grid grid-cols-1 gap-x-6 gap-y-4 @3xs:grid-cols-2">
         {items.map((item, i) => (
           <div
-            // biome-ignore lint/suspicious/noArrayIndexKey: items have no id and keep the caller's order
+            // eslint-disable-next-line react/no-array-index-key -- items have no id and keep the caller's order
             key={i}
             className={cn(
               "flex min-w-0 flex-col gap-1",
@@ -205,7 +205,7 @@ export function StatStrip({
   return (
     <dl className="m-0 grid shrink-0 grid-cols-[repeat(auto-fit,minmax(7rem,1fr))] gap-x-6 gap-y-4">
       {items.map((item, i) => (
-        // biome-ignore lint/suspicious/noArrayIndexKey: items have no id and keep the caller's order
+        // eslint-disable-next-line react/no-array-index-key -- items have no id and keep the caller's order
         <div key={i} className="flex min-w-0 flex-col gap-1">
           <dt className="truncate text-sm text-muted-foreground">
             {item.label}

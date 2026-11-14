@@ -14,8 +14,8 @@ import {
 import { Button } from "@/components/ui/button";
 
 import {
-  type DocEntry,
   describe,
+  type DocEntry,
   exportedNames,
   groupTitle,
   ORDER,

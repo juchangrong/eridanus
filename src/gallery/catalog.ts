@@ -5,6 +5,7 @@
  */
 
 import type { Locale } from "@/lib/eridanus/locale";
+
 import root from "../../registry.json";
 import skills from "../../skills/registry.json";
 import components from "../components/eridanus/registry.json";

@@ -13,10 +13,10 @@ export function Prose({ text }: { text: string }) {
   // The parts of a fixed string never reorder, so their index is their key.
   return text.split("`").map((part, i) =>
     i % 2 === 1 ? (
-      // biome-ignore lint/suspicious/noArrayIndexKey: see above
+      // eslint-disable-next-line react/no-array-index-key -- see above
       <InlineCode key={i}>{part}</InlineCode>
     ) : (
-      // biome-ignore lint/suspicious/noArrayIndexKey: see above
+      // eslint-disable-next-line react/no-array-index-key -- see above
       <Fragment key={i}>{part}</Fragment>
     ),
   );
