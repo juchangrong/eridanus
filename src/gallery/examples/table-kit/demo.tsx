@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 
 import { FilterSelect } from "@/components/eridanus/filter-select";
-import { defaultPagerLabels, Pager } from "@/components/eridanus/pager";
+import { Pager } from "@/components/eridanus/pager";
 import { SearchField } from "@/components/eridanus/search-field";
 import {
   ClickableRow,
@@ -128,7 +128,7 @@ export default function TableKitDemo() {
         {...paging}
         total={rows.length}
         pageSizes={[10, 20, 50]}
-        labels={{ ...defaultPagerLabels, navigation: "运行列表分页" }}
+        labels={{ navigation: "运行列表分页" }}
       />
     </div>
   );

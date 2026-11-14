@@ -1,5 +1,6 @@
 import { CaretDownIcon } from "@phosphor-icons/react";
 
+import { useMessages } from "@/components/eridanus/locale-provider";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -10,6 +11,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import type { Locale } from "@/lib/eridanus/locale";
 import { cn } from "@/lib/utils";
 
 export interface MultiFilterOption {
@@ -18,6 +20,20 @@ export interface MultiFilterOption {
   /** How many rows have this value, shown at the end of the option. */
   count?: number;
 }
+
+const MESSAGES: Record<
+  Locale,
+  { clear: string; count: (count: number) => string }
+> = {
+  "zh-CN": {
+    clear: "清除筛选",
+    count: (n) => `已选 ${n.toLocaleString()} 项`,
+  },
+  "en-US": {
+    clear: "Clear filter",
+    count: (n) => `${n.toLocaleString()} selected`,
+  },
+};
 
 /**
  * A filter that takes several values at once ("状态 failed, running"). The
@@ -31,8 +47,8 @@ export function MultiFilter({
   value,
   onChange,
   options,
-  clearLabel = "清除筛选",
-  countLabel = (n) => `已选 ${n.toLocaleString()} 项`,
+  clearLabel,
+  countLabel,
   className,
 }: {
   /** What is filtered; shown in the trigger and in its accessible name. */
@@ -45,6 +61,7 @@ export function MultiFilter({
   countLabel?: (count: number) => string;
   className?: string;
 }) {
+  const t = useMessages(MESSAGES);
   const chosen = options.filter((o) => value.includes(o.value));
 
   return (
@@ -60,7 +77,9 @@ export function MultiFilter({
       >
         <span className="text-muted-foreground">{label}</span>
         {chosen.length > 2 ? (
-          <Badge variant="secondary">{countLabel(chosen.length)}</Badge>
+          <Badge variant="secondary">
+            {(countLabel ?? t.count)(chosen.length)}
+          </Badge>
         ) : (
           chosen.map((o) => (
             <Badge key={o.value} variant="secondary" className="max-w-32">
@@ -99,7 +118,7 @@ export function MultiFilter({
               className="justify-center text-muted-foreground"
               onClick={() => onChange([])}
             >
-              {clearLabel}
+              {clearLabel ?? t.clear}
             </DropdownMenuItem>
           </>
         ) : null}

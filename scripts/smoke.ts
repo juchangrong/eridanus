@@ -12,7 +12,7 @@
  *
  * Needs network access for npm packages and shadcn's own primitives.
  */
-import { execFileSync } from "node:child_process";
+import { execFileSync, spawn } from "node:child_process";
 import {
   existsSync,
   mkdirSync,
@@ -29,11 +29,54 @@ const out = join(root, ".smoke", "r");
 const app = join(root, ".smoke", "app");
 const shadcn = join(root, "node_modules", ".bin", "shadcn");
 
-function run(cmd: string, args: string[], cwd: string) {
+function echo(cmd: string, args: string[], cwd: string) {
   console.log(
     `\n$ ${cmd === shadcn ? "shadcn" : cmd} ${args.map((a) => (a.startsWith(root) ? relative(cwd, a) || "." : a)).join(" ")}`,
   );
-  execFileSync(cmd, args, { cwd, stdio: ["ignore", "inherit", "inherit"] });
+}
+
+/** Runs a package's bin, or the shadcn CLI, on Bun's runtime rather than
+ * the Node its shebang asks for. */
+const viaBun = (cmd: string, args: string[]) =>
+  cmd === "bun" ? args : ["--bun", cmd, ...args];
+
+function run(cmd: string, args: string[], cwd: string) {
+  echo(cmd, args, cwd);
+  execFileSync("bun", viaBun(cmd, args), {
+    cwd,
+    stdio: ["ignore", "inherit", "inherit"],
+  });
+}
+
+/** Runs the CLI and answers no to every "overwrite?" question as it is
+ * asked; answers piped up front reach only the first question. Questions
+ * arrive on stdout and the file summary on stderr; stdin closes after the
+ * summary, which follows the last question, or the CLI would wait on it. */
+function runDecliningOverwrites(cmd: string, args: string[], cwd: string) {
+  echo(cmd, args, cwd);
+  return new Promise<void>((resolve, reject) => {
+    const child = spawn("bun", viaBun(cmd, args), {
+      cwd,
+      stdio: ["pipe", "pipe", "pipe"],
+    });
+    let seen = "";
+    let answered = 0;
+    const read = (into: NodeJS.WriteStream) => (chunk: Buffer) => {
+      into.write(chunk);
+      // eslint-disable-next-line no-control-regex -- strips ANSI
+      seen += chunk.toString().replace(/\x1b\[[0-9;?]*[A-Za-z]/g, "");
+      const asked = seen.split("(y/N)").length - 1;
+      for (; answered < asked; answered++) child.stdin.write("n");
+      if (/(Created|Updated|Skipped) \d+ files?/.test(seen)) child.stdin.end();
+    };
+    child.stdout.on("data", read(process.stdout));
+    child.stderr.on("data", read(process.stderr));
+    child.on("error", reject);
+    // "exit", not "close": a process the CLI starts can hold stdout open.
+    child.on("exit", (code) =>
+      code === 0 ? resolve() : reject(new Error(`${cmd} exited with ${code}`)),
+    );
+  });
 }
 
 function write(path: string, content: string) {
@@ -82,12 +125,11 @@ write(
       dependencies: pick(pkg.dependencies, ["react", "react-dom"]),
       devDependencies: pick(pkg.devDependencies, [
         "@tailwindcss/vite",
-        "@types/node",
+        "@types/bun",
         "@types/react",
         "@types/react-dom",
         "@vitejs/plugin-react",
         "tailwindcss",
-        "typescript",
         "vite",
       ]),
     },
@@ -109,7 +151,7 @@ write(
         noEmit: true,
         skipLibCheck: true,
         verbatimModuleSyntax: true,
-        types: ["vite/client", "node"],
+        types: ["vite/client", "bun"],
         paths: { "@/*": ["./src/*"] },
       },
       include: ["src", "vite.config.ts"],
@@ -150,13 +192,17 @@ createRoot(document.getElementById("root")!).render(<pre>{Object.keys(modules).j
 `,
 );
 write(join(app, "src", "all.ts"), "export const modules = {};\n");
-run("pnpm", ["install"], app);
+run("bun", ["install"], app);
 
 run(shadcn, ["init", join(out, "base.json"), "--yes"], app);
 const rest = catalog.items
   .filter((i) => i.type !== "registry:base")
   .map((i) => join(out, `${i.name}.json`));
-run(shadcn, ["add", ...rest, "--yes"], app);
+// An upstream item that depends on a forked primitive (sidebar on input,
+// dialog on button) makes the CLI ask before overwriting the fork. Consumers
+// answer no, and so does the test; the fork check below proves the forks
+// survived.
+await runDecliningOverwrites(shadcn, ["add", ...rest, "--yes"], app);
 
 // 4. The promises the base makes, then a full type-check and build.
 const failures: string[] = [];
@@ -223,7 +269,20 @@ for (const spec of expected) {
 }
 // The forks replace shadcn's files, so a CLI that kept an existing upstream
 // copy would still build; check the installed files are the forks.
-for (const fork of ["input", "textarea", "select", "input-group"]) {
+for (const fork of [
+  "input",
+  "textarea",
+  "select",
+  "input-group",
+  "dropdown-menu",
+  "combobox",
+  "button",
+  "toggle",
+  "toggle-group",
+  "badge",
+  "tabs",
+  "command",
+]) {
   const file = join(app, "src", "components", "ui", `${fork}.tsx`);
   if (
     !existsSync(file) ||
@@ -248,8 +307,8 @@ if (failures.length) {
   );
   process.exit(1);
 }
-run("pnpm", ["exec", "tsc", "--noEmit"], app);
-run("pnpm", ["exec", "vite", "build"], app);
+run("bun", ["check"], app);
+run("vite", ["build"], app);
 console.log(
   `\nsmoke: ${catalog.items.length} items, ${expected.length} modules installed and built`,
 );

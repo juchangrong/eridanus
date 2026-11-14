@@ -5,15 +5,9 @@
       "name": "input",
       "type": "registry:ui",
       "title": "Input",
-      "description": "Eridanus fork of the shadcn base-rhea input, installed in place of it at components/ui/input.tsx. Focus and errors show on the border alone: no focus ring, a muted-foreground border on focus (3:1 or better against the field in both themes) and a solid destructive border when invalid. Same API as shadcn's.",
-      "categories": [
-        "form",
-        "shadcn-fork"
-      ],
-      "dependencies": [
-        "@base-ui/react",
-        "cn"
-      ],
+      "description": "Eridanus fork of the shadcn base-rhea input, installed in place of it at components/ui/input.tsx. Focus and errors show on the border alone: no focus ring, a muted-foreground border on focus (3:1 or better against the field in both themes) and a solid destructive border when invalid. Same API as shadcn's. The field is a pill, with its text 12px in to line up with a Select's value.",
+      "categories": ["form", "shadcn-fork"],
+      "dependencies": ["@base-ui/react", "cn"],
       "files": [
         {
           "path": "input.tsx",
@@ -25,14 +19,9 @@
       "name": "textarea",
       "type": "registry:ui",
       "title": "Textarea",
-      "description": "Eridanus fork of the shadcn base-rhea textarea, installed in place of it at components/ui/textarea.tsx. Focus and errors show on the border alone: no focus ring, a muted-foreground border on focus (3:1 or better against the field in both themes) and a solid destructive border when invalid. Same API as shadcn's.",
-      "categories": [
-        "form",
-        "shadcn-fork"
-      ],
-      "dependencies": [
-        "cn"
-      ],
+      "description": "Eridanus fork of the shadcn base-rhea textarea, installed in place of it at components/ui/textarea.tsx. Focus and errors show on the border alone: no focus ring, a muted-foreground border on focus (3:1 or better against the field in both themes) and a solid destructive border when invalid. Same API as shadcn's. Its corners are 16px, the same as a multi-line input group.",
+      "categories": ["form", "shadcn-fork"],
+      "dependencies": ["cn"],
       "files": [
         {
           "path": "textarea.tsx",
@@ -44,16 +33,9 @@
       "name": "select",
       "type": "registry:ui",
       "title": "Select",
-      "description": "Eridanus fork of the shadcn base-rhea select, installed in place of it at components/ui/select.tsx. Focus and errors show on the border alone: no focus ring, a muted-foreground border on focus (3:1 or better against the field in both themes) and a solid destructive border when invalid. Applies to the trigger; same API as shadcn's.",
-      "categories": [
-        "form",
-        "shadcn-fork"
-      ],
-      "dependencies": [
-        "@base-ui/react",
-        "cn",
-        "@phosphor-icons/react"
-      ],
+      "description": "Eridanus fork of the shadcn base-rhea select, installed in place of it at components/ui/select.tsx. Focus and errors show on the border alone: no focus ring, a muted-foreground border on focus (3:1 or better against the field in both themes) and a solid destructive border when invalid. The popup pads its list so the selected option lands on the value, grows to fit its longest option, and highlights options as pills inside concentric corners; the trigger is a pill too. Same API as shadcn's.",
+      "categories": ["form", "shadcn-fork"],
+      "dependencies": ["@base-ui/react", "cn", "@phosphor-icons/react"],
       "files": [
         {
           "path": "select.tsx",
@@ -65,23 +47,135 @@
       "name": "input-group",
       "type": "registry:ui",
       "title": "Input Group",
-      "description": "Eridanus fork of the shadcn base-rhea input group, installed in place of it at components/ui/input-group.tsx, on the forked input and textarea. Focus and errors show on the border alone: no focus ring, a muted-foreground border on focus (3:1 or better against the field in both themes) and a solid destructive border when invalid. Same API as shadcn's.",
-      "categories": [
-        "form",
-        "shadcn-fork"
-      ],
-      "dependencies": [
-        "class-variance-authority",
-        "cn"
-      ],
+      "description": "Eridanus fork of the shadcn base-rhea input group, installed in place of it at components/ui/input-group.tsx, on the forked input and textarea. Focus and errors show on the border alone: no focus ring, a muted-foreground border on focus (3:1 or better against the field in both themes) and a solid destructive border when invalid. Same API as shadcn's. Its corners are 16px, a pill at the single-line height, with pill buttons inside.",
+      "categories": ["form", "shadcn-fork"],
+      "dependencies": ["class-variance-authority", "cn"],
       "registryDependencies": [
-        "button",
+        "juchangrong/eridanus/button",
         "juchangrong/eridanus/input",
         "juchangrong/eridanus/textarea"
       ],
       "files": [
         {
           "path": "input-group.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
+      "name": "dropdown-menu",
+      "type": "registry:ui",
+      "title": "Dropdown Menu",
+      "description": "Eridanus fork of the shadcn base-rhea dropdown menu, installed in place of it at components/ui/dropdown-menu.tsx. The highlighted item is a pill and the popup's corners stay concentric with it (16px pill radius plus the 4px list padding), matching Select and Combobox. Same API as shadcn's.",
+      "categories": ["menu", "shadcn-fork"],
+      "dependencies": ["@base-ui/react", "cn", "@phosphor-icons/react"],
+      "files": [
+        {
+          "path": "dropdown-menu.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
+      "name": "combobox",
+      "type": "registry:ui",
+      "title": "Combobox",
+      "description": "Eridanus fork of the shadcn base-rhea combobox, installed in place of it at components/ui/combobox.tsx. The highlighted option is a pill and the popup's corners stay concentric with it (16px pill radius plus the 4px list padding), matching Select and Dropdown Menu. Same API as shadcn's. The chips field has 16px corners (a pill on one line) and pill chips.",
+      "categories": ["form", "shadcn-fork"],
+      "dependencies": ["@base-ui/react", "cn", "@phosphor-icons/react"],
+      "registryDependencies": [
+        "juchangrong/eridanus/button",
+        "juchangrong/eridanus/input-group"
+      ],
+      "files": [
+        {
+          "path": "combobox.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
+      "name": "button",
+      "type": "registry:ui",
+      "title": "Button",
+      "description": "Eridanus fork of the shadcn base-rhea button, installed in place of it at components/ui/button.tsx. Every size is a pill and icon sizes are circles, matching the fields and the Select trigger. Same API as shadcn's.",
+      "categories": ["button", "shadcn-fork"],
+      "dependencies": ["@base-ui/react", "class-variance-authority", "cn"],
+      "files": [
+        {
+          "path": "button.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
+      "name": "toggle",
+      "type": "registry:ui",
+      "title": "Toggle",
+      "description": "Eridanus fork of the shadcn base-rhea toggle, installed in place of it at components/ui/toggle.tsx. It is a pill, like Button. Same API as shadcn's.",
+      "categories": ["button", "shadcn-fork"],
+      "dependencies": ["@base-ui/react", "class-variance-authority", "cn"],
+      "files": [
+        {
+          "path": "toggle.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
+      "name": "toggle-group",
+      "type": "registry:ui",
+      "title": "Toggle Group",
+      "description": "Eridanus fork of the shadcn base-rhea toggle group, installed in place of it at components/ui/toggle-group.tsx. Items are pills; a joined horizontal group is one pill, and a joined vertical group has 16px outer corners. Same API as shadcn's.",
+      "categories": ["button", "shadcn-fork"],
+      "dependencies": ["@base-ui/react", "class-variance-authority", "cn"],
+      "registryDependencies": ["juchangrong/eridanus/toggle"],
+      "files": [
+        {
+          "path": "toggle-group.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
+      "name": "badge",
+      "type": "registry:ui",
+      "title": "Badge",
+      "description": "Eridanus fork of the shadcn base-rhea badge, installed in place of it at components/ui/badge.tsx. It is a pill, like Button. Same API as shadcn's.",
+      "categories": ["data-display", "shadcn-fork"],
+      "dependencies": ["@base-ui/react", "class-variance-authority", "cn"],
+      "files": [
+        {
+          "path": "badge.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
+      "name": "tabs",
+      "type": "registry:ui",
+      "title": "Tabs",
+      "description": "Eridanus fork of the shadcn base-rhea tabs, installed in place of it at components/ui/tabs.tsx. The default list is a pill with pill triggers (16px corners when vertical); the line variant is unchanged. Same API as shadcn's.",
+      "categories": ["navigation", "shadcn-fork"],
+      "dependencies": ["@base-ui/react", "class-variance-authority", "cn"],
+      "files": [
+        {
+          "path": "tabs.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
+      "name": "command",
+      "type": "registry:ui",
+      "title": "Command",
+      "description": "Eridanus fork of the shadcn base-rhea command, installed in place of it at components/ui/command.tsx. Items highlight as pills inside 20px corners, matching the dropdowns. Same API as shadcn's.",
+      "categories": ["menu", "shadcn-fork"],
+      "dependencies": ["cmdk", "cn", "@phosphor-icons/react"],
+      "registryDependencies": ["dialog", "juchangrong/eridanus/input-group"],
+      "files": [
+        {
+          "path": "command.tsx",
           "type": "registry:ui"
         }
       ]

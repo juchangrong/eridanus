@@ -15,6 +15,11 @@ import {
 } from "@/components/ui/input-group"
 import { MagnifyingGlassIcon, CheckIcon } from "@phosphor-icons/react"
 
+/**
+ * Eridanus fork of shadcn's base-rhea command. Items highlight as pills inside
+ * 20px corners (16px pill radius plus the 4px padding), as in every Eridanus
+ * dropdown. Upstream changes are merged by hand, see docs/plan.md.
+ */
 function Command({
   className,
   ...props
@@ -23,7 +28,7 @@ function Command({
     <CommandPrimitive
       data-slot="command"
       className={cn(
-        "flex size-full flex-col overflow-hidden rounded-3xl bg-popover p-1 text-popover-foreground",
+        "flex size-full flex-col overflow-hidden rounded-[1.25rem] bg-popover p-1 text-popover-foreground",
         className
       )}
       {...props}
@@ -53,7 +58,7 @@ function CommandDialog({
       </DialogHeader>
       <DialogContent
         className={cn(
-          "top-1/3 translate-y-0 overflow-hidden rounded-3xl! p-0",
+          "top-1/3 translate-y-0 overflow-hidden rounded-[1.25rem]! p-0",
           className
         )}
         showCloseButton={showCloseButton}
@@ -154,7 +159,7 @@ function CommandItem({
     <CommandPrimitive.Item
       data-slot="command-item"
       className={cn(
-        "group/command-item relative flex min-h-7 cursor-default items-center gap-2 rounded-xl px-2 py-1.5 text-sm outline-hidden select-none in-data-[slot=dialog-content]:rounded-2xl data-[disabled=true]:pointer-events-none data-[disabled=true]:opacity-50 data-selected:bg-muted data-selected:text-foreground [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 data-selected:*:[svg]:text-foreground",
+        "group/command-item relative flex min-h-7 cursor-pointer items-center gap-2 rounded-full px-2 py-1.5 text-sm outline-hidden select-none data-[disabled=true]:pointer-events-none data-[disabled=true]:opacity-50 data-selected:bg-muted data-selected:text-foreground [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 data-selected:*:[svg]:text-foreground",
         className
       )}
       {...props}

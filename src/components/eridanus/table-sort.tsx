@@ -81,7 +81,7 @@ export function SortableHead({
       <button
         type="button"
         className={cn(
-          "-mx-1 inline-flex h-6 items-center gap-1 rounded-sm px-1 outline-offset-1 hover:text-foreground focus-visible:outline-2 focus-visible:outline-ring",
+          "-mx-2 inline-flex h-6 items-center gap-1 rounded-full px-2 outline-offset-1 hover:text-foreground focus-visible:outline-2 focus-visible:outline-ring",
           active && "text-foreground",
           align === "end" && "flex-row-reverse",
         )}

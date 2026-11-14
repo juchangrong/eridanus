@@ -18,7 +18,7 @@ import {
 
 export default function CommandDemo() {
   return (
-    <Command className="max-w-sm rounded-3xl border">
+    <Command className="max-w-sm border">
       <CommandInput placeholder="输入命令或搜索…" aria-label="命令" />
       <CommandList>
         <CommandEmpty>没有匹配的结果</CommandEmpty>

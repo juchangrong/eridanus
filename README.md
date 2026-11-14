@@ -11,11 +11,14 @@ npx shadcn@latest add juchangrong/eridanus/time        # add an item to a shadcn
 ## Development
 
 ```bash
-pnpm install
-pnpm dev            # the docs site: every item and shadcn primitive with live examples
-pnpm check          # type-check, lint, registry validation and the docs build
-pnpm lint:fix       # format, sort imports and apply safe lint fixes with Biome
-pnpm test:install   # install every item into a fresh app and build it
+bun install
+bun run dev          # the docs site: every item and shadcn primitive with live examples
+bun check            # type-check, lint, format check, registry validation and the docs build
+bun fmt              # format, sort imports and Tailwind classes
+bun lint --fix       # apply safe lint fixes
+bun run test:install # install every item into a fresh app and build it
 ```
+
+Bun's linter ships only in canary builds so far: `bun upgrade --canary`.
 
 See [docs/plan.md](docs/plan.md) for the scope, layout and roadmap.

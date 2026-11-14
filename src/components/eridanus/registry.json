@@ -5,9 +5,13 @@
       "name": "time",
       "type": "registry:component",
       "title": "Time",
-      "description": "Renders an instant as readable Chinese text (12 分钟前, 今天 14:05) inside a <time> element, with a tooltip giving the exact local time to the millisecond, the UTC time and the relative time; screen readers get the exact local time too. Within the hour the relative form (12 分钟前) keeps itself current on one shared timer. Props: value (Date | ISO string | epoch ms), clock (bare HH:mm:ss), seconds, placeholder, delay.",
+      "description": "Renders an instant as readable text in the LocaleProvider language (12 分钟前, 今天 14:05; 12 minutes ago, Today 14:05) inside a <time> element, with a tooltip giving the exact local time to the millisecond, the UTC time and the relative time; screen readers get the exact local time too. Within the hour the relative form (12 分钟前, 12 minutes ago) keeps itself current on one shared timer. Props: value (Date | ISO string | epoch ms), clock (bare HH:mm:ss), seconds, placeholder, delay.",
       "categories": ["time", "data-display"],
-      "registryDependencies": ["tooltip", "juchangrong/eridanus/format-time"],
+      "registryDependencies": [
+        "tooltip",
+        "juchangrong/eridanus/format-time",
+        "juchangrong/eridanus/locale-provider"
+      ],
       "files": [
         {
           "path": "time.tsx",
@@ -22,7 +26,10 @@
       "title": "ToneBadge",
       "description": "Status badge with a tone: success, error, info, warning, neutral or outline. Tinted backgrounds keep the text at 4.5:1 or better in both themes; the word always states the status, so it never relies on color alone. Map domain states (failed, running, …) to tones at the call site.",
       "categories": ["status", "data-display"],
-      "registryDependencies": ["badge", "juchangrong/eridanus/status-colors"],
+      "registryDependencies": [
+        "juchangrong/eridanus/badge",
+        "juchangrong/eridanus/status-colors"
+      ],
       "files": [
         {
           "path": "tone-badge.tsx",
@@ -66,10 +73,14 @@
       "name": "copy-button",
       "type": "registry:component",
       "title": "CopyButton",
-      "description": "Icon-only copy button: copies text, cross-fades the copy icon to a check for 1.5 s and switches its accessible name to 已复制. Props: text, label (default 复制), copiedLabel, variant, size.",
+      "description": "Icon-only copy button: copies text, cross-fades the copy icon to a check for 1.5 s and switches its accessible name to 已复制 (Copied). Props: text, label (default 复制, Copy), copiedLabel, variant, size.",
       "categories": ["clipboard", "actions"],
       "dependencies": ["@phosphor-icons/react"],
-      "registryDependencies": ["button", "juchangrong/eridanus/clipboard"],
+      "registryDependencies": [
+        "juchangrong/eridanus/button",
+        "juchangrong/eridanus/clipboard",
+        "juchangrong/eridanus/locale-provider"
+      ],
       "files": [
         {
           "path": "copy-button.tsx",
@@ -89,6 +100,21 @@
           "path": "theme-provider.tsx",
           "type": "registry:component",
           "target": "@components/eridanus/theme-provider.tsx"
+        }
+      ]
+    },
+    {
+      "name": "locale-provider",
+      "type": "registry:component",
+      "title": "LocaleProvider",
+      "description": "Sets the language of every Eridanus component inside it, Chinese (zh-CN, the default without a provider) or English (en-US): built-in labels, readable times, time ranges and the calendar. Text passed through a component's props always wins. LocaleProvider takes the locale as a prop, so the app owns the choice; useLocale() reads it and useMessages() picks from a per-locale table.",
+      "categories": ["i18n", "provider"],
+      "registryDependencies": ["juchangrong/eridanus/locale"],
+      "files": [
+        {
+          "path": "locale-provider.tsx",
+          "type": "registry:component",
+          "target": "@components/eridanus/locale-provider.tsx"
         }
       ]
     },
@@ -144,7 +170,10 @@
       "description": "A 28px toolbar search input with a magnifier and a clear button; Escape clears a non-empty field. label is the accessible name.",
       "categories": ["forms", "search", "toolbar"],
       "dependencies": ["@phosphor-icons/react"],
-      "registryDependencies": ["juchangrong/eridanus/input-group"],
+      "registryDependencies": [
+        "juchangrong/eridanus/input-group",
+        "juchangrong/eridanus/locale-provider"
+      ],
       "files": [
         {
           "path": "search-field.tsx",
@@ -157,9 +186,12 @@
       "name": "filter-select",
       "type": "registry:component",
       "title": "FilterSelect",
-      "description": "A 28px select for filtering a list; the trigger reads \"<label> <choice>\" and the first option, allLabel (全部), means no filter (value \"\").",
+      "description": "A 28px select for filtering a list; the trigger reads \"<label> <choice>\" and the first option, allLabel (全部, All), means no filter (value \"\").",
       "categories": ["forms", "toolbar"],
-      "registryDependencies": ["juchangrong/eridanus/select"],
+      "registryDependencies": [
+        "juchangrong/eridanus/select",
+        "juchangrong/eridanus/locale-provider"
+      ],
       "files": [
         {
           "path": "filter-select.tsx",
@@ -172,13 +204,14 @@
       "name": "pager",
       "type": "registry:component",
       "title": "Pager",
-      "description": "Paging controls under a table: the range shown (第 1–50 条，共 173 条), an optional page-size select, first/previous/next/last buttons and a page field. Zero-based; folds back to the last page when the total shrinks. All text comes from the labels prop.",
+      "description": "Paging controls under a table: the range shown (第 1–50 条，共 173 条 or 1–50 of 173), an optional page-size select, first/previous/next/last buttons and a page field. Zero-based; folds back to the last page when the total shrinks. Text follows LocaleProvider; the labels prop replaces any part of it.",
       "categories": ["table", "navigation"],
       "dependencies": ["@phosphor-icons/react"],
       "registryDependencies": [
-        "button",
+        "juchangrong/eridanus/button",
         "juchangrong/eridanus/input",
-        "juchangrong/eridanus/select"
+        "juchangrong/eridanus/select",
+        "juchangrong/eridanus/locale-provider"
       ],
       "files": [
         {
@@ -197,7 +230,8 @@
       "registryDependencies": [
         "table",
         "juchangrong/eridanus/empty-state",
-        "juchangrong/eridanus/status-colors"
+        "juchangrong/eridanus/status-colors",
+        "juchangrong/eridanus/locale-provider"
       ],
       "files": [
         {
@@ -231,9 +265,10 @@
       "dependencies": ["@base-ui/react"],
       "registryDependencies": [
         "alert-dialog",
-        "button",
+        "juchangrong/eridanus/button",
         "spinner",
-        "juchangrong/eridanus/notice"
+        "juchangrong/eridanus/notice",
+        "juchangrong/eridanus/locale-provider"
       ],
       "files": [
         {
@@ -247,10 +282,14 @@
       "name": "toaster",
       "type": "registry:component",
       "title": "AppToaster",
-      "description": "AppToaster (a toast region with the region and close buttons named in Chinese) and notify(title, { description, type }) for success toasts that close after 4 s and error toasts that are announced at once and stay.",
+      "description": "AppToaster (a toast region with the region and close buttons named in the LocaleProvider language) and notify(title, { description, type }) for success toasts that close after 4 s and error toasts that are announced at once and stay.",
       "categories": ["feedback"],
       "dependencies": ["@phosphor-icons/react"],
-      "registryDependencies": ["toast", "juchangrong/eridanus/status-colors"],
+      "registryDependencies": [
+        "toast",
+        "juchangrong/eridanus/status-colors",
+        "juchangrong/eridanus/locale-provider"
+      ],
       "files": [
         {
           "path": "toaster.tsx",
@@ -278,10 +317,15 @@
       "name": "multi-filter",
       "type": "registry:component",
       "title": "MultiFilter",
-      "description": "Toolbar filter that takes several values (状态 failed, running): a 28px trigger naming what it filters with up to two chosen labels or a count, and a menu of checkbox items, with optional per-value counts, that stays open while values are toggled and ends with a clear item. Value is a string array; [] means no filter. Pairs with useUrlListState.",
+      "description": "Toolbar filter that takes several values (状态 failed, running; Status failed, running): a 28px trigger naming what it filters with up to two chosen labels or a count, and a menu of checkbox items, with optional per-value counts, that stays open while values are toggled and ends with a clear item. Value is a string array; [] means no filter. Pairs with useUrlListState.",
       "categories": ["filter", "form"],
       "dependencies": ["@phosphor-icons/react"],
-      "registryDependencies": ["badge", "button", "dropdown-menu"],
+      "registryDependencies": [
+        "juchangrong/eridanus/badge",
+        "juchangrong/eridanus/button",
+        "juchangrong/eridanus/dropdown-menu",
+        "juchangrong/eridanus/locale-provider"
+      ],
       "files": [
         {
           "path": "multi-filter.tsx",
@@ -294,15 +338,16 @@
       "name": "time-range-picker",
       "type": "registry:component",
       "title": "TimeRangePicker",
-      "description": "Time filter for log, run and metrics pages: trailing presets (最近 15 分钟 … 最近 30 天) that apply on one click, and a Chinese calendar for a span of whole days, applied with a button; future days are disabled. Value is a time-range TimeRange; store it in the URL with formatTimeRange/parseTimeRange.",
+      "description": "Time filter for log, run and metrics pages: trailing presets (最近 15 分钟 … 最近 30 天, or Last 15 minutes … Last 30 days in English) that apply on one click, and a calendar in the LocaleProvider language for a span of whole days, applied with a button; future days are disabled. Value is a time-range TimeRange; store it in the URL with formatTimeRange/parseTimeRange.",
       "categories": ["filter", "time"],
       "dependencies": ["@phosphor-icons/react", "react-day-picker"],
       "registryDependencies": [
-        "button",
+        "juchangrong/eridanus/button",
         "calendar",
         "popover",
         "juchangrong/eridanus/format-time",
-        "juchangrong/eridanus/time-range"
+        "juchangrong/eridanus/time-range",
+        "juchangrong/eridanus/locale-provider"
       ],
       "files": [
         {
@@ -335,16 +380,42 @@
       "description": "Row selection and bulk actions for table-kit tables: useRowSelection(visibleIds, filters) keeps selected ids across pages and clears them when a filter changes; SelectAllHead (with a mixed state), SelectCell and SelectionBar (count, bulk actions, clear; shown in place of the toolbar while rows are selected) render it.",
       "categories": ["table"],
       "registryDependencies": [
-        "button",
+        "juchangrong/eridanus/button",
         "checkbox",
         "table",
-        "juchangrong/eridanus/table-kit"
+        "juchangrong/eridanus/table-kit",
+        "juchangrong/eridanus/locale-provider"
       ],
       "files": [
         {
           "path": "table-selection.tsx",
           "type": "registry:component",
           "target": "@components/eridanus/table-selection.tsx"
+        }
+      ]
+    },
+    {
+      "name": "app-shell",
+      "type": "registry:block",
+      "title": "AppShell",
+      "description": "The frame of a console app: a sidebar with the product, grouped navigation (icon, label, badge, current page) and an account menu with the system/light/dark theme choice and sign-out, and a top bar with the sidebar toggle, a breadcrumb slot and page-wide actions. Collapses to icons with tooltips on desktop (⌘B or the rail) and remembers it; opens as a sheet under 768px. The content area scrolls by itself, so Page fill gets an exact height. Needs a ThemeProvider above it; renderLink plugs in the router's links.",
+      "categories": ["layout", "navigation"],
+      "dependencies": ["@phosphor-icons/react"],
+      "registryDependencies": [
+        "juchangrong/eridanus/button",
+        "juchangrong/eridanus/dropdown-menu",
+        "separator",
+        "sidebar",
+        "juchangrong/eridanus/person-avatar",
+        "juchangrong/eridanus/theme-provider",
+        "juchangrong/eridanus/locale-provider"
+      ],
+      "docs": "AppShell reads the theme from ThemeProvider: wrap the app in <ThemeProvider>. shadcn's sidebar depends on input; if the CLI asks to overwrite components/ui/input.tsx, answer no to keep the Eridanus fork.",
+      "files": [
+        {
+          "path": "app-shell.tsx",
+          "type": "registry:component",
+          "target": "@components/eridanus/app-shell.tsx"
         }
       ]
     }

@@ -21,38 +21,71 @@ Installed files live in `components/eridanus/`, `lib/eridanus/` and `hooks/erida
 4. **Contrast.** Text keeps 4.5:1 in both themes. Use the tokens (`text-muted-foreground`, `text-success`, `bg-warning/10`, …), never raw palette colors, and check any new tint.
 5. **One control height.** Buttons use `size="sm"` (28px); `SearchField`, `FilterSelect` and the `Pager` match it. The default (near-black) button variant marks the single main action of a page, form or dialog; other actions use `secondary`, destructive ones `destructive`, inline and icon controls `ghost`.
 6. **Writes confirm.** Irreversible or outward-facing writes go through `ConfirmDialog`, which stays open and shows the error until the write succeeds. Report success with `notify()`.
-7. **Copy.** Visible text is short plain Chinese. Identifiers and paths are monospace. Every Eridanus component takes its visible strings as props when another language is needed.
+7. **Copy.** Visible text is short and plain, in Chinese by default. Wrap the app in `LocaleProvider locale="en-US"` for English; components switch their built-in labels, times and ranges, and pass the locale to `friendly()`, `relative()` and `describeTimeRange()` yourself. Identifiers and paths are monospace. Props replace any built-in string.
 
 ## Catalog
 
-| Need | Item | Use |
-|---|---|---|
-| Start a project | `base` | `npx shadcn@latest init juchangrong/eridanus/base` |
-| Status tokens only | `status-colors` | `bg-success/10`, `text-warning`, `text-info` |
-| Time on screen | `time` | `<Time value={iso} />`, `clock` for HH:mm:ss, `seconds` |
-| Time as text | `format-time` | `friendly()`, `exactTime()`, `clock()`, `relative()` |
-| Status | `tone-badge` | `<ToneBadge tone="error">failed</ToneBadge>` |
-| Page frame | `page-layout` | `Page`, `PageHeader`, `Section`, `FactLine`, `Facts`, `StatStrip` |
-| Long IDs | `id-text` | `<IdText value={id} copy />`, shortened in the middle |
-| Tables | `table-kit` | `TableScroll` › `Table` › `TableHeaderRow` + `TableBody` › `TableRows` / `ClickableRow` |
-| Sorting | `table-sort` | `SortableHead` in the header row; `formatSort(sort)` for the API |
-| Bulk actions | `table-selection` | `useRowSelection(ids, [filters])`, `SelectAllHead`, `SelectCell`, `SelectionBar` |
-| Paging | `pager`, `use-paging` | `usePaging([filters])` feeds `<Pager {...paging} total={n} />` |
-| Filters | `search-field`, `filter-select`, `multi-filter`, `use-debounced-value` | debounce the search value before querying |
-| Time filter | `time-range-picker`, `time-range` | `resolveTimeRange(range)` for the query's from/to |
-| Filters in the URL | `use-url-state` | `useUrlState("q")`, `useUrlListState("status")`, so views reload and share |
-| Nothing to show | `empty-state` | also for no-access and failed pages |
-| Notices | `notice` | `tone="error"` for failed reads with a retry `action` |
-| Forms | `form-input` | label, hint and error wired for screen readers |
-| Fields | `input`, `textarea`, `select`, `input-group` | Eridanus forks in `components/ui`, same API as shadcn's; keep them when adding upstream items (answer no to overwriting, never `--overwrite`) |
-| Confirmation | `confirm-dialog` | `onConfirm` returns a promise; reject to show the error |
-| Feedback | `toaster` | wrap the app in `AppToaster`, call `notify()` |
-| Copy values | `copy-button`, `clipboard` | icon button next to an ID or URL |
-| Capacity | `meter` | in-flight work against a cap |
-| People | `person-avatar` | decorative; show the name beside it |
-| Theme | `theme-provider` | `ThemeProvider`, `useTheme()`; the `dark` class on `<html>` |
+| Need               | Item                                                                   | Use                                                                                                                                           |
+| ------------------ | ---------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
+| Start a project    | `base`                                                                 | `npx shadcn@latest init juchangrong/eridanus/base`                                                                                            |
+| Status tokens only | `status-colors`                                                        | `bg-success/10`, `text-warning`, `text-info`                                                                                                  |
+| Time on screen     | `time`                                                                 | `<Time value={iso} />`, `clock` for HH:mm:ss, `seconds`                                                                                       |
+| Time as text       | `format-time`                                                          | `friendly()`, `exactTime()`, `clock()`, `relative()`                                                                                          |
+| Status             | `tone-badge`                                                           | `<ToneBadge tone="error">failed</ToneBadge>`                                                                                                  |
+| App frame          | `app-shell`                                                            | `<AppShell brand nav account breadcrumb renderLink={(href) => <Link to={href} />}>`; inside `ThemeProvider`                                   |
+| Page frame         | `page-layout`                                                          | `Page`, `PageHeader`, `Section`, `FactLine`, `Facts`, `StatStrip`                                                                             |
+| Long IDs           | `id-text`                                                              | `<IdText value={id} copy />`, shortened in the middle                                                                                         |
+| Tables             | `table-kit`                                                            | `TableScroll` › `Table` › `TableHeaderRow` + `TableBody` › `TableRows` / `ClickableRow`                                                       |
+| Sorting            | `table-sort`                                                           | `SortableHead` in the header row; `formatSort(sort)` for the API                                                                              |
+| Bulk actions       | `table-selection`                                                      | `useRowSelection(ids, [filters])`, `SelectAllHead`, `SelectCell`, `SelectionBar`                                                              |
+| Paging             | `pager`, `use-paging`                                                  | `usePaging([filters])` feeds `<Pager {...paging} total={n} />`                                                                                |
+| Filters            | `search-field`, `filter-select`, `multi-filter`, `use-debounced-value` | debounce the search value before querying                                                                                                     |
+| Time filter        | `time-range-picker`, `time-range`                                      | `resolveTimeRange(range)` for the query's from/to                                                                                             |
+| Filters in the URL | `use-url-state`                                                        | `useUrlState("q")`, `useUrlListState("status")`, so views reload and share                                                                    |
+| Nothing to show    | `empty-state`                                                          | also for no-access and failed pages                                                                                                           |
+| Notices            | `notice`                                                               | `tone="error"` for failed reads with a retry `action`                                                                                         |
+| Forms              | `form-input`                                                           | label, hint and error wired for screen readers                                                                                                |
+| Fields             | `input`, `textarea`, `select`, `input-group`                           | Eridanus forks in `components/ui`, same API as shadcn's; keep them when adding upstream items (answer no to overwriting, never `--overwrite`) |
+| Confirmation       | `confirm-dialog`                                                       | `onConfirm` returns a promise; reject to show the error                                                                                       |
+| Feedback           | `toaster`                                                              | wrap the app in `AppToaster`, call `notify()`                                                                                                 |
+| Copy values        | `copy-button`, `clipboard`                                             | icon button next to an ID or URL                                                                                                              |
+| Capacity           | `meter`                                                                | in-flight work against a cap                                                                                                                  |
+| People             | `person-avatar`                                                        | decorative; show the name beside it                                                                                                           |
+| Theme              | `theme-provider`                                                       | `ThemeProvider`, `useTheme()`; the `dark` class on `<html>`                                                                                   |
+| Language           | `locale-provider`                                                      | `<LocaleProvider locale="zh-CN" \| "en-US">`, `useLocale()`; the app owns the choice and sets `<html lang>`                                   |
 
 ## Patterns
+
+The app frame, once at the root; each route renders its `Page` as the children:
+
+```tsx
+<ThemeProvider>
+  <LocaleProvider locale={locale}>
+    <AppToaster>
+      <AppShell
+        brand={{ name: "运营台", logo: <PlanetIcon weight="fill" /> }}
+        nav={[
+          {
+            items: [
+              {
+                label: "运行记录",
+                href: "/runs",
+                icon: <ListChecksIcon />,
+                active: path.startsWith("/runs"),
+              },
+            ],
+          },
+        ]}
+        account={{ name: user.name, email: user.email, onSignOut: signOut }}
+        breadcrumb={<Breadcrumb>…</Breadcrumb>}
+        renderLink={(href) => <Link to={href} />}
+      >
+        <Outlet />
+      </AppShell>
+    </AppToaster>
+  </LocaleProvider>
+</ThemeProvider>
+```
 
 A list page:
 
@@ -61,7 +94,12 @@ A list page:
   <PageHeader title="运行记录" hideTitle />
   <div className="flex flex-wrap items-center gap-2">
     <SearchField label="搜索运行" value={q} onChange={setQ} />
-    <FilterSelect label="状态" value={status} onChange={setStatus} options={statuses} />
+    <FilterSelect
+      label="状态"
+      value={status}
+      onChange={setStatus}
+      options={statuses}
+    />
   </div>
   <TableScroll fill>
     <Table>
@@ -71,12 +109,23 @@ A list page:
         <TableHead>创建时间</TableHead>
       </TableHeaderRow>
       <TableBody>
-        <TableRows colSpan={3} pending={isPending} rows={rows} empty={{ title: "还没有运行" }}>
+        <TableRows
+          colSpan={3}
+          pending={isPending}
+          rows={rows}
+          empty={{ title: "还没有运行" }}
+        >
           {(row) => (
             <ClickableRow key={row.id}>
-              <TableCell><a href={`/runs/${row.id}`}>{row.id}</a></TableCell>
-              <TableCell><ToneBadge tone={toneOf(row.status)}>{row.status}</ToneBadge></TableCell>
-              <TableCell><Time value={row.createdAt} /></TableCell>
+              <TableCell>
+                <a href={`/runs/${row.id}`}>{row.id}</a>
+              </TableCell>
+              <TableCell>
+                <ToneBadge tone={toneOf(row.status)}>{row.status}</ToneBadge>
+              </TableCell>
+              <TableCell>
+                <Time value={row.createdAt} />
+              </TableCell>
             </ClickableRow>
           )}
         </TableRows>

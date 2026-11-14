@@ -1,12 +1,19 @@
 import { MagnifyingGlassIcon, XIcon } from "@phosphor-icons/react";
 
+import { useMessages } from "@/components/eridanus/locale-provider";
 import {
   InputGroup,
   InputGroupAddon,
   InputGroupButton,
   InputGroupInput,
 } from "@/components/ui/input-group";
+import type { Locale } from "@/lib/eridanus/locale";
 import { cn } from "@/lib/utils";
+
+const MESSAGES: Record<Locale, { clear: string }> = {
+  "zh-CN": { clear: "清除搜索" },
+  "en-US": { clear: "Clear search" },
+};
 
 /**
  * A search input for a toolbar: a magnifier, the field, and a clear button
@@ -18,7 +25,7 @@ export function SearchField({
   onChange,
   label,
   placeholder,
-  clearLabel = "清除搜索",
+  clearLabel,
   size = "sm",
   className,
 }: {
@@ -31,6 +38,7 @@ export function SearchField({
   size?: "sm" | "default";
   className?: string;
 }) {
+  const t = useMessages(MESSAGES);
   return (
     <InputGroup
       className={cn(size === "sm" ? "h-7" : "h-8", "w-full sm:w-72", className)}
@@ -54,7 +62,7 @@ export function SearchField({
         <InputGroupAddon align="inline-end">
           <InputGroupButton
             size="icon-xs"
-            aria-label={clearLabel}
+            aria-label={clearLabel ?? t.clear}
             onClick={() => onChange("")}
           >
             <XIcon />

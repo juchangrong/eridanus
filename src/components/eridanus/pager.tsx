@@ -6,6 +6,7 @@ import {
 } from "@phosphor-icons/react";
 import { useEffect, useState } from "react";
 
+import { useMessages } from "@/components/eridanus/locale-provider";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -15,6 +16,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import type { Locale } from "@/lib/eridanus/locale";
 
 export interface PagerLabels {
   navigation: string;
@@ -25,25 +27,42 @@ export interface PagerLabels {
   pageSize: string;
   /** The page field's accessible name, given the page count. */
   page: (pages: number) => string;
-  /** The range line, e.g. "第 1–50 条，共 173 条"; `total` is 0 for an empty list. */
+  /** The range line, e.g. "第 1–50 条，共 173 条" or "1–50 of 173"; `total` is 0 for an empty list. */
   range: (first: number, last: number, total: number) => string;
   /** An option in the page-size select. */
   size: (size: number) => string;
 }
 
-export const defaultPagerLabels: PagerLabels = {
-  navigation: "分页",
-  first: "第一页",
-  previous: "上一页",
-  next: "下一页",
-  last: "最后一页",
-  pageSize: "每页条数",
-  page: (pages) => `页码，共 ${pages} 页`,
-  range: (first, last, total) =>
-    total === 0
-      ? "共 0 条"
-      : `第 ${first.toLocaleString()}–${last.toLocaleString()} 条，共 ${total.toLocaleString()} 条`,
-  size: (size) => `${size} 条`,
+/** The built-in text in each locale. */
+export const pagerLabels: Record<Locale, PagerLabels> = {
+  "zh-CN": {
+    navigation: "分页",
+    first: "第一页",
+    previous: "上一页",
+    next: "下一页",
+    last: "最后一页",
+    pageSize: "每页条数",
+    page: (pages) => `页码，共 ${pages} 页`,
+    range: (first, last, total) =>
+      total === 0
+        ? "共 0 条"
+        : `第 ${first.toLocaleString()}–${last.toLocaleString()} 条，共 ${total.toLocaleString()} 条`,
+    size: (size) => `${size} 条`,
+  },
+  "en-US": {
+    navigation: "Pagination",
+    first: "First page",
+    previous: "Previous page",
+    next: "Next page",
+    last: "Last page",
+    pageSize: "Rows per page",
+    page: (pages) => `Page, of ${pages}`,
+    range: (first, last, total) =>
+      total === 0
+        ? "0 rows"
+        : `${first.toLocaleString()}–${last.toLocaleString()} of ${total.toLocaleString()}`,
+    size: (size) => `${size} / page`,
+  },
 };
 
 /**
@@ -51,6 +70,7 @@ export const defaultPagerLabels: PagerLabels = {
  * first/previous/next/last buttons around a page field (type a page, press
  * Enter). Pages are zero-based. When the total shrinks under the current page,
  * as a live refresh can make it, the pager moves back to the last real page.
+ * Text follows LocaleProvider; `labels` replaces any part of it.
  */
 export function Pager({
   total,
@@ -59,7 +79,7 @@ export function Pager({
   onPage,
   onPageSize,
   pageSizes = [20, 50, 100],
-  labels = defaultPagerLabels,
+  labels: overrides,
 }: {
   total: number;
   page: number;
@@ -68,8 +88,9 @@ export function Pager({
   /** Shows the page-size select when set. */
   onPageSize?: (size: number) => void;
   pageSizes?: number[];
-  labels?: PagerLabels;
+  labels?: Partial<PagerLabels>;
 }) {
+  const labels = { ...useMessages(pagerLabels), ...overrides };
   const pages = Math.max(1, Math.ceil(total / pageSize));
   useEffect(() => {
     if (page >= pages) onPage(pages - 1);

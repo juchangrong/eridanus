@@ -5,12 +5,14 @@
  * form for URLs and query strings.
  */
 
+import { DEFAULT_LOCALE, type Locale } from "@/lib/eridanus/locale";
+
 export type TimeRange = { last: string } | { from: string; to: string };
 
 const UNITS = {
-  m: { ms: 60_000, label: "分钟" },
-  h: { ms: 3_600_000, label: "小时" },
-  d: { ms: 86_400_000, label: "天" },
+  m: { ms: 60_000, zh: "分钟", en: "minute" },
+  h: { ms: 3_600_000, zh: "小时", en: "hour" },
+  d: { ms: 86_400_000, zh: "天", en: "day" },
 } as const;
 
 const LAST = /^(\d+)([mhd])$/;
@@ -68,12 +70,24 @@ export function resolveTimeRange(
   return { from, to };
 }
 
-/** "最近 1 小时", "2026-10-01" or "2026-09-28 至 2026-10-01". */
-export function describeTimeRange(range: TimeRange): string {
+/**
+ * "最近 1 小时", "2026-10-01" or "2026-09-28 至 2026-10-01"; in English
+ * "Last 1 hour", "Last 7 days" and "2026-09-28 to 2026-10-01".
+ */
+export function describeTimeRange(
+  range: TimeRange,
+  locale: Locale = DEFAULT_LOCALE,
+): string {
+  const zh = locale === "zh-CN";
   if ("last" in range) {
     const m = LAST.exec(range.last);
     if (!m) return range.last;
-    return `最近 ${m[1]} ${UNITS[m[2] as keyof typeof UNITS].label}`;
+    const n = Number(m[1]);
+    const unit = UNITS[m[2] as keyof typeof UNITS];
+    return zh
+      ? `最近 ${n} ${unit.zh}`
+      : `Last ${n} ${unit.en}${n === 1 ? "" : "s"}`;
   }
-  return range.from === range.to ? range.from : `${range.from} 至 ${range.to}`;
+  if (range.from === range.to) return range.from;
+  return `${range.from} ${zh ? "至" : "to"} ${range.to}`;
 }

@@ -2,9 +2,11 @@ import type { ReactNode } from "react";
 import { useSyncExternalStore } from "react";
 
 import { CopyButton } from "@/components/eridanus/copy-button";
+import { useLocale } from "@/components/eridanus/locale-provider";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 import type { DocEntry } from "../catalog";
+import { useT } from "../i18n";
 import { CodeBlock, Highlighted } from "./code-block";
 
 const MANAGERS = ["pnpm", "npm", "yarn", "bun"] as const;
@@ -47,7 +49,9 @@ function useManager() {
     manager = next;
     try {
       localStorage.setItem(STORAGE_KEY, next);
-    } catch {}
+    } catch {
+      // Storage can be off, as in a private window; the choice lasts the visit.
+    }
     for (const l of listeners) l();
   };
   return [value, set] as const;
@@ -59,6 +63,7 @@ const isManager = (value: unknown): value is Manager =>
 /** A shell command in each package manager's form, with tabs to pick one. */
 export function CommandBlock({ run, add }: { run?: string; add?: string[] }) {
   const [current, setCurrent] = useManager();
+  const t = useT();
   const command = (m: Manager) =>
     run ? `${RUN[m]} ${run}` : `${ADD[m]} ${add?.join(" ")}`;
   return (
@@ -70,7 +75,11 @@ export function CommandBlock({ run, add }: { run?: string; add?: string[] }) {
       className="gap-0 overflow-hidden rounded-xl bg-(--code)"
     >
       <div className="flex h-10 items-center gap-2 border-b border-border/60 ps-2 pe-1.5">
-        <TabsList variant="line" aria-label="包管理器" className="h-8">
+        <TabsList
+          variant="line"
+          aria-label={t("包管理器", "Package manager")}
+          className="h-8"
+        >
           {MANAGERS.map((m) => (
             <TabsTrigger key={m} value={m} className="px-2 font-mono text-xs">
               {m}
@@ -79,7 +88,7 @@ export function CommandBlock({ run, add }: { run?: string; add?: string[] }) {
         </TabsList>
         <CopyButton
           text={command(current)}
-          label="复制命令"
+          label={t("复制命令", "Copy command")}
           className="ms-auto hover:bg-background dark:hover:bg-background/60"
         />
       </div>
@@ -133,40 +142,57 @@ function Code({ children }: { children: ReactNode }) {
   );
 }
 
-/** 命令行 and 手动 install instructions, shadcn-docs style. */
+/** Command-line and manual install instructions, shadcn-docs style. */
 export function Installation({ entry }: { entry: DocEntry }) {
   const hasCode = entry.files.some((f) => /\.tsx?$/.test(f.path));
+  const zh = useLocale() === "zh-CN";
+  const t = useT();
   return (
     <Tabs defaultValue="cli" className="gap-4">
-      <TabsList variant="line" aria-label="安装方式">
-        <TabsTrigger value="cli">命令行</TabsTrigger>
-        <TabsTrigger value="manual">手动</TabsTrigger>
+      <TabsList variant="line" aria-label={t("安装方式", "Install method")}>
+        <TabsTrigger value="cli">{t("命令行", "CLI")}</TabsTrigger>
+        <TabsTrigger value="manual">{t("手动", "Manual")}</TabsTrigger>
       </TabsList>
       <TabsContent value="cli" className="flex flex-col gap-3">
         <CommandBlock run={entry.install} />
         {entry.kind === "eridanus" ? (
           <p className="m-0 text-sm text-muted-foreground">
-            仓库是私有的，CLI 用你的 GitHub 凭据读取：先运行{" "}
-            <Code>gh auth login</Code>，或者设置 <Code>GH_TOKEN</Code>。
+            {zh ? (
+              <>
+                仓库是私有的，CLI 用你的 GitHub 凭据读取：先运行{" "}
+                <Code>gh auth login</Code>，或者设置 <Code>GH_TOKEN</Code>。
+              </>
+            ) : (
+              <>
+                The repository is private, so the CLI reads it with your GitHub
+                credentials: run <Code>gh auth login</Code> first, or set{" "}
+                <Code>GH_TOKEN</Code>.
+              </>
+            )}
           </p>
         ) : null}
       </TabsContent>
       <TabsContent value="manual">
         <Steps>
           {entry.dependencies.length ? (
-            <Step title="安装依赖包">
+            <Step title={t("安装依赖包", "Install the packages")}>
               <CommandBlock add={entry.dependencies} />
             </Step>
           ) : null}
           {entry.registryDependencies.length ? (
-            <Step title="添加它用到的条目">
+            <Step title={t("添加它用到的条目", "Add the items it uses")}>
               <CommandBlock
                 run={`shadcn@latest add ${entry.registryDependencies.join(" ")}`}
               />
             </Step>
           ) : null}
           {entry.cssVars ? (
-            <Step title="把这些变量加进全局 CSS">
+            <Step
+              title={t(
+                "把这些变量加进全局 CSS",
+                "Add these variables to your global CSS",
+              )}
+            >
               <CodeBlock code={cssOf(entry.cssVars)} collapsible />
             </Step>
           ) : null}
@@ -174,9 +200,15 @@ export function Installation({ entry }: { entry: DocEntry }) {
             <Step
               key={file.path}
               title={
-                <>
-                  把下面的代码复制到 <Code>{file.target}</Code>
-                </>
+                zh ? (
+                  <>
+                    把下面的代码复制到 <Code>{file.target}</Code>
+                  </>
+                ) : (
+                  <>
+                    Copy this code into <Code>{file.target}</Code>
+                  </>
+                )
               }
             >
               <CodeBlock
@@ -187,11 +219,26 @@ export function Installation({ entry }: { entry: DocEntry }) {
             </Step>
           ))}
           {hasCode ? (
-            <Step title="按项目的路径别名调整 import">
+            <Step
+              title={t(
+                "按项目的路径别名调整 import",
+                "Adjust the imports to your path aliases",
+              )}
+            >
               <p className="m-0 text-sm text-muted-foreground">
-                代码按 <Code>@/components</Code>、<Code>@/lib</Code>、
-                <Code>@/hooks</Code> 的别名写成，和 shadcn 默认的{" "}
-                <Code>components.json</Code> 一致。
+                {zh ? (
+                  <>
+                    代码按 <Code>@/components</Code>、<Code>@/lib</Code>、
+                    <Code>@/hooks</Code> 的别名写成，和 shadcn 默认的{" "}
+                    <Code>components.json</Code> 一致。
+                  </>
+                ) : (
+                  <>
+                    The code imports through the <Code>@/components</Code>,{" "}
+                    <Code>@/lib</Code> and <Code>@/hooks</Code> aliases, as
+                    shadcn's default <Code>components.json</Code> sets them.
+                  </>
+                )}
               </p>
             </Step>
           ) : null}

@@ -1,6 +1,0 @@
-# Commits that only reformat code; git blame skips them. GitHub reads this
-# file on its own; locally, run once:
-#   git config blame.ignoreRevsFile .git-blame-ignore-revs
-
-# style: format with Biome
-3e5540f91b0e820c7d29407a7920760bfb09d815

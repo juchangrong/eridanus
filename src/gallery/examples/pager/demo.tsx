@@ -1,4 +1,4 @@
-import { defaultPagerLabels, Pager } from "@/components/eridanus/pager";
+import { Pager } from "@/components/eridanus/pager";
 import { usePaging } from "@/hooks/eridanus/use-paging";
 
 export default function PagerDemo() {
@@ -8,7 +8,7 @@ export default function PagerDemo() {
       {...paging}
       total={173}
       pageSizes={[20, 50, 100]}
-      labels={{ ...defaultPagerLabels, navigation: "Pager 示例分页" }}
+      labels={{ navigation: "Pager 示例分页" }}
     />
   );
 }

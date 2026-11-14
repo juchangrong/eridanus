@@ -6,10 +6,12 @@ import {
 } from "@/components/eridanus/theme-provider";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 
+import { useT } from "../i18n";
+
 const OPTIONS = [
-  { value: "system", label: "跟随系统", Icon: DesktopIcon },
-  { value: "light", label: "浅色", Icon: SunIcon },
-  { value: "dark", label: "深色", Icon: MoonIcon },
+  { value: "system", zh: "跟随系统", en: "System", Icon: DesktopIcon },
+  { value: "light", zh: "浅色", en: "Light", Icon: SunIcon },
+  { value: "dark", zh: "深色", en: "Dark", Icon: MoonIcon },
 ] as const;
 
 const isPreference = (value: unknown): value is ThemePreference =>
@@ -17,9 +19,10 @@ const isPreference = (value: unknown): value is ThemePreference =>
 
 export function ThemeSwitch() {
   const { preference, setPreference } = useTheme();
+  const t = useT();
   return (
     <ToggleGroup
-      aria-label="主题"
+      aria-label={t("主题", "Theme")}
       size="sm"
       variant="outline"
       spacing={0}
@@ -29,12 +32,12 @@ export function ThemeSwitch() {
         if (isPreference(next)) setPreference(next);
       }}
     >
-      {OPTIONS.map(({ value, label, Icon }) => (
+      {OPTIONS.map(({ value, zh, en, Icon }) => (
         <ToggleGroupItem
           key={value}
           value={value}
-          aria-label={label}
-          title={label}
+          aria-label={t(zh, en)}
+          title={t(zh, en)}
         >
           <Icon />
         </ToggleGroupItem>

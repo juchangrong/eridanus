@@ -1,7 +1,7 @@
 import { useState } from "react";
 
 import { FilterSelect } from "@/components/eridanus/filter-select";
-import { defaultPagerLabels, Pager } from "@/components/eridanus/pager";
+import { Pager } from "@/components/eridanus/pager";
 import { usePaging } from "@/hooks/eridanus/use-paging";
 
 const STATUSES = ["completed", "running", "failed"].map((s) => ({
@@ -24,7 +24,7 @@ export default function UsePagingDemo() {
       <Pager
         {...paging}
         total={173}
-        labels={{ ...defaultPagerLabels, navigation: "usePaging 示例分页" }}
+        labels={{ navigation: "usePaging 示例分页" }}
       />
       <p className="m-0 font-mono text-[13px] text-muted-foreground">
         page={paging.page} offset={paging.offset} query={paging.query}

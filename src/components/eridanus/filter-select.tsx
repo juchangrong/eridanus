@@ -1,5 +1,6 @@
 import { type ReactNode, useMemo } from "react";
 
+import { useMessages } from "@/components/eridanus/locale-provider";
 import {
   Select,
   SelectContent,
@@ -7,9 +8,15 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import type { Locale } from "@/lib/eridanus/locale";
 import { cn } from "@/lib/utils";
 
 const ALL = "__all__";
+
+const MESSAGES: Record<Locale, { all: string }> = {
+  "zh-CN": { all: "全部" },
+  "en-US": { all: "All" },
+};
 
 /**
  * A select that filters a list, whose trigger names what it filters
@@ -21,7 +28,7 @@ export function FilterSelect({
   value,
   onChange,
   options,
-  allLabel = "全部",
+  allLabel: allProp,
   size = "sm",
   className,
 }: {
@@ -35,6 +42,8 @@ export function FilterSelect({
   size?: "sm" | "default";
   className?: string;
 }) {
+  const t = useMessages(MESSAGES);
+  const allLabel = allProp ?? t.all;
   const items = useMemo(
     () => [{ value: ALL, label: allLabel }, ...options],
     [options, allLabel],
