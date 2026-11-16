@@ -155,6 +155,12 @@ function storedWidth(): number {
   return SIDEBAR_WIDTH.default;
 }
 
+/** The sidebar's CSS width for a stored one: never more than 30% of the
+ * window, so a width dragged on a large screen leaves a small one its
+ * content. */
+const widthVar = (value: number) =>
+  `clamp(${SIDEBAR_WIDTH.min}px, 30vw, ${value}px)`;
+
 const clampWidth = (value: number) =>
   Math.round(Math.min(SIDEBAR_WIDTH.max, Math.max(SIDEBAR_WIDTH.min, value)));
 
@@ -256,13 +262,7 @@ export function AppShell({
           "cursor-col-resize select-none **:data-[slot=sidebar-container]:transition-none **:data-[slot=sidebar-gap]:transition-none",
         className,
       )}
-      // Never more than 30% of the window, so a sidebar dragged wide on a
-      // large screen leaves a small one its content.
-      style={
-        {
-          "--sidebar-width": `clamp(${SIDEBAR_WIDTH.min}px, 30vw, ${width}px)`,
-        } as CSSProperties
-      }
+      style={{ "--sidebar-width": widthVar(width) } as CSSProperties}
     >
       <Sidebar collapsible="icon" variant="inset">
         <SidebarHeader>
@@ -353,7 +353,10 @@ export function AppShell({
       </Sidebar>
       {/* A card with a hairline edge, as on the reference console: the
           border draws the structure, so there is no shadow. */}
-      <SidebarInset className="min-w-0 overflow-hidden md:peer-data-[variant=inset]:rounded-xl md:peer-data-[variant=inset]:border md:peer-data-[variant=inset]:shadow-none">
+      {/* The gap beside the sidebar stays 8px when it collapses, as the
+          resize line sits in its middle: the collapsed sidebar is 2px wider
+          than the space it holds, so the card moves 2px, not 8. */}
+      <SidebarInset className="min-w-0 overflow-hidden md:peer-data-[variant=inset]:rounded-xl md:peer-data-[variant=inset]:border md:peer-data-[variant=inset]:shadow-none md:peer-data-[variant=inset]:peer-data-[state=collapsed]:ml-0.5">
         {/* Inset like a Page, so the toggle's icon lines up with the page's
             text. Without a breadcrumb or actions only phones get the bar, to
             open the sidebar. */}
@@ -454,11 +457,16 @@ function ResizeHandle({
     }
   };
 
+  // A drag runs outside React: the width goes straight to the wrapper's CSS
+  // variable once a frame, and React hears of it only when the sidebar opens
+  // or closes and when the drag ends. Re-rendering the shell, and the page
+  // inside it, on every pointer move is what made dragging stutter.
   const onPointerDown = (event: ReactPointerEvent<HTMLDivElement>) => {
     if (event.button !== 0) return;
     event.preventDefault();
     const handle = event.currentTarget;
     handle.setPointerCapture(event.pointerId);
+    const wrapper = handle.closest<HTMLElement>("[data-slot=sidebar-wrapper]");
     const container = handle
       .closest("[data-slot=sidebar-container]")
       ?.getBoundingClientRect();
@@ -467,39 +475,57 @@ function ResizeHandle({
     // The width on screen, which the window may hold under the stored one.
     const startWidth = open && container ? container.width : width;
     const wasOpen = open;
+    let liveOpen = open;
     let moved = false;
     let raw = startWidth;
+    let pointerX = startX;
+    let frame = 0;
 
+    const apply = () => {
+      frame = 0;
+      // The pointer holds the edge where it took it.
+      raw = pointerX - left + (wasOpen ? startWidth - (startX - left) : 0);
+      const nextOpen = raw >= SIDEBAR_WIDTH.min || wasOpen;
+      const next = clampWidth(raw);
+      if (nextOpen !== liveOpen) {
+        liveOpen = nextOpen;
+        onWidthChange(next);
+        setOpen(nextOpen);
+      } else if (liveOpen) {
+        wrapper?.style.setProperty("--sidebar-width", widthVar(next));
+      }
+    };
     const onMove = (move: PointerEvent) => {
-      if (!moved && Math.abs(move.clientX - startX) < 3) return;
+      pointerX = move.clientX;
       if (!moved) {
+        if (Math.abs(pointerX - startX) < 3) return;
         moved = true;
         onResizingChange(true);
       }
-      // The pointer holds the edge where it took it.
-      raw = move.clientX - left + (wasOpen ? startWidth - (startX - left) : 0);
-      if (raw >= SIDEBAR_WIDTH.min) {
-        setOpen(true);
-        onWidthChange(clampWidth(raw));
-      } else if (!wasOpen) {
-        setOpen(false);
-      } else {
-        onWidthChange(SIDEBAR_WIDTH.min);
-      }
+      if (!frame) frame = requestAnimationFrame(apply);
     };
     const onUp = () => {
       handle.removeEventListener("pointermove", onMove);
       handle.removeEventListener("pointerup", onUp);
       handle.removeEventListener("pointercancel", onUp);
+      if (frame) cancelAnimationFrame(frame);
       onResizingChange(false);
       if (!moved) {
         toggleSidebar();
-      } else if (raw < SIDEBAR_WIDTH.min) {
-        // Short of the minimum: collapse, and open later at the old width.
-        setOpen(false);
-        onWidthChange(startWidth);
+        return;
+      }
+      apply();
+      // Short of the minimum: collapse, and open later at the old width.
+      const collapse = raw < SIDEBAR_WIDTH.min;
+      const final = collapse ? startWidth : clampWidth(raw);
+      // Written here as well as in state: when the state already holds this
+      // width, React leaves the variable the drag wrote.
+      wrapper?.style.setProperty("--sidebar-width", widthVar(final));
+      onWidthChange(final);
+      if (collapse) {
+        if (liveOpen) setOpen(false);
       } else {
-        save(clampWidth(raw));
+        save(final);
       }
     };
     handle.addEventListener("pointermove", onMove);
@@ -539,7 +565,9 @@ function ResizeHandle({
       title={label}
       onPointerDown={onPointerDown}
       onKeyDown={onKeyDown}
-      className="group/resize absolute inset-y-0 -right-2.5 z-20 hidden w-3 cursor-col-resize touch-none outline-none md:block"
+      // Positioned in the sidebar's container, whose last 8px are the gap
+      // before the card: 12px wide, centred on that gap.
+      className="group/resize absolute inset-y-0 -right-0.5 z-20 hidden w-3 cursor-col-resize touch-none outline-none md:block"
     >
       <span className="pointer-events-none absolute inset-y-3 left-1/2 w-px -translate-x-1/2 bg-foreground mask-[linear-gradient(to_bottom,transparent,black_12%,black_88%,transparent)] opacity-0 transition-opacity group-hover/resize:opacity-20 group-focus-visible/resize:opacity-60" />
     </div>
