@@ -288,8 +288,9 @@ export function AppShell({
         variant="inset"
         className="group-data-[collapsible=icon]:w-12"
       >
-        {/* No top padding: the brand row starts level with the card. */}
-        <SidebarHeader className="px-0 pt-0">
+        {/* No vertical padding: the brand row starts level with the card,
+            and the nav sits 8px under it. */}
+        <SidebarHeader className="px-0 py-0">
           <SidebarMenu>
             <SidebarMenuItem className="flex items-center gap-1">
               <NavButton
