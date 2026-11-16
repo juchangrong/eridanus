@@ -634,11 +634,12 @@ function ResizeHandle({
       title={label}
       onPointerDown={onPointerDown}
       onKeyDown={onKeyDown}
-      // Positioned in the sidebar's container, whose last 8px are the gap
-      // before the card: 12px wide, centred on that gap.
-      className="group/resize absolute inset-y-0 -right-0.5 z-20 hidden w-3 cursor-col-resize touch-none outline-none md:block"
+      // Positioned in the sidebar's container, whose right edge is the
+      // card's: 12px wide, with the line against the card's border, as on
+      // the reference console.
+      className="group/resize absolute inset-y-0 -right-[5px] z-20 hidden w-3 cursor-col-resize touch-none outline-none md:block"
     >
-      <span className="pointer-events-none absolute inset-y-3 left-1/2 w-px -translate-x-1/2 bg-foreground mask-[linear-gradient(to_bottom,transparent,black_12%,black_88%,transparent)] opacity-0 transition-opacity group-hover/resize:opacity-20 group-focus-visible/resize:opacity-60" />
+      <span className="pointer-events-none absolute inset-y-3 right-[5px] w-px bg-foreground mask-[linear-gradient(to_bottom,transparent,black_12%,black_88%,transparent)] opacity-0 transition-opacity group-hover/resize:opacity-20 group-focus-visible/resize:opacity-60" />
     </div>
   );
 }
