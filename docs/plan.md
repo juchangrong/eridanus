@@ -88,7 +88,7 @@ The repository is itself a shadcn project (Vite, React, Tailwind CSS v4, `compon
 | `time-range-picker`, `time-range`                     | component, lib | trailing presets and whole-day spans, with a short text form for URLs                                                                                                                    |
 | `table-sort`, `table-selection`                       | component      | sortable headers with aria-sort; row selection across pages with a bulk-action bar                                                                                                       |
 | `use-url-state`                                       | hook           | filters, sort and paging kept in the address bar's query                                                                                                                                 |
-| `app-shell`                                           | block          | sidebar, top bar, breadcrumb slot and account menu with the theme choice                                                                                                                 |
+| `app-shell`                                           | block          | inset layout: sidebar on the window background, the page in a card, the account menu with the theme choice beside footer buttons, an optional top bar for a breadcrumb                   |
 | `ui-guidelines`                                       | file           | a Claude Code skill with the design rules and the item catalog                                                                                                                           |
 
 ## Quality gates

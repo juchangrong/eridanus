@@ -1,35 +1,28 @@
 import {
   BellIcon,
-  ChartLineIcon,
-  GearSixIcon,
-  ListChecksIcon,
+  ChartLineUpIcon,
+  GearIcon,
+  LightningIcon,
   PlanetIcon,
-  QueueIcon,
+  PlayCircleIcon,
+  StackIcon,
   UserIcon,
-  UsersThreeIcon,
+  UsersIcon,
 } from "@phosphor-icons/react";
 import { useState } from "react";
 
 import { type AppNavGroup, AppShell } from "@/components/eridanus/app-shell";
 import { Page, PageHeader, StatStrip } from "@/components/eridanus/page-layout";
 import { notify } from "@/components/eridanus/toaster";
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbList,
-  BreadcrumbPage,
-  BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb";
 import { Button } from "@/components/ui/button";
 import { DropdownMenuItem } from "@/components/ui/dropdown-menu";
 
 const PAGES = [
-  { href: "/runs", label: "Runs", icon: <ListChecksIcon />, badge: 3 },
-  { href: "/queues", label: "Queues", icon: <QueueIcon /> },
-  { href: "/metrics", label: "Metrics", icon: <ChartLineIcon /> },
-  { href: "/members", label: "Members", icon: <UsersThreeIcon /> },
-  { href: "/settings", label: "Settings", icon: <GearSixIcon /> },
+  { href: "/runs", label: "Runs", icon: <PlayCircleIcon />, badge: 3 },
+  { href: "/queues", label: "Queues", icon: <StackIcon /> },
+  { href: "/metrics", label: "Metrics", icon: <ChartLineUpIcon /> },
+  { href: "/members", label: "Members", icon: <UsersIcon /> },
+  { href: "/settings", label: "Settings", icon: <GearIcon /> },
 ];
 
 export default function AppShellDemo() {
@@ -39,7 +32,7 @@ export default function AppShellDemo() {
   const items = PAGES.map((p) => ({ ...p, active: p.href === current }));
   const nav: AppNavGroup[] = [
     { items: items.slice(0, 3) },
-    { title: "Admin", items: items.slice(3) },
+    { items: items.slice(3) },
   ];
 
   return (
@@ -60,28 +53,25 @@ export default function AppShellDemo() {
             }}
           />
         )}
-        breadcrumb={
-          <Breadcrumb>
-            <BreadcrumbList>
-              <BreadcrumbItem>
-                <BreadcrumbLink href="/">Ops console</BreadcrumbLink>
-              </BreadcrumbItem>
-              <BreadcrumbSeparator />
-              <BreadcrumbItem>
-                <BreadcrumbPage>{page.label}</BreadcrumbPage>
-              </BreadcrumbItem>
-            </BreadcrumbList>
-          </Breadcrumb>
-        }
-        actions={
-          <Button
-            variant="ghost"
-            size="icon-sm"
-            aria-label="Notifications"
-            title="Notifications"
-          >
-            <BellIcon />
-          </Button>
+        footerActions={
+          <>
+            <Button
+              variant="ghost"
+              size="icon"
+              aria-label="What's new"
+              title="What's new"
+            >
+              <LightningIcon />
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon"
+              aria-label="Notifications"
+              title="Notifications"
+            >
+              <BellIcon />
+            </Button>
+          </>
         }
         account={{
           name: "Avery Lin",

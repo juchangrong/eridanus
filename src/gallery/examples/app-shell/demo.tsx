@@ -1,35 +1,28 @@
 import {
   BellIcon,
-  ChartLineIcon,
-  GearSixIcon,
-  ListChecksIcon,
+  ChartLineUpIcon,
+  GearIcon,
+  LightningIcon,
   PlanetIcon,
-  QueueIcon,
+  PlayCircleIcon,
+  StackIcon,
   UserIcon,
-  UsersThreeIcon,
+  UsersIcon,
 } from "@phosphor-icons/react";
 import { useState } from "react";
 
 import { type AppNavGroup, AppShell } from "@/components/eridanus/app-shell";
 import { Page, PageHeader, StatStrip } from "@/components/eridanus/page-layout";
 import { notify } from "@/components/eridanus/toaster";
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbList,
-  BreadcrumbPage,
-  BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb";
 import { Button } from "@/components/ui/button";
 import { DropdownMenuItem } from "@/components/ui/dropdown-menu";
 
 const PAGES = [
-  { href: "/runs", label: "运行记录", icon: <ListChecksIcon />, badge: 3 },
-  { href: "/queues", label: "队列", icon: <QueueIcon /> },
-  { href: "/metrics", label: "监控", icon: <ChartLineIcon /> },
-  { href: "/members", label: "成员", icon: <UsersThreeIcon /> },
-  { href: "/settings", label: "设置", icon: <GearSixIcon /> },
+  { href: "/runs", label: "运行记录", icon: <PlayCircleIcon />, badge: 3 },
+  { href: "/queues", label: "队列", icon: <StackIcon /> },
+  { href: "/metrics", label: "监控", icon: <ChartLineUpIcon /> },
+  { href: "/members", label: "成员", icon: <UsersIcon /> },
+  { href: "/settings", label: "设置", icon: <GearIcon /> },
 ];
 
 export default function AppShellDemo() {
@@ -39,7 +32,7 @@ export default function AppShellDemo() {
   const items = PAGES.map((p) => ({ ...p, active: p.href === current }));
   const nav: AppNavGroup[] = [
     { items: items.slice(0, 3) },
-    { title: "管理", items: items.slice(3) },
+    { items: items.slice(3) },
   ];
 
   return (
@@ -60,23 +53,20 @@ export default function AppShellDemo() {
             }}
           />
         )}
-        breadcrumb={
-          <Breadcrumb>
-            <BreadcrumbList>
-              <BreadcrumbItem>
-                <BreadcrumbLink href="/">运营台</BreadcrumbLink>
-              </BreadcrumbItem>
-              <BreadcrumbSeparator />
-              <BreadcrumbItem>
-                <BreadcrumbPage>{page.label}</BreadcrumbPage>
-              </BreadcrumbItem>
-            </BreadcrumbList>
-          </Breadcrumb>
-        }
-        actions={
-          <Button variant="ghost" size="icon-sm" aria-label="通知" title="通知">
-            <BellIcon />
-          </Button>
+        footerActions={
+          <>
+            <Button
+              variant="ghost"
+              size="icon"
+              aria-label="最新动态"
+              title="最新动态"
+            >
+              <LightningIcon />
+            </Button>
+            <Button variant="ghost" size="icon" aria-label="通知" title="通知">
+              <BellIcon />
+            </Button>
+          </>
         }
         account={{
           name: "林小雨",

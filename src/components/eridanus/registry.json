@@ -398,7 +398,7 @@
       "name": "app-shell",
       "type": "registry:block",
       "title": "AppShell",
-      "description": "The frame of a console app: a sidebar with the product, grouped navigation (icon, label, badge, current page) and an account menu with the system/light/dark theme choice and sign-out, and a top bar with the sidebar toggle, a breadcrumb slot and page-wide actions. Collapses to icons with tooltips on desktop (⌘B or the rail) and remembers it; opens as a sheet under 768px. The content area scrolls by itself, so Page fill gets an exact height. Needs a ThemeProvider above it; renderLink plugs in the router's links.",
+      "description": "The frame of a console app: a sidebar on the window's own background with the product, navigation groups divided by rules (icon, label, badge, current page) and, at its foot, the account (avatar and name, opening a menu with the system/light/dark theme choice and sign-out) beside a few icon buttons such as notifications; the page sits in a card inset from the window. A breadcrumb or page-wide actions add a top bar inside the card with the sidebar toggle. On desktop the sidebar's edge drags between 180 and 320px, and letting go short of that, ⌘B or a click on the edge collapses it to icons with tooltips; it remembers both; opens as a sheet under 768px. The card scrolls by itself, so Page fill gets an exact height. Needs a ThemeProvider above it; renderLink plugs in the router's links.",
       "categories": ["layout", "navigation"],
       "dependencies": ["@phosphor-icons/react"],
       "registryDependencies": [

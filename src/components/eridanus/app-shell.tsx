@@ -1,5 +1,4 @@
 import {
-  CaretUpDownIcon,
   DesktopIcon,
   MoonIcon,
   SidebarSimpleIcon,
@@ -9,7 +8,10 @@ import {
 import {
   cloneElement,
   type ComponentProps,
+  type CSSProperties,
   isValidElement,
+  type KeyboardEvent as ReactKeyboardEvent,
+  type PointerEvent as ReactPointerEvent,
   type ReactElement,
   type ReactNode,
   useState,
@@ -48,7 +50,6 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarProvider,
-  SidebarRail,
   useSidebar,
 } from "@/components/ui/sidebar";
 import type { Locale } from "@/lib/eridanus/locale";
@@ -65,7 +66,7 @@ export interface AppBrand {
 export interface AppNavItem {
   label: string;
   href: string;
-  /** A Phosphor icon element, such as <ListChecksIcon />, in its outline
+  /** A Phosphor icon element, such as <PlayCircleIcon />, in its outline
    * weight; the current page's icon switches to the fill weight. Collapsed to
    * icons, the sidebar shows only this, with the label in a tooltip. */
   icon?: ReactNode;
@@ -94,6 +95,7 @@ export interface AppAccount {
 
 export interface AppShellLabels {
   toggleSidebar: string;
+  resizeSidebar: string;
   navigation: string;
   /** The account button's accessible name, given the person's name. */
   account: (name: string) => string;
@@ -108,6 +110,7 @@ export interface AppShellLabels {
 export const appShellLabels: Record<Locale, AppShellLabels> = {
   "zh-CN": {
     toggleSidebar: "切换侧边栏",
+    resizeSidebar: "调整侧边栏宽度",
     navigation: "主导航",
     account: (name) => `账号菜单：${name}`,
     theme: "主题",
@@ -118,6 +121,7 @@ export const appShellLabels: Record<Locale, AppShellLabels> = {
   },
   "en-US": {
     toggleSidebar: "Toggle sidebar",
+    resizeSidebar: "Resize sidebar",
     navigation: "Main navigation",
     account: (name) => `Account menu: ${name}`,
     theme: "Theme",
@@ -137,6 +141,24 @@ function storedOpen(): boolean | undefined {
   return value ? value[1] === "true" : undefined;
 }
 
+/** The expanded sidebar's width in pixels: dragged between these, and kept
+ * in localStorage across visits. */
+const SIDEBAR_WIDTH = { min: 180, max: 320, default: 224 };
+const WIDTH_KEY = "eridanus-sidebar-width";
+
+function storedWidth(): number {
+  try {
+    const value = Number(localStorage.getItem(WIDTH_KEY));
+    if (value >= SIDEBAR_WIDTH.min && value <= SIDEBAR_WIDTH.max) return value;
+  } catch {
+    // Storage can be off, as in a private window; the default stands.
+  }
+  return SIDEBAR_WIDTH.default;
+}
+
+const clampWidth = (value: number) =>
+  Math.round(Math.min(SIDEBAR_WIDTH.max, Math.max(SIDEBAR_WIDTH.min, value)));
+
 /** The fill weight of a Phosphor icon element, which marks the current page. */
 function filled(icon: ReactNode): ReactNode {
   return isValidElement<{ weight?: string }>(icon)
@@ -149,14 +171,18 @@ function filled(icon: ReactNode): ReactNode {
 const defaultLink = (href: string) => <a href={href} />;
 
 /**
- * The frame of a console app: a sidebar with the product, grouped navigation
- * and the account menu, and a top bar with the sidebar toggle, a breadcrumb
- * slot and page-wide actions. The sidebar collapses to icons on desktop (⌘B,
- * or the rail on its edge) and remembers that across visits; under 768px it
- * opens as a sheet.
+ * The frame of a console app. The sidebar sits on the window's own background
+ * with the product, navigation groups divided by rules and, under a last
+ * rule, the account menu beside a few icon buttons; the page sits in a card
+ * inset from the window. A breadcrumb or page-wide actions get a top bar
+ * inside the card, with the sidebar toggle; without them the page starts at
+ * the card's top edge. On desktop the sidebar's edge drags to
+ * resize it, and it collapses to icons (⌘B, a click on the edge, or a drag
+ * short of the minimum width); it remembers both across visits. Under 768px
+ * it opens as a sheet, from a bar that phones always get.
  *
- * The content area takes the rest of the viewport and scrolls by itself, so
- * the top bar stays in view and a `<Page fill>` gets an exact height.
+ * The card takes the rest of the viewport and scrolls by itself, so the top
+ * bar stays in view and a `<Page fill>` gets an exact height.
  *
  * Needs a ThemeProvider above it for the account menu's theme choice. Links
  * are plain <a> elements; pass `renderLink` to use the router's own, such as
@@ -168,6 +194,7 @@ export function AppShell({
   account,
   breadcrumb,
   actions,
+  footerActions,
   renderLink = defaultLink,
   defaultOpen,
   labels: labelOverrides,
@@ -177,10 +204,14 @@ export function AppShell({
   brand: AppBrand;
   nav: AppNavGroup[];
   account?: AppAccount;
-  /** A Breadcrumb for the current page. */
+  /** A Breadcrumb for the current page, in a top bar inside the card. */
   breadcrumb?: ReactNode;
   /** Page-wide controls on the top bar's trailing edge, such as search or help. */
   actions?: ReactNode;
+  /** Icon buttons beside the account at the foot of the sidebar, such as
+   * notifications: ghost Buttons of size "icon" with an aria-label. Collapsed
+   * to icons, they stack above the avatar. */
+  footerActions?: ReactNode;
   renderLink?: (href: string) => ReactElement;
   /** Whether the sidebar starts expanded when no choice is stored. */
   defaultOpen?: boolean;
@@ -190,25 +221,33 @@ export function AppShell({
 }) {
   const labels = { ...useMessages(appShellLabels), ...labelOverrides };
   const [initialOpen] = useState(() => storedOpen() ?? defaultOpen ?? true);
+  const [width, setWidth] = useState(storedWidth);
+  const [resizing, setResizing] = useState(false);
   return (
     <SidebarProvider
       defaultOpen={initialOpen}
-      className={cn("h-svh min-h-0", className)}
+      // While the edge is dragged the sidebar follows the pointer at once,
+      // without its width transition.
+      className={cn(
+        "h-svh min-h-0",
+        resizing &&
+          "cursor-col-resize select-none **:data-[slot=sidebar-container]:transition-none **:data-[slot=sidebar-gap]:transition-none",
+        className,
+      )}
+      style={{ "--sidebar-width": `${width}px` } as CSSProperties}
     >
-      <Sidebar collapsible="icon">
+      <Sidebar collapsible="icon" variant="inset">
         <SidebarHeader>
           <SidebarMenu>
             <SidebarMenuItem>
               <NavButton
-                size="lg"
                 tooltip={brand.name}
                 link={renderLink(brand.href ?? "/")}
-                className="px-2"
+                className="ps-0 group-data-[collapsible=icon]:p-0!"
               >
                 {brand.logo ? (
-                  // A circle, concentric with the pill button around it: the
-                  // button's 24px radius less its 8px inset on every side is
-                  // the tile's 16.
+                  // A circle that fills the pill's rounded end, so the two
+                  // share a radius; the row stays 48px in both states.
                   <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground [&_svg]:size-4">
                     {brand.logo}
                   </span>
@@ -220,7 +259,15 @@ export function AppShell({
         </SidebarHeader>
         <SidebarContent role="navigation" aria-label={labels.navigation}>
           {nav.map((group, i) => (
-            <SidebarGroup key={group.title ?? i}>
+            <SidebarGroup
+              key={group.title ?? i}
+              // A rule between groups; a title, when there is one, sits
+              // under it.
+              className={cn(
+                i > 0 &&
+                  "before:mx-2 before:mb-2 before:h-px before:bg-sidebar-border before:content-['']",
+              )}
+            >
               {group.title ? (
                 <SidebarGroupLabel>{group.title}</SidebarGroupLabel>
               ) : null}
@@ -249,21 +296,35 @@ export function AppShell({
             </SidebarGroup>
           ))}
         </SidebarContent>
-        {account ? (
-          <SidebarFooter>
-            <AccountMenu account={account} labels={labels} />
+        {account || footerActions ? (
+          <SidebarFooter className="flex-row items-center gap-1 group-data-[collapsible=icon]:flex-col-reverse group-data-[collapsible=icon]:items-start">
+            {account ? <AccountMenu account={account} labels={labels} /> : null}
+            {footerActions ? (
+              <div className="ms-auto flex shrink-0 items-center gap-0.5 text-muted-foreground group-data-[collapsible=icon]:ms-0 group-data-[collapsible=icon]:flex-col">
+                {footerActions}
+              </div>
+            ) : null}
           </SidebarFooter>
         ) : null}
-        <SidebarRail
-          aria-label={labels.toggleSidebar}
-          title={labels.toggleSidebar}
+        <ResizeHandle
+          label={labels.resizeSidebar}
+          width={width}
+          onWidthChange={setWidth}
+          onResizingChange={setResizing}
         />
       </Sidebar>
-      <SidebarInset className="min-w-0 overflow-hidden">
-        {/* As tall as the sidebar's brand row, expanded or collapsed, so the
-            two read as one band; inset like a Page, so the toggle's icon
-            lines up with the page's text. */}
-        <div className="flex h-12 shrink-0 items-center gap-2 border-b px-4 transition-[height] duration-200 ease-linear sm:px-6 md:h-16 md:group-has-data-[collapsible=icon]/sidebar-wrapper:h-12">
+      {/* A card with a hairline edge, as on the reference console: the
+          border draws the structure, so there is no shadow. */}
+      <SidebarInset className="min-w-0 overflow-hidden md:peer-data-[variant=inset]:rounded-xl md:peer-data-[variant=inset]:border md:peer-data-[variant=inset]:shadow-none">
+        {/* Inset like a Page, so the toggle's icon lines up with the page's
+            text. Without a breadcrumb or actions only phones get the bar, to
+            open the sidebar. */}
+        <div
+          className={cn(
+            "flex h-12 shrink-0 items-center gap-2 border-b px-4 sm:px-6",
+            !breadcrumb && !actions && "md:hidden",
+          )}
+        >
           <ToggleButton label={labels.toggleSidebar} />
           {breadcrumb ? (
             <>
@@ -327,6 +388,124 @@ function ToggleButton({ label }: { label: string }) {
   );
 }
 
+/**
+ * The sidebar's edge, in the gap between it and the card: drag it to set the
+ * width, which follows the pointer between the minimum and maximum. Let go
+ * short of the minimum and the sidebar collapses to icons; drag out from the
+ * icons and it opens again. A click without a drag toggles it. A thin line
+ * shows on hover and focus. It is a focusable window splitter: the arrow keys
+ * change the width and Enter toggles the sidebar.
+ */
+function ResizeHandle({
+  label,
+  width,
+  onWidthChange,
+  onResizingChange,
+}: {
+  label: string;
+  width: number;
+  onWidthChange: (width: number) => void;
+  onResizingChange: (resizing: boolean) => void;
+}) {
+  const { open, setOpen, toggleSidebar } = useSidebar();
+  const save = (value: number) => {
+    try {
+      localStorage.setItem(WIDTH_KEY, String(value));
+    } catch {
+      // Storage can be off, as in a private window; the width lasts the visit.
+    }
+  };
+
+  const onPointerDown = (event: ReactPointerEvent<HTMLDivElement>) => {
+    if (event.button !== 0) return;
+    event.preventDefault();
+    const handle = event.currentTarget;
+    handle.setPointerCapture(event.pointerId);
+    const left =
+      handle.closest("[data-slot=sidebar-container]")?.getBoundingClientRect()
+        .left ?? 0;
+    const startX = event.clientX;
+    const startWidth = width;
+    const wasOpen = open;
+    let moved = false;
+    let raw = startWidth;
+
+    const onMove = (move: PointerEvent) => {
+      if (!moved && Math.abs(move.clientX - startX) < 3) return;
+      if (!moved) {
+        moved = true;
+        onResizingChange(true);
+      }
+      // The pointer holds the edge where it took it.
+      raw = move.clientX - left + (wasOpen ? startWidth - (startX - left) : 0);
+      if (raw >= SIDEBAR_WIDTH.min) {
+        setOpen(true);
+        onWidthChange(clampWidth(raw));
+      } else if (!wasOpen) {
+        setOpen(false);
+      } else {
+        onWidthChange(SIDEBAR_WIDTH.min);
+      }
+    };
+    const onUp = () => {
+      handle.removeEventListener("pointermove", onMove);
+      handle.removeEventListener("pointerup", onUp);
+      handle.removeEventListener("pointercancel", onUp);
+      onResizingChange(false);
+      if (!moved) {
+        toggleSidebar();
+      } else if (raw < SIDEBAR_WIDTH.min) {
+        // Short of the minimum: collapse, and open later at the old width.
+        setOpen(false);
+        onWidthChange(startWidth);
+      } else {
+        save(clampWidth(raw));
+      }
+    };
+    handle.addEventListener("pointermove", onMove);
+    handle.addEventListener("pointerup", onUp);
+    handle.addEventListener("pointercancel", onUp);
+  };
+
+  const onKeyDown = (event: ReactKeyboardEvent<HTMLDivElement>) => {
+    const step = event.shiftKey ? 48 : 16;
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      toggleSidebar();
+    } else if (event.key === "ArrowLeft" || event.key === "ArrowRight") {
+      event.preventDefault();
+      if (!open) {
+        if (event.key === "ArrowRight") setOpen(true);
+        return;
+      }
+      const next = clampWidth(
+        width + (event.key === "ArrowRight" ? step : -step),
+      );
+      onWidthChange(next);
+      save(next);
+    }
+  };
+
+  return (
+    // The window splitter pattern: a focusable separator with its value.
+    <div
+      role="separator"
+      aria-orientation="vertical"
+      aria-label={label}
+      aria-valuemin={SIDEBAR_WIDTH.min}
+      aria-valuemax={SIDEBAR_WIDTH.max}
+      aria-valuenow={open ? width : SIDEBAR_WIDTH.min}
+      tabIndex={0}
+      title={label}
+      onPointerDown={onPointerDown}
+      onKeyDown={onKeyDown}
+      className="group/resize absolute inset-y-0 -right-2.5 z-20 hidden w-3 cursor-col-resize touch-none outline-none md:block"
+    >
+      <span className="pointer-events-none absolute inset-y-3 left-1/2 w-px -translate-x-1/2 bg-foreground mask-[linear-gradient(to_bottom,transparent,black_12%,black_88%,transparent)] opacity-0 transition-opacity group-hover/resize:opacity-20 group-focus-visible/resize:opacity-60" />
+    </div>
+  );
+}
+
 const THEME_OPTIONS = [
   { value: "system", Icon: DesktopIcon },
   { value: "light", Icon: SunIcon },
@@ -346,16 +525,15 @@ function AccountMenu({
   const { isMobile } = useSidebar();
   const { preference, setPreference } = useTheme();
   return (
-    <SidebarMenu>
+    <SidebarMenu className="w-auto min-w-0 flex-1">
       <SidebarMenuItem>
         <DropdownMenu>
           {/* The menu button renders the trigger, not the other way round:
               SidebarMenuButton does not pass a ref on, and the menu needs
               the trigger's element to open. */}
           <SidebarMenuButton
-            size="lg"
             aria-label={labels.account(account.name)}
-            className="rounded-full px-2 data-popup-open:bg-sidebar-accent data-popup-open:text-sidebar-accent-foreground"
+            className="rounded-full ps-0 group-data-[collapsible=icon]:p-0! data-popup-open:bg-sidebar-accent data-popup-open:text-sidebar-accent-foreground"
             render={<DropdownMenuTrigger />}
           >
             <PersonAvatar
@@ -363,15 +541,9 @@ function AccountMenu({
               src={account.avatar}
               size="default"
             />
-            <span className="grid min-w-0 flex-1 text-left leading-tight">
-              <span className="truncate font-medium">{account.name}</span>
-              {account.email ? (
-                <span className="truncate text-xs text-muted-foreground">
-                  {account.email}
-                </span>
-              ) : null}
-            </span>
-            <CaretUpDownIcon className="ml-auto text-muted-foreground" />
+            {/* The email waits in the menu, which leaves room for the
+                footer's buttons. */}
+            <span className="truncate font-medium">{account.name}</span>
           </SidebarMenuButton>
           <DropdownMenuContent
             side={isMobile ? "bottom" : "right"}

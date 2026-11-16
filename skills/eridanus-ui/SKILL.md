@@ -70,13 +70,18 @@ The app frame, once at the root; each route renders its `Page` as the children:
               {
                 label: "运行记录",
                 href: "/runs",
-                icon: <ListChecksIcon />,
+                icon: <PlayCircleIcon />,
                 active: path.startsWith("/runs"),
               },
             ],
           },
         ]}
         account={{ name: user.name, email: user.email, onSignOut: signOut }}
+        footerActions={
+          <Button variant="ghost" size="icon" aria-label="通知">
+            <BellIcon />
+          </Button>
+        }
         breadcrumb={<Breadcrumb>…</Breadcrumb>}
         renderLink={(href) => <Link to={href} />}
       >
