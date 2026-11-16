@@ -46,7 +46,6 @@ import {
   SidebarHeader,
   SidebarInset,
   SidebarMenu,
-  SidebarMenuBadge,
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarProvider,
@@ -159,6 +158,29 @@ function storedWidth(): number {
 const clampWidth = (value: number) =>
   Math.round(Math.min(SIDEBAR_WIDTH.max, Math.max(SIDEBAR_WIDTH.min, value)));
 
+/** Sets --fade-top and --fade-bottom on a scrolling element to 24px where
+ * more content lies past that edge, for a mask that fades it out there. */
+function fadeScrollEdges(element: HTMLElement | null) {
+  if (!element) return;
+  const update = () => {
+    const { scrollTop, scrollHeight, clientHeight } = element;
+    element.style.setProperty("--fade-top", scrollTop > 0 ? "24px" : "0px");
+    element.style.setProperty(
+      "--fade-bottom",
+      scrollTop + clientHeight < scrollHeight - 1 ? "24px" : "0px",
+    );
+  };
+  update();
+  element.addEventListener("scroll", update, { passive: true });
+  const observer = new ResizeObserver(update);
+  observer.observe(element);
+  for (const child of element.children) observer.observe(child);
+  return () => {
+    element.removeEventListener("scroll", update);
+    observer.disconnect();
+  };
+}
+
 /** The fill weight of a Phosphor icon element, which marks the current page. */
 function filled(icon: ReactNode): ReactNode {
   return isValidElement<{ weight?: string }>(icon)
@@ -234,7 +256,13 @@ export function AppShell({
           "cursor-col-resize select-none **:data-[slot=sidebar-container]:transition-none **:data-[slot=sidebar-gap]:transition-none",
         className,
       )}
-      style={{ "--sidebar-width": `${width}px` } as CSSProperties}
+      // Never more than 30% of the window, so a sidebar dragged wide on a
+      // large screen leaves a small one its content.
+      style={
+        {
+          "--sidebar-width": `clamp(${SIDEBAR_WIDTH.min}px, 30vw, ${width}px)`,
+        } as CSSProperties
+      }
     >
       <Sidebar collapsible="icon" variant="inset">
         <SidebarHeader>
@@ -257,15 +285,21 @@ export function AppShell({
             </SidebarMenuItem>
           </SidebarMenu>
         </SidebarHeader>
-        <SidebarContent role="navigation" aria-label={labels.navigation}>
+        <SidebarContent
+          ref={fadeScrollEdges}
+          role="navigation"
+          aria-label={labels.navigation}
+          // A long nav fades out at an edge that has more beyond it.
+          className="mask-[linear-gradient(to_bottom,transparent,black_var(--fade-top,0px),black_calc(100%-var(--fade-bottom,0px)),transparent)]"
+        >
           {nav.map((group, i) => (
             <SidebarGroup
               key={group.title ?? i}
-              // A rule between groups; a title, when there is one, sits
-              // under it.
+              // A rule between groups, centred in the 16px on either side of
+              // it; a title, when there is one, sits under it.
               className={cn(
                 i > 0 &&
-                  "before:mx-2 before:mb-2 before:h-px before:bg-sidebar-border before:content-['']",
+                  "pt-0 before:mx-2 before:mb-4 before:h-px before:bg-sidebar-border before:content-['']",
               )}
             >
               {group.title ? (
@@ -282,13 +316,17 @@ export function AppShell({
                         link={renderLink(item.href)}
                       >
                         {item.active ? filled(item.icon) : item.icon}
-                        <span>{item.label}</span>
+                        <span className="min-w-0 flex-1 truncate">
+                          {item.label}
+                        </span>
+                        {/* In the row, not over it, so a long label stops
+                            short of a badge of any width. */}
+                        {item.badge != null ? (
+                          <span className="shrink-0 text-xs font-medium tabular-nums group-data-[collapsible=icon]:hidden">
+                            {item.badge}
+                          </span>
+                        ) : null}
                       </NavButton>
-                      {item.badge != null ? (
-                        <SidebarMenuBadge className="rounded-full">
-                          {item.badge}
-                        </SidebarMenuBadge>
-                      ) : null}
                     </SidebarMenuItem>
                   ))}
                 </SidebarMenu>
@@ -381,7 +419,7 @@ function ToggleButton({ label }: { label: string }) {
       aria-label={label}
       title={label}
       onClick={toggleSidebar}
-      className="-ml-1.5"
+      className="-ms-1.5"
     >
       <SidebarSimpleIcon />
     </Button>
@@ -421,11 +459,13 @@ function ResizeHandle({
     event.preventDefault();
     const handle = event.currentTarget;
     handle.setPointerCapture(event.pointerId);
-    const left =
-      handle.closest("[data-slot=sidebar-container]")?.getBoundingClientRect()
-        .left ?? 0;
+    const container = handle
+      .closest("[data-slot=sidebar-container]")
+      ?.getBoundingClientRect();
+    const left = container?.left ?? 0;
     const startX = event.clientX;
-    const startWidth = width;
+    // The width on screen, which the window may hold under the stored one.
+    const startWidth = open && container ? container.width : width;
     const wasOpen = open;
     let moved = false;
     let raw = startWidth;
