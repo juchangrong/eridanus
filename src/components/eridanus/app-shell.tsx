@@ -360,7 +360,7 @@ export function AppShell({
               className="px-0"
             >
               {group.title ? (
-                <SidebarGroupLabel className="ps-[7px]">
+                <SidebarGroupLabel className="ps-[15px]">
                   {group.title}
                 </SidebarGroupLabel>
               ) : null}
@@ -373,10 +373,11 @@ export function AppShell({
                         aria-current={item.active ? "page" : undefined}
                         tooltip={item.label}
                         link={renderLink(item.href)}
-                        // 18px icons centred on the middle of the pill's
-                        // rounded end, where the brand tile and avatar centre
-                        // too, so collapsing moves none of them.
-                        className="group-data-[collapsible=icon]:p-[7px]! has-[>svg:first-child]:pl-[7px] [&_svg]:size-[18px]"
+                        // One column with the header: the 18px icon centred
+                        // under the 32px logo, the label where the product's
+                        // name starts. Collapsed, the icon centres in its
+                        // 32px button, with the logo and avatar.
+                        className="gap-[15px] group-data-[collapsible=icon]:p-[7px]! has-[>svg:first-child]:pl-[15px] [&_svg]:size-[18px]"
                       >
                         {item.active ? filled(item.icon) : item.icon}
                         <span className="min-w-0 flex-1 truncate">
@@ -815,9 +816,9 @@ function AccountMenu({
               the trigger's element to open. */}
           <SidebarMenuButton
             aria-label={labels.account(account.name)}
-            // A 24px avatar centred like the nav icons, with the name in
-            // line with their labels.
-            className="gap-[5px] rounded-full ps-1 group-data-[collapsible=icon]:p-1! data-popup-open:bg-sidebar-accent data-popup-open:text-sidebar-accent-foreground"
+            // The 24px avatar centred under the logo and nav icons, the name
+            // in line with their labels.
+            className="gap-3 rounded-full ps-3 group-data-[collapsible=icon]:p-1! data-popup-open:bg-sidebar-accent data-popup-open:text-sidebar-accent-foreground"
             render={<DropdownMenuTrigger />}
           >
             <PersonAvatar name={account.name} src={account.avatar} size="sm" />
