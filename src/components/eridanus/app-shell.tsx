@@ -375,9 +375,11 @@ export function AppShell({
                         link={renderLink(item.href)}
                         // One column with the header: the 18px icon centred
                         // under the 32px logo, the label where the product's
-                        // name starts. Collapsed, the icon centres in its
-                        // 32px button, with the logo and avatar.
-                        className="gap-[15px] group-data-[collapsible=icon]:p-[7px]! has-[>svg:first-child]:pl-[15px] [&_svg]:size-[18px]"
+                        // name starts. The pill starts under the logo, so
+                        // its 7px around the icon is the same on every side.
+                        // Collapsed, the icon centres in its 32px button,
+                        // with the logo and avatar.
+                        className="ms-2 w-[calc(100%-0.5rem)] gap-[15px] group-data-[collapsible=icon]:ms-0 group-data-[collapsible=icon]:p-[7px]! has-[>svg:first-child]:pl-[7px] [&_svg]:size-[18px]"
                       >
                         {item.active ? filled(item.icon) : item.icon}
                         <span className="min-w-0 flex-1 truncate">
@@ -817,8 +819,9 @@ function AccountMenu({
           <SidebarMenuButton
             aria-label={labels.account(account.name)}
             // The 24px avatar centred under the logo and nav icons, the name
-            // in line with their labels.
-            className="gap-3 rounded-full ps-3 group-data-[collapsible=icon]:p-1! data-popup-open:bg-sidebar-accent data-popup-open:text-sidebar-accent-foreground"
+            // in line with their labels; like theirs, the pill starts under
+            // the logo, 4px from the avatar on every side.
+            className="ms-2 w-[calc(100%-0.5rem)] gap-3 rounded-full ps-1 group-data-[collapsible=icon]:ms-0 group-data-[collapsible=icon]:p-1! data-popup-open:bg-sidebar-accent data-popup-open:text-sidebar-accent-foreground"
             render={<DropdownMenuTrigger />}
           >
             <PersonAvatar name={account.name} src={account.avatar} size="sm" />
