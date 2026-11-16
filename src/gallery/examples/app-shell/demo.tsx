@@ -28,6 +28,7 @@ const PAGES = [
 export default function AppShellDemo() {
   // In an app the router knows the current page; here a click sets it.
   const [current, setCurrent] = useState("/runs");
+  const [tenant, setTenant] = useState("ops");
   const page = PAGES.find((p) => p.href === current)!;
   const items = PAGES.map((p) => ({ ...p, active: p.href === current }));
   const nav: AppNavGroup[] = [
@@ -42,6 +43,16 @@ export default function AppShellDemo() {
       <AppShell
         className="h-full"
         brand={{ name: "运营台", logo: <PlanetIcon weight="fill" /> }}
+        tenants={{
+          items: [
+            { id: "ops", name: "运营台", logo: <PlanetIcon weight="fill" /> },
+            { id: "growth", name: "增长团队" },
+            { id: "lab", name: "实验室" },
+          ],
+          current: tenant,
+          onSelect: setTenant,
+          onCreate: () => notify("新建租户"),
+        }}
         nav={nav}
         renderLink={(href) => (
           // eslint-disable-next-line jsx-a11y/anchor-has-content -- the shell renders the label into it

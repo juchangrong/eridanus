@@ -1,6 +1,8 @@
 import {
+  CaretUpDownIcon,
   DesktopIcon,
   MoonIcon,
+  PlusIcon,
   SidebarSimpleIcon,
   SignOutIcon,
   SunIcon,
@@ -62,6 +64,25 @@ export interface AppBrand {
   href?: string;
 }
 
+/** One of the tenants (workspaces, teams, organisations) a person can work
+ * in; the sidebar's header switches between them. */
+export interface AppTenant {
+  id: string;
+  name: string;
+  /** A mark for the tile; without one, the tile shows the name's first
+   * letter. */
+  logo?: ReactNode;
+}
+
+export interface AppTenants {
+  items: AppTenant[];
+  /** The id of the tenant the app is in. */
+  current: string;
+  onSelect: (id: string) => void;
+  /** Adds a "new tenant" item at the end of the menu. */
+  onCreate?: () => void;
+}
+
 export interface AppNavItem {
   label: string;
   href: string;
@@ -99,6 +120,9 @@ export interface AppShellLabels {
   navigation: string;
   /** The account button's accessible name, given the person's name. */
   account: (name: string) => string;
+  /** The tenant switcher's accessible name, given the current tenant. */
+  switchTenant: (name: string) => string;
+  newTenant: string;
   theme: string;
   system: string;
   light: string;
@@ -114,6 +138,8 @@ export const appShellLabels: Record<Locale, AppShellLabels> = {
     collapseSidebar: "收起侧边栏",
     navigation: "主导航",
     account: (name) => `账号菜单：${name}`,
+    switchTenant: (name) => `切换租户：${name}`,
+    newTenant: "新建租户",
     theme: "主题",
     system: "跟随系统",
     light: "浅色",
@@ -126,6 +152,8 @@ export const appShellLabels: Record<Locale, AppShellLabels> = {
     collapseSidebar: "Collapse sidebar",
     navigation: "Main navigation",
     account: (name) => `Account menu: ${name}`,
+    switchTenant: (name) => `Switch tenant: ${name}`,
+    newTenant: "New tenant",
     theme: "Theme",
     system: "System",
     light: "Light",
@@ -213,7 +241,8 @@ const defaultLink = (href: string) => <a href={href} />;
 
 /**
  * The frame of a console app. The sidebar sits on the window's own background
- * with the product, navigation groups under small headings and, at its
+ * with the product (or, with `tenants`, a switcher between them), navigation
+ * groups under small headings and, at its
  * foot, the account menu beside a few icon buttons; the page sits in a card
  * inset from the window. A breadcrumb or page-wide actions get a top bar
  * inside the card, with the sidebar toggle; without them the page starts at
@@ -231,6 +260,7 @@ const defaultLink = (href: string) => <a href={href} />;
  */
 export function AppShell({
   brand,
+  tenants,
   nav,
   account,
   breadcrumb,
@@ -243,6 +273,9 @@ export function AppShell({
   children,
 }: {
   brand: AppBrand;
+  /** Makes the header a tenant switcher, in place of the brand link: the
+   * current tenant's tile and name, opening a menu of the others. */
+  tenants?: AppTenants;
   nav: AppNavGroup[];
   account?: AppAccount;
   /** A Breadcrumb for the current page, in a top bar inside the card. */
@@ -293,23 +326,18 @@ export function AppShell({
         <SidebarHeader className="px-0 py-0">
           <SidebarMenu>
             <SidebarMenuItem className="flex items-center gap-1">
-              <NavButton
-                tooltip={brand.name}
-                link={renderLink(brand.href ?? "/")}
-                // Laid out like the account row: a 24px tile 4px inside the
-                // pill, centred with the nav icons, the name in line with
-                // their labels.
-                className="min-w-0 flex-1 gap-[5px] ps-1 group-data-[collapsible=icon]:p-1!"
-              >
-                {brand.logo ? (
-                  // Concentric with the pill's rounded end: its 16px radius
-                  // less the 4px inset is the tile's 12.
-                  <span className="flex size-6 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground [&_svg]:size-3.5">
-                    {brand.logo}
-                  </span>
-                ) : null}
-                <span className="font-heading font-medium">{brand.name}</span>
-              </NavButton>
+              {tenants ? (
+                <TenantSwitcher tenants={tenants} labels={labels} />
+              ) : (
+                <NavButton
+                  tooltip={brand.name}
+                  link={renderLink(brand.href ?? "/")}
+                  className={HEADER_ROW}
+                >
+                  {brand.logo ? <Tile logo={brand.logo} /> : null}
+                  <span className="font-heading font-medium">{brand.name}</span>
+                </NavButton>
+              )}
               <CollapseButton label={labels.collapseSidebar} />
             </SidebarMenuItem>
           </SidebarMenu>
@@ -440,6 +468,110 @@ function NavButton({
         setOpenMobile(false);
       }}
     />
+  );
+}
+
+/** The header row, laid out like the account row: a 24px tile 4px inside
+ * the pill, centred with the nav icons, the name in line with their labels. */
+const HEADER_ROW =
+  "min-w-0 flex-1 gap-[5px] ps-1 group-data-[collapsible=icon]:p-1!";
+
+/** A round tile with a mark, or a name's first letter. At 24px it is
+ * concentric with a pill's rounded end: the pill's 16px radius less the 4px
+ * inset is the tile's 12. */
+function Tile({
+  logo,
+  name,
+  size = "md",
+}: {
+  logo?: ReactNode;
+  name?: string;
+  size?: "sm" | "md";
+}) {
+  return (
+    <span
+      aria-hidden
+      className={cn(
+        "flex shrink-0 items-center justify-center rounded-full bg-primary font-semibold text-primary-foreground",
+        size === "md"
+          ? "size-6 text-[11px] [&_svg]:size-3.5!"
+          : "size-5 text-[10px] [&_svg]:size-3!",
+      )}
+    >
+      {logo ?? Array.from(name?.trim() ?? "")[0]?.toUpperCase()}
+    </span>
+  );
+}
+
+/** The header as a tenant switcher: the current tenant's tile and name with
+ * a caret, opening the list of tenants, the current one checked, and an item
+ * to make a new one. */
+function TenantSwitcher({
+  tenants,
+  labels,
+}: {
+  tenants: AppTenants;
+  labels: AppShellLabels;
+}) {
+  const current =
+    tenants.items.find((t) => t.id === tenants.current) ?? tenants.items[0];
+  if (!current) return null;
+  return (
+    <DropdownMenu>
+      {/* The menu button renders the trigger, as in the account menu. */}
+      <SidebarMenuButton
+        aria-label={labels.switchTenant(current.name)}
+        className={cn(
+          HEADER_ROW,
+          "rounded-full data-popup-open:bg-sidebar-accent data-popup-open:text-sidebar-accent-foreground",
+        )}
+        render={<DropdownMenuTrigger />}
+      >
+        <Tile logo={current.logo} name={current.name} />
+        <span className="min-w-0 flex-1 truncate font-heading font-medium">
+          {current.name}
+        </span>
+        <CaretUpDownIcon className="text-muted-foreground" />
+      </SidebarMenuButton>
+      <DropdownMenuContent
+        side="bottom"
+        align="start"
+        sideOffset={4}
+        className="w-(--anchor-width) min-w-56"
+      >
+        <DropdownMenuRadioGroup
+          value={current.id}
+          onValueChange={(id) => {
+            if (typeof id === "string" && id !== current.id)
+              tenants.onSelect(id);
+          }}
+        >
+          {tenants.items.map((tenant) => (
+            <DropdownMenuRadioItem key={tenant.id} value={tenant.id}>
+              <Tile logo={tenant.logo} name={tenant.name} size="sm" />
+              <span className="truncate">{tenant.name}</span>
+            </DropdownMenuRadioItem>
+          ))}
+        </DropdownMenuRadioGroup>
+        {tenants.onCreate ? (
+          <>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem
+              onClick={tenants.onCreate}
+              className="text-muted-foreground"
+            >
+              <span
+                aria-hidden
+                className="flex size-5 shrink-0 items-center justify-center rounded-full border border-dashed border-muted-foreground/50 [&_svg]:size-3!"
+              >
+                <PlusIcon />
+              </span>
+              {labels.newTenant}
+            </DropdownMenuItem>
+          </>
+        ) : null}
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 }
 
