@@ -294,12 +294,15 @@ export function AppShell({
               <NavButton
                 tooltip={brand.name}
                 link={renderLink(brand.href ?? "/")}
-                className="min-w-0 flex-1 ps-0 group-data-[collapsible=icon]:p-0!"
+                // Laid out like the account row: a 24px tile 4px inside the
+                // pill, centred with the nav icons, the name in line with
+                // their labels.
+                className="min-w-0 flex-1 gap-[5px] ps-1 group-data-[collapsible=icon]:p-1!"
               >
                 {brand.logo ? (
-                  // A circle that fills the pill's rounded end, so the two
-                  // share a radius; the row stays 48px in both states.
-                  <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground [&_svg]:size-4">
+                  // Concentric with the pill's rounded end: its 16px radius
+                  // less the 4px inset is the tile's 12.
+                  <span className="flex size-6 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground [&_svg]:size-3.5">
                     {brand.logo}
                   </span>
                 ) : null}
