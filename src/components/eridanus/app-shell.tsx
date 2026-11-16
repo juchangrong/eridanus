@@ -213,8 +213,8 @@ const defaultLink = (href: string) => <a href={href} />;
 
 /**
  * The frame of a console app. The sidebar sits on the window's own background
- * with the product, navigation groups divided by rules and, under a last
- * rule, the account menu beside a few icon buttons; the page sits in a card
+ * with the product, navigation groups under small headings and, at its
+ * foot, the account menu beside a few icon buttons; the page sits in a card
  * inset from the window. A breadcrumb or page-wide actions get a top bar
  * inside the card, with the sidebar toggle; without them the page starts at
  * the card's top edge. On desktop the sidebar's edge drags to
@@ -322,16 +322,14 @@ export function AppShell({
           {nav.map((group, i) => (
             <SidebarGroup
               key={group.title ?? i}
-              // A rule between groups, centred in the 16px on either side of
-              // it; a title, when there is one, sits under it.
-              className={cn(
-                "px-0",
-                i > 0 &&
-                  "pt-0 before:mx-2 before:mb-4 before:h-px before:bg-sidebar-border before:content-['']",
-              )}
+              // Groups part by space and their headings, with no rule; a
+              // heading starts where the icons below it do.
+              className="px-0"
             >
               {group.title ? (
-                <SidebarGroupLabel>{group.title}</SidebarGroupLabel>
+                <SidebarGroupLabel className="ps-[7px]">
+                  {group.title}
+                </SidebarGroupLabel>
               ) : null}
               <SidebarGroupContent>
                 <SidebarMenu>

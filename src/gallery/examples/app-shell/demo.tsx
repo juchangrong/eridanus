@@ -32,7 +32,7 @@ export default function AppShellDemo() {
   const items = PAGES.map((p) => ({ ...p, active: p.href === current }));
   const nav: AppNavGroup[] = [
     { items: items.slice(0, 3) },
-    { items: items.slice(3) },
+    { title: "管理", items: items.slice(3) },
   ];
 
   return (
