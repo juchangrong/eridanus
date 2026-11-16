@@ -364,8 +364,9 @@ export function AppShell({
             </SidebarGroup>
           ))}
         </SidebarContent>
+        {/* No bottom padding: the row's foot lines up with the card's. */}
         {account || footerActions ? (
-          <SidebarFooter className="flex-row items-center gap-1 px-0 group-data-[collapsible=icon]:flex-col-reverse group-data-[collapsible=icon]:items-start">
+          <SidebarFooter className="flex-row items-center gap-1 px-0 pb-0 group-data-[collapsible=icon]:flex-col-reverse group-data-[collapsible=icon]:items-start">
             {account ? <AccountMenu account={account} labels={labels} /> : null}
             {footerActions ? (
               <div className="ms-auto flex shrink-0 items-center gap-0.5 text-muted-foreground group-data-[collapsible=icon]:ms-0 group-data-[collapsible=icon]:flex-col">
