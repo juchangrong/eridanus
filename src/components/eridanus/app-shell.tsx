@@ -250,16 +250,13 @@ export function AppShell({
   const labels = { ...useMessages(appShellLabels), ...labelOverrides };
   const [initialOpen] = useState(() => storedOpen() ?? defaultOpen ?? true);
   const [width, setWidth] = useState(storedWidth);
-  const [resizing, setResizing] = useState(false);
   return (
     <SidebarProvider
       defaultOpen={initialOpen}
-      // While the edge is dragged the sidebar follows the pointer at once,
-      // without its width transition.
+      // While the edge is dragged (data-resizing, set by the handle) the
+      // sidebar follows the pointer at once, without its width transition.
       className={cn(
-        "h-svh min-h-0",
-        resizing &&
-          "cursor-col-resize select-none **:data-[slot=sidebar-container]:transition-none **:data-[slot=sidebar-gap]:transition-none",
+        "h-svh min-h-0 data-resizing:cursor-col-resize data-resizing:select-none data-resizing:**:data-[slot=sidebar-container]:transition-none data-resizing:**:data-[slot=sidebar-gap]:transition-none",
         className,
       )}
       style={{ "--sidebar-width": widthVar(width) } as CSSProperties}
@@ -314,6 +311,10 @@ export function AppShell({
                         aria-current={item.active ? "page" : undefined}
                         tooltip={item.label}
                         link={renderLink(item.href)}
+                        // 18px icons centred on the middle of the pill's
+                        // rounded end, where the brand tile and avatar centre
+                        // too, so collapsing moves none of them.
+                        className="group-data-[collapsible=icon]:p-[7px]! has-[>svg:first-child]:pl-[7px] [&_svg]:size-[18px]"
                       >
                         {item.active ? filled(item.icon) : item.icon}
                         <span className="min-w-0 flex-1 truncate">
@@ -348,7 +349,6 @@ export function AppShell({
           label={labels.resizeSidebar}
           width={width}
           onWidthChange={setWidth}
-          onResizingChange={setResizing}
         />
       </Sidebar>
       {/* A card with a hairline edge, as on the reference console: the
@@ -429,11 +429,19 @@ function ToggleButton({ label }: { label: string }) {
   );
 }
 
+/** How far past the minimum width the pointer goes before the sidebar
+ * collapses, and how close to it, coming back, before it opens again. The
+ * space between the two keeps it from flickering at one point. */
+const COLLAPSE_PAST = 48;
+const EXPAND_WITHIN = 24;
+
 /**
  * The sidebar's edge, in the gap between it and the card: drag it to set the
- * width, which follows the pointer between the minimum and maximum. Let go
- * short of the minimum and the sidebar collapses to icons; drag out from the
- * icons and it opens again. A click without a drag toggles it. A thin line
+ * width, which follows the pointer between the minimum and maximum. Past the
+ * minimum it holds, and only well past it does the sidebar collapse to icons;
+ * dragged out from the icons it opens again near the minimum. Both changes
+ * animate, and nothing changes on letting go. A click without a drag toggles
+ * it. A thin line
  * shows on hover and focus. It is a focusable window splitter: the arrow keys
  * change the width and Enter toggles the sidebar.
  */
@@ -441,12 +449,10 @@ function ResizeHandle({
   label,
   width,
   onWidthChange,
-  onResizingChange,
 }: {
   label: string;
   width: number;
   onWidthChange: (width: number) => void;
-  onResizingChange: (resizing: boolean) => void;
 }) {
   const { open, setOpen, toggleSidebar } = useSidebar();
   const save = (value: number) => {
@@ -481,52 +487,69 @@ function ResizeHandle({
     let pointerX = startX;
     let frame = 0;
 
+    let settle = 0;
+
+    // Opening or closing mid-drag lets the sidebar's own transition run for
+    // its 200ms, so the change is a motion rather than a jump.
+    const snap = (nextOpen: boolean) => {
+      liveOpen = nextOpen;
+      wrapper?.removeAttribute("data-resizing");
+      clearTimeout(settle);
+      settle = window.setTimeout(() => {
+        if (moved && dragging) wrapper?.setAttribute("data-resizing", "");
+      }, 200);
+      setOpen(nextOpen);
+    };
     const apply = () => {
       frame = 0;
       // The pointer holds the edge where it took it.
       raw = pointerX - left + (wasOpen ? startWidth - (startX - left) : 0);
-      const nextOpen = raw >= SIDEBAR_WIDTH.min || wasOpen;
-      const next = clampWidth(raw);
-      if (nextOpen !== liveOpen) {
-        liveOpen = nextOpen;
-        onWidthChange(next);
-        setOpen(nextOpen);
+      if (liveOpen && raw < SIDEBAR_WIDTH.min - COLLAPSE_PAST) {
+        snap(false);
+      } else if (!liveOpen && raw >= SIDEBAR_WIDTH.min - EXPAND_WITHIN) {
+        wrapper?.style.setProperty(
+          "--sidebar-width",
+          widthVar(clampWidth(raw)),
+        );
+        snap(true);
       } else if (liveOpen) {
-        wrapper?.style.setProperty("--sidebar-width", widthVar(next));
+        wrapper?.style.setProperty(
+          "--sidebar-width",
+          widthVar(clampWidth(raw)),
+        );
       }
     };
+    let dragging = true;
     const onMove = (move: PointerEvent) => {
       pointerX = move.clientX;
       if (!moved) {
         if (Math.abs(pointerX - startX) < 3) return;
         moved = true;
-        onResizingChange(true);
+        wrapper?.setAttribute("data-resizing", "");
       }
       if (!frame) frame = requestAnimationFrame(apply);
     };
     const onUp = () => {
+      dragging = false;
       handle.removeEventListener("pointermove", onMove);
       handle.removeEventListener("pointerup", onUp);
       handle.removeEventListener("pointercancel", onUp);
       if (frame) cancelAnimationFrame(frame);
-      onResizingChange(false);
+      clearTimeout(settle);
+      wrapper?.removeAttribute("data-resizing");
       if (!moved) {
         toggleSidebar();
         return;
       }
       apply();
-      // Short of the minimum: collapse, and open later at the old width.
-      const collapse = raw < SIDEBAR_WIDTH.min;
-      const final = collapse ? startWidth : clampWidth(raw);
+      // Collapsed, it keeps the width it opens at: the one it had before
+      // the drag.
+      const final = liveOpen ? clampWidth(raw) : wasOpen ? startWidth : width;
       // Written here as well as in state: when the state already holds this
       // width, React leaves the variable the drag wrote.
       wrapper?.style.setProperty("--sidebar-width", widthVar(final));
       onWidthChange(final);
-      if (collapse) {
-        if (liveOpen) setOpen(false);
-      } else {
-        save(final);
-      }
+      if (liveOpen) save(final);
     };
     handle.addEventListener("pointermove", onMove);
     handle.addEventListener("pointerup", onUp);
@@ -601,14 +624,12 @@ function AccountMenu({
               the trigger's element to open. */}
           <SidebarMenuButton
             aria-label={labels.account(account.name)}
-            className="rounded-full ps-0 group-data-[collapsible=icon]:p-0! data-popup-open:bg-sidebar-accent data-popup-open:text-sidebar-accent-foreground"
+            // A 24px avatar centred like the nav icons, with the name in
+            // line with their labels.
+            className="gap-[5px] rounded-full ps-1 group-data-[collapsible=icon]:p-1! data-popup-open:bg-sidebar-accent data-popup-open:text-sidebar-accent-foreground"
             render={<DropdownMenuTrigger />}
           >
-            <PersonAvatar
-              name={account.name}
-              src={account.avatar}
-              size="default"
-            />
+            <PersonAvatar name={account.name} src={account.avatar} size="sm" />
             {/* The email waits in the menu, which leaves room for the
                 footer's buttons. */}
             <span className="truncate font-medium">{account.name}</span>
