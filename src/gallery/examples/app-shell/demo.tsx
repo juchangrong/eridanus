@@ -39,7 +39,7 @@ export default function AppShellDemo() {
   return (
     // The shell fills the viewport; the docs frame it in a box, which the
     // transform makes the containing block for the sidebar's fixed panel.
-    <div className="h-[34rem] w-full transform-gpu overflow-hidden rounded-lg border [&_[data-slot=sidebar-container]]:h-full">
+    <div className="h-[34rem] w-full transform-gpu overflow-hidden rounded-lg border in-data-fullscreen:h-full [&_[data-slot=sidebar-container]]:h-full">
       <AppShell
         className="h-full"
         brand={{ name: "运营台", logo: <PlanetIcon weight="fill" /> }}
