@@ -325,7 +325,9 @@ export function AppShell({
             and the nav sits 8px under it. */}
         <SidebarHeader className="px-0 py-0">
           <SidebarMenu>
-            <SidebarMenuItem className="flex items-center gap-1">
+            {/* Clips what does not fit yet while the sidebar opens, leaving
+                room for focus rings. */}
+            <SidebarMenuItem className="flex items-center gap-1 overflow-clip [overflow-clip-margin:4px]">
               {tenants ? (
                 <TenantSwitcher tenants={tenants} labels={labels} />
               ) : (
@@ -396,7 +398,7 @@ export function AppShell({
         </SidebarContent>
         {/* No bottom padding: the row's foot lines up with the card's. */}
         {account || footerActions ? (
-          <SidebarFooter className="flex-row items-center gap-1 px-0 pb-0 group-data-[collapsible=icon]:flex-col-reverse group-data-[collapsible=icon]:items-start">
+          <SidebarFooter className="flex-row items-center gap-1 overflow-clip px-0 pb-0 [overflow-clip-margin:4px] group-data-[collapsible=icon]:flex-col-reverse group-data-[collapsible=icon]:items-start">
             {account ? <AccountMenu account={account} labels={labels} /> : null}
             {footerActions ? (
               <div className="ms-auto flex shrink-0 items-center gap-0.5 text-muted-foreground group-data-[collapsible=icon]:ms-0 group-data-[collapsible=icon]:flex-col">
@@ -473,8 +475,11 @@ function NavButton({
 
 /** The header row, laid out like the account row: a 24px tile 4px inside
  * the pill, centred with the nav icons, the name in line with their labels. */
+// min-w-8: while the sidebar opens, the collapse button is already there
+// and the row is still 32px wide; without a floor it squeezed the tile out
+// of sight for a moment, a flicker on every toggle.
 const HEADER_ROW =
-  "min-w-0 flex-1 gap-[5px] ps-1 group-data-[collapsible=icon]:p-1!";
+  "min-w-8 flex-1 gap-[5px] ps-1 group-data-[collapsible=icon]:p-1!";
 
 /** A round tile with a mark, or a name's first letter. At 24px it is
  * concentric with a pill's rounded end: the pill's 16px radius less the 4px
@@ -798,7 +803,9 @@ function AccountMenu({
   const { isMobile } = useSidebar();
   const { preference, setPreference } = useTheme();
   return (
-    <SidebarMenu className="w-auto min-w-0 flex-1">
+    // min-w-8, as in the header: the footer's buttons never squeeze the
+    // avatar while the sidebar opens.
+    <SidebarMenu className="w-auto min-w-8 flex-1">
       <SidebarMenuItem>
         <DropdownMenu>
           {/* The menu button renders the trigger, not the other way round:
