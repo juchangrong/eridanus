@@ -155,14 +155,24 @@ function storedWidth(): number {
   return SIDEBAR_WIDTH.default;
 }
 
-/** The sidebar's CSS width for a stored one: never more than 30% of the
- * window, so a width dragged on a large screen leaves a small one its
- * content. */
-const widthVar = (value: number) =>
-  `clamp(${SIDEBAR_WIDTH.min}px, 30vw, ${value}px)`;
+/** The page keeps at least this much of the window, so a width dragged on
+ * a large screen leaves a small one its content. */
+const MIN_CONTENT = 480;
 
-const clampWidth = (value: number) =>
-  Math.round(Math.min(SIDEBAR_WIDTH.max, Math.max(SIDEBAR_WIDTH.min, value)));
+/** The sidebar's CSS width for a stored one, held to what the window
+ * leaves after MIN_CONTENT. */
+const widthVar = (value: number) =>
+  `clamp(${SIDEBAR_WIDTH.min}px, calc(100vw - ${MIN_CONTENT}px), ${value}px)`;
+
+/** A width within the limits, including the one the window sets now, so a
+ * drag stores what it shows. */
+const clampWidth = (value: number) => {
+  const max =
+    typeof window === "undefined"
+      ? SIDEBAR_WIDTH.max
+      : Math.min(SIDEBAR_WIDTH.max, window.innerWidth - MIN_CONTENT);
+  return Math.round(Math.max(SIDEBAR_WIDTH.min, Math.min(max, value)));
+};
 
 /** Sets --fade-top and --fade-bottom on a scrolling element to 24px where
  * more content lies past that edge, for a mask that fades it out there. */
@@ -464,8 +474,8 @@ function ResizeHandle({
   };
 
   // A drag runs outside React: the width goes straight to the wrapper's CSS
-  // variable once a frame, and React hears of it only when the sidebar opens
-  // or closes and when the drag ends. Re-rendering the shell, and the page
+  // variable on each pointer move, and React hears of it only when the
+  // sidebar opens or closes and when the drag ends. Re-rendering the shell, and the page
   // inside it, on every pointer move is what made dragging stutter.
   const onPointerDown = (event: ReactPointerEvent<HTMLDivElement>) => {
     if (event.button !== 0) return;
@@ -485,7 +495,6 @@ function ResizeHandle({
     let moved = false;
     let raw = startWidth;
     let pointerX = startX;
-    let frame = 0;
 
     let settle = 0;
 
@@ -501,7 +510,6 @@ function ResizeHandle({
       setOpen(nextOpen);
     };
     const apply = () => {
-      frame = 0;
       // The pointer holds the edge where it took it.
       raw = pointerX - left + (wasOpen ? startWidth - (startX - left) : 0);
       if (liveOpen && raw < SIDEBAR_WIDTH.min - COLLAPSE_PAST) {
@@ -527,14 +535,15 @@ function ResizeHandle({
         moved = true;
         wrapper?.setAttribute("data-resizing", "");
       }
-      if (!frame) frame = requestAnimationFrame(apply);
+      // At once, not on the next frame: Chrome already sends pointer moves
+      // once a frame, and the work is one CSS variable.
+      apply();
     };
     const onUp = () => {
       dragging = false;
       handle.removeEventListener("pointermove", onMove);
       handle.removeEventListener("pointerup", onUp);
       handle.removeEventListener("pointercancel", onUp);
-      if (frame) cancelAnimationFrame(frame);
       clearTimeout(settle);
       wrapper?.removeAttribute("data-resizing");
       if (!moved) {
