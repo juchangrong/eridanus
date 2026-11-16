@@ -95,6 +95,7 @@ export interface AppAccount {
 export interface AppShellLabels {
   toggleSidebar: string;
   resizeSidebar: string;
+  collapseSidebar: string;
   navigation: string;
   /** The account button's accessible name, given the person's name. */
   account: (name: string) => string;
@@ -110,6 +111,7 @@ export const appShellLabels: Record<Locale, AppShellLabels> = {
   "zh-CN": {
     toggleSidebar: "切换侧边栏",
     resizeSidebar: "调整侧边栏宽度",
+    collapseSidebar: "收起侧边栏",
     navigation: "主导航",
     account: (name) => `账号菜单：${name}`,
     theme: "主题",
@@ -121,6 +123,7 @@ export const appShellLabels: Record<Locale, AppShellLabels> = {
   "en-US": {
     toggleSidebar: "Toggle sidebar",
     resizeSidebar: "Resize sidebar",
+    collapseSidebar: "Collapse sidebar",
     navigation: "Main navigation",
     account: (name) => `Account menu: ${name}`,
     theme: "Theme",
@@ -269,16 +272,29 @@ export function AppShell({
         "h-svh min-h-0 data-resizing:cursor-col-resize data-resizing:select-none data-resizing:**:data-[slot=sidebar-container]:transition-none data-resizing:**:data-[slot=sidebar-gap]:transition-none",
         className,
       )}
-      style={{ "--sidebar-width": widthVar(width) } as CSSProperties}
+      style={
+        {
+          "--sidebar-width": widthVar(width),
+          // Collapsed, the sidebar is the 32px icon buttons with 8px on
+          // either side: 48px, the last 8 being the gap before the card.
+          "--sidebar-width-icon": "2rem",
+        } as CSSProperties
+      }
     >
-      <Sidebar collapsible="icon" variant="inset">
-        <SidebarHeader>
+      {/* Items sit at the sidebar's own 8px inset rather than 8px further
+          in, so they keep their place when it collapses to 48px. */}
+      <Sidebar
+        collapsible="icon"
+        variant="inset"
+        className="group-data-[collapsible=icon]:w-12"
+      >
+        <SidebarHeader className="px-0">
           <SidebarMenu>
-            <SidebarMenuItem>
+            <SidebarMenuItem className="flex items-center gap-1">
               <NavButton
                 tooltip={brand.name}
                 link={renderLink(brand.href ?? "/")}
-                className="ps-0 group-data-[collapsible=icon]:p-0!"
+                className="min-w-0 flex-1 ps-0 group-data-[collapsible=icon]:p-0!"
               >
                 {brand.logo ? (
                   // A circle that fills the pill's rounded end, so the two
@@ -289,6 +305,7 @@ export function AppShell({
                 ) : null}
                 <span className="font-heading font-medium">{brand.name}</span>
               </NavButton>
+              <CollapseButton label={labels.collapseSidebar} />
             </SidebarMenuItem>
           </SidebarMenu>
         </SidebarHeader>
@@ -305,6 +322,7 @@ export function AppShell({
               // A rule between groups, centred in the 16px on either side of
               // it; a title, when there is one, sits under it.
               className={cn(
+                "px-0",
                 i > 0 &&
                   "pt-0 before:mx-2 before:mb-4 before:h-px before:bg-sidebar-border before:content-['']",
               )}
@@ -346,7 +364,7 @@ export function AppShell({
           ))}
         </SidebarContent>
         {account || footerActions ? (
-          <SidebarFooter className="flex-row items-center gap-1 group-data-[collapsible=icon]:flex-col-reverse group-data-[collapsible=icon]:items-start">
+          <SidebarFooter className="flex-row items-center gap-1 px-0 group-data-[collapsible=icon]:flex-col-reverse group-data-[collapsible=icon]:items-start">
             {account ? <AccountMenu account={account} labels={labels} /> : null}
             {footerActions ? (
               <div className="ms-auto flex shrink-0 items-center gap-0.5 text-muted-foreground group-data-[collapsible=icon]:ms-0 group-data-[collapsible=icon]:flex-col">
@@ -364,9 +382,8 @@ export function AppShell({
       {/* A card with a hairline edge, as on the reference console: the
           border draws the structure, so there is no shadow. */}
       {/* The gap beside the sidebar stays 8px when it collapses, as the
-          resize line sits in its middle: the collapsed sidebar is 2px wider
-          than the space it holds, so the card moves 2px, not 8. */}
-      <SidebarInset className="min-w-0 overflow-hidden md:peer-data-[variant=inset]:rounded-xl md:peer-data-[variant=inset]:border md:peer-data-[variant=inset]:shadow-none md:peer-data-[variant=inset]:peer-data-[state=collapsed]:ml-0.5">
+          resize line sits in its middle, so the card does not move off. */}
+      <SidebarInset className="min-w-0 overflow-hidden md:peer-data-[variant=inset]:rounded-xl md:peer-data-[variant=inset]:border md:peer-data-[variant=inset]:shadow-none md:peer-data-[variant=inset]:peer-data-[state=collapsed]:ml-0">
         {/* Inset like a Page, so the toggle's icon lines up with the page's
             text. Without a breadcrumb or actions only phones get the bar, to
             open the sidebar. */}
@@ -419,6 +436,25 @@ function NavButton({
         setOpenMobile(false);
       }}
     />
+  );
+}
+
+/** At the end of the brand row while the sidebar is open: the visible way
+ * to collapse it, beside ⌘B and the edge. Collapsed, the edge or ⌘B opens
+ * it again. */
+function CollapseButton({ label }: { label: string }) {
+  const { setOpen } = useSidebar();
+  return (
+    <Button
+      variant="ghost"
+      size="icon"
+      aria-label={label}
+      title={label}
+      onClick={() => setOpen(false)}
+      className="shrink-0 text-muted-foreground group-data-[collapsible=icon]:hidden"
+    >
+      <SidebarSimpleIcon />
+    </Button>
   );
 }
 
