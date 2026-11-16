@@ -376,10 +376,11 @@ export function AppShell({
                         // One column with the header: the 18px icon centred
                         // under the 32px logo, the label where the product's
                         // name starts. The pill starts under the logo, so
-                        // its 7px around the icon is the same on every side.
+                        // its 7px around the icon is the same on every side,
+                        // and a badge keeps 7px at the other end.
                         // Collapsed, the icon centres in its 32px button,
                         // with the logo and avatar.
-                        className="ms-2 w-[calc(100%-0.5rem)] gap-[15px] group-data-[collapsible=icon]:ms-0 group-data-[collapsible=icon]:p-[7px]! has-[>svg:first-child]:pl-[7px] [&_svg]:size-[18px]"
+                        className="ms-2 w-[calc(100%-0.5rem)] gap-[15px] pe-[7px] group-data-[collapsible=icon]:ms-0 group-data-[collapsible=icon]:p-[7px]! has-[>svg:first-child]:pl-[7px] [&_svg]:size-[18px]"
                       >
                         {item.active ? filled(item.icon) : item.icon}
                         <span className="min-w-0 flex-1 truncate">
