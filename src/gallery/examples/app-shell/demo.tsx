@@ -14,8 +14,17 @@ import {
 import { useState } from "react";
 
 import { type AppNavGroup, AppShell } from "@/components/eridanus/app-shell";
-import { Page, PageHeader, StatStrip } from "@/components/eridanus/page-layout";
+import {
+  FactLine,
+  Facts,
+  Page,
+  PageHeader,
+  Section,
+  StatStrip,
+} from "@/components/eridanus/page-layout";
+import { Time } from "@/components/eridanus/time";
 import { notify } from "@/components/eridanus/toaster";
+import { ToneBadge } from "@/components/eridanus/tone-badge";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -75,6 +84,7 @@ const TENANTS = [
   { id: "growth", name: "增长团队" },
   { id: "lab", name: "实验室" },
 ];
+const CREATED = new Date(Date.now() - 90 * 24 * 60 * 60_000);
 const PAGES = [...MAIN, ...PINNED, ...RECENT];
 
 export default function AppShellDemo() {
@@ -173,15 +183,56 @@ export default function AppShellDemo() {
           onSignOut: () => notify("已退出登录"),
         }}
       >
+        {/* The page is built from PageLayout: a header with status and
+            facts, headline figures, then a titled section. */}
         <Page>
-          <PageHeader title={page.label} />
+          <PageHeader
+            title={page.label}
+            badges={<ToneBadge tone="success">运行正常</ToneBadge>}
+            meta={
+              <FactLine>
+                <span>{TENANTS.find((t) => t.id === tenant)?.name}</span>
+                <span>
+                  创建于 <Time value={CREATED} />
+                </span>
+                <span>3 个管理员</span>
+              </FactLine>
+            }
+          />
           <StatStrip
             items={[
               { label: "24 小时运行", value: "12,840" },
-              { label: "失败", value: "96", tone: "danger" },
+              {
+                label: "失败率",
+                value: "0.7%",
+                tone: "danger",
+                hint: "96 次失败",
+              },
               { label: "在途", value: "37", hint: "上限 200" },
+              { label: "队列积压", value: "12", tone: "warning" },
             ]}
           />
+          <Section
+            title="配置"
+            description="只有项目管理员能修改。"
+            actions={
+              <Button size="sm" variant="secondary">
+                编辑配置
+              </Button>
+            }
+          >
+            <Facts
+              items={[
+                { label: "项目 ID", value: "prj_7f3a9c" },
+                { label: "在途上限", value: "200" },
+                {
+                  label: "回调地址",
+                  value: "https://orders.example.com/api/workflow",
+                  wide: true,
+                },
+              ]}
+            />
+          </Section>
         </Page>
       </AppShell>
       {/* CommandDialog is the dialog shell; a Command inside holds the

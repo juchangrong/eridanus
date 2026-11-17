@@ -14,8 +14,17 @@ import {
 import { useState } from "react";
 
 import { type AppNavGroup, AppShell } from "@/components/eridanus/app-shell";
-import { Page, PageHeader, StatStrip } from "@/components/eridanus/page-layout";
+import {
+  FactLine,
+  Facts,
+  Page,
+  PageHeader,
+  Section,
+  StatStrip,
+} from "@/components/eridanus/page-layout";
+import { Time } from "@/components/eridanus/time";
 import { notify } from "@/components/eridanus/toaster";
+import { ToneBadge } from "@/components/eridanus/tone-badge";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -75,6 +84,7 @@ const TENANTS = [
   { id: "growth", name: "Growth" },
   { id: "lab", name: "Research lab" },
 ];
+const CREATED = new Date(Date.now() - 90 * 24 * 60 * 60_000);
 const PAGES = [...MAIN, ...PINNED, ...RECENT];
 
 export default function AppShellDemo() {
@@ -178,15 +188,56 @@ export default function AppShellDemo() {
           onSignOut: () => notify("Signed out"),
         }}
       >
+        {/* The page is built from PageLayout: a header with status and
+            facts, headline figures, then a titled section. */}
         <Page>
-          <PageHeader title={page.label} />
+          <PageHeader
+            title={page.label}
+            badges={<ToneBadge tone="success">Healthy</ToneBadge>}
+            meta={
+              <FactLine>
+                <span>{TENANTS.find((t) => t.id === tenant)?.name}</span>
+                <span>
+                  Created <Time value={CREATED} />
+                </span>
+                <span>3 admins</span>
+              </FactLine>
+            }
+          />
           <StatStrip
             items={[
-              { label: "Runs, 24h", value: "12,840" },
-              { label: "Failed", value: "96", tone: "danger" },
+              { label: "Runs in 24h", value: "12,840" },
+              {
+                label: "Failure rate",
+                value: "0.7%",
+                tone: "danger",
+                hint: "96 failures",
+              },
               { label: "In flight", value: "37", hint: "Limit 200" },
+              { label: "Queue backlog", value: "12", tone: "warning" },
             ]}
           />
+          <Section
+            title="Configuration"
+            description="Only project admins can change this."
+            actions={
+              <Button size="sm" variant="secondary">
+                Edit configuration
+              </Button>
+            }
+          >
+            <Facts
+              items={[
+                { label: "Project ID", value: "prj_7f3a9c" },
+                { label: "In-flight limit", value: "200" },
+                {
+                  label: "Callback URL",
+                  value: "https://orders.example.com/api/workflow",
+                  wide: true,
+                },
+              ]}
+            />
+          </Section>
         </Page>
       </AppShell>
       {/* CommandDialog is the dialog shell; a Command inside holds the
