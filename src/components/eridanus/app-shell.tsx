@@ -564,7 +564,7 @@ function TenantSwitcher({
         render={<DropdownMenuTrigger />}
       >
         <Tile logo={current.logo} name={current.name} />
-        <span className="min-w-0 flex-1 truncate text-left font-heading font-medium">
+        <span className="min-w-0 flex-1 truncate text-left font-heading text-[15px] font-medium">
           {current.name}
         </span>
         <CaretUpDownIcon className="size-3.5! text-muted-foreground" />
