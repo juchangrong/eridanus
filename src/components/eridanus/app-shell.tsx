@@ -4,7 +4,6 @@ import {
   MagnifyingGlassIcon,
   MoonIcon,
   PlusIcon,
-  PushPinIcon,
   SidebarSimpleIcon,
   SignOutIcon,
   SunIcon,
@@ -136,8 +135,8 @@ export interface AppShellLabels {
   resizeSidebar: string;
   collapseSidebar: string;
   /** The collapse button while the collapsed sidebar is open on hover:
-   * it keeps the sidebar open. */
-  pinSidebar: string;
+   * it opens the sidebar for good. */
+  expandSidebar: string;
   navigation: string;
   /** The account button's accessible name, given the person's name. */
   account: (name: string) => string;
@@ -158,7 +157,7 @@ export const appShellLabels: Record<Locale, AppShellLabels> = {
     toggleSidebar: "切换侧边栏",
     resizeSidebar: "调整侧边栏宽度",
     collapseSidebar: "收起侧边栏",
-    pinSidebar: "固定展开侧边栏",
+    expandSidebar: "展开侧边栏",
     navigation: "主导航",
     account: (name) => `账号菜单：${name}`,
     switchTenant: (name) => `切换租户：${name}`,
@@ -174,7 +173,7 @@ export const appShellLabels: Record<Locale, AppShellLabels> = {
     toggleSidebar: "Toggle sidebar",
     resizeSidebar: "Resize sidebar",
     collapseSidebar: "Collapse sidebar",
-    pinSidebar: "Keep sidebar open",
+    expandSidebar: "Expand sidebar",
     navigation: "Main navigation",
     account: (name) => `Account menu: ${name}`,
     switchTenant: (name) => `Switch tenant: ${name}`,
@@ -270,7 +269,7 @@ const defaultLink = (href: string) => <a href={href} />;
  * resize it, and it collapses to icons (⌘B, a click on the edge, or a drag
  * short of the minimum width); it remembers both across visits. Collapsed,
  * resting the pointer on it opens it over the card, without moving the page,
- * until the pointer leaves; its pin button keeps it open. Under 768px
+ * until the pointer leaves; its expand button opens it for good. Under 768px
  * it opens as a sheet, from a bar that phones always get.
  *
  * The card takes the rest of the viewport and scrolls by itself, so the top
@@ -339,8 +338,9 @@ export function AppShell({
       // sidebar follows the pointer at once, without its width transition.
       className={cn(
         // Open on hover, the sidebar keeps its collapsed gap, so it lies over
-        // the card instead of moving it, as a floating panel.
-        "data-peek:**:data-[slot=sidebar-gap]:w-11! data-peek:**:data-[slot=sidebar-inner]:rounded-xl data-peek:**:data-[slot=sidebar-inner]:shadow-lg data-peek:**:data-[slot=sidebar-inner]:ring-1 data-peek:**:data-[slot=sidebar-inner]:ring-sidebar-border",
+        // the card instead of moving it: a panel with the card's hairline
+        // edge and radius, and like the card no shadow.
+        "data-peek:**:data-[slot=sidebar-gap]:w-11! data-peek:**:data-[slot=sidebar-inner]:rounded-xl data-peek:**:data-[slot=sidebar-inner]:ring-1 data-peek:**:data-[slot=sidebar-inner]:ring-border",
         "h-svh min-h-0 data-resizing:cursor-col-resize data-resizing:select-none data-resizing:**:data-[slot=sidebar-container]:transition-none data-resizing:**:data-[slot=sidebar-gap]:transition-none",
         className,
       )}
@@ -382,7 +382,9 @@ export function AppShell({
                 </NavButton>
               )}
               <CollapseButton
-                label={peek.open ? labels.pinSidebar : labels.collapseSidebar}
+                label={
+                  peek.open ? labels.expandSidebar : labels.collapseSidebar
+                }
                 pin={peek.open}
               />
             </SidebarMenuItem>
@@ -725,7 +727,7 @@ function CollapseButton({
   pin,
 }: {
   label: string;
-  /** The sidebar is open on hover: the button keeps it open instead. */
+  /** The sidebar is open on hover: the button opens it for good. */
   pin: boolean;
 }) {
   const { setOpen } = useSidebar();
@@ -739,16 +741,16 @@ function CollapseButton({
       // Fades in as the sidebar opens, instead of popping in.
       className="ms-auto shrink-0 animate-in text-muted-foreground duration-200 fade-in group-data-[collapsible=icon]:hidden motion-reduce:animate-none"
     >
-      {pin ? <PushPinIcon /> : <SidebarSimpleIcon />}
+      <SidebarSimpleIcon />
     </Button>
   );
 }
 
 /** How long the pointer rests on the collapsed sidebar before it opens, and
  * how long it may be away before it closes, so passing over it or slipping
- * off its edge does nothing. */
-const PEEK_OPEN_DELAY = 120;
-const PEEK_CLOSE_DELAY = 240;
+ * off its edge does nothing; the Cloudflare dashboard's timings. */
+const PEEK_OPEN_DELAY = 450;
+const PEEK_CLOSE_DELAY = 1000;
 
 /**
  * Opens the collapsed sidebar while the pointer is over it, as a panel over
