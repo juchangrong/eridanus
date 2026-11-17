@@ -18,7 +18,7 @@ import { Button } from "@/components/ui/button";
 import { DropdownMenuItem } from "@/components/ui/dropdown-menu";
 
 const PAGES = [
-  { href: "/runs", label: "Runs", icon: <PlayCircleIcon />, badge: 3 },
+  { href: "/runs", label: "Runs", icon: <PlayCircleIcon /> },
   { href: "/queues", label: "Queues", icon: <StackIcon /> },
   { href: "/metrics", label: "Metrics", icon: <ChartLineUpIcon /> },
   { href: "/members", label: "Members", icon: <UsersIcon /> },

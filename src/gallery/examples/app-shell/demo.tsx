@@ -18,7 +18,7 @@ import { Button } from "@/components/ui/button";
 import { DropdownMenuItem } from "@/components/ui/dropdown-menu";
 
 const PAGES = [
-  { href: "/runs", label: "运行记录", icon: <PlayCircleIcon />, badge: 3 },
+  { href: "/runs", label: "运行记录", icon: <PlayCircleIcon /> },
   { href: "/queues", label: "队列", icon: <StackIcon /> },
   { href: "/metrics", label: "监控", icon: <ChartLineUpIcon /> },
   { href: "/members", label: "成员", icon: <UsersIcon /> },
