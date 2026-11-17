@@ -90,11 +90,10 @@ export default function AppShellDemo() {
             {
               id: "ops",
               name: "运营台",
-              description: "生产环境",
               logo: <PlanetIcon weight="fill" />,
             },
-            { id: "growth", name: "增长团队", description: "生产环境" },
-            { id: "lab", name: "实验室", description: "预发环境" },
+            { id: "growth", name: "增长团队" },
+            { id: "lab", name: "实验室" },
           ],
           current: tenant,
           onSelect: setTenant,

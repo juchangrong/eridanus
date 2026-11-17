@@ -73,8 +73,6 @@ export interface AppTenant {
   /** A mark for the tile; without one, the tile shows the name's first
    * letter. */
   logo?: ReactNode;
-  /** A second line under the name, such as the environment ("Production"). */
-  description?: ReactNode;
 }
 
 /** The search entry under the header: a field-like button that opens the
@@ -549,25 +547,18 @@ function TenantSwitcher({
       {/* The menu button renders the trigger, as in the account menu. */}
       <SidebarMenuButton
         aria-label={labels.switchTenant(current.name)}
-        // A card: the tenant on the window's ground, with its name and a
-        // second line, the 28px tile 6px inside (concentric: 20 less 6 is
-        // 14). Collapsed it is the bare tile, like the other icons.
+        // The tenant's tile and name in a 32px row like a nav pill, the
+        // 28px tile 2px inside (concentric: 16 less 2 is 14), centred on
+        // the icon column. Collapsed it is the bare tile, like the icons.
         className={cn(
           HEADER_ROW,
-          "h-10 gap-2.5 rounded-full bg-background ps-1.5 ring-1 ring-sidebar-border ring-inset group-data-[collapsible=icon]:bg-transparent group-data-[collapsible=icon]:ring-0 data-popup-open:bg-sidebar-accent data-popup-open:text-sidebar-accent-foreground",
+          "h-8 gap-1.5 rounded-full ps-0.5 data-popup-open:bg-sidebar-accent data-popup-open:text-sidebar-accent-foreground",
         )}
         render={<DropdownMenuTrigger />}
       >
         <Tile logo={current.logo} name={current.name} />
-        <span className="grid min-w-0 flex-1 text-left leading-tight">
-          <span className="truncate font-heading font-medium">
-            {current.name}
-          </span>
-          {current.description ? (
-            <span className="truncate text-xs text-muted-foreground">
-              {current.description}
-            </span>
-          ) : null}
+        <span className="min-w-0 flex-1 truncate text-left font-heading font-medium">
+          {current.name}
         </span>
         <CaretUpDownIcon className="size-3.5! text-muted-foreground" />
       </SidebarMenuButton>
