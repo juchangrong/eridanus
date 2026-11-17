@@ -388,7 +388,9 @@ export function AppShell({
                 </SidebarGroupLabel>
               ) : null}
               <SidebarGroupContent>
-                <SidebarMenu>
+                {/* Collapsed, the 28px buttons part by 8px (a 36px pitch),
+                    so the bare icons have room around them. */}
+                <SidebarMenu className="transition-[gap] duration-200 ease-linear group-data-[collapsible=icon]:gap-2">
                   {group.items.map((item) => (
                     <SidebarMenuItem key={item.href}>
                       <NavButton
