@@ -554,7 +554,7 @@ function TenantSwitcher({
         // 14). Collapsed it is the bare tile, like the other icons.
         className={cn(
           HEADER_ROW,
-          "h-10 gap-2.5 rounded-full bg-background ps-1.5 ring-1 ring-sidebar-border group-data-[collapsible=icon]:bg-transparent group-data-[collapsible=icon]:ring-0 data-popup-open:bg-sidebar-accent data-popup-open:text-sidebar-accent-foreground",
+          "h-10 gap-2.5 rounded-full bg-background ps-1.5 ring-1 ring-sidebar-border ring-inset group-data-[collapsible=icon]:bg-transparent group-data-[collapsible=icon]:ring-0 data-popup-open:bg-sidebar-accent data-popup-open:text-sidebar-accent-foreground",
         )}
         render={<DropdownMenuTrigger />}
       >
@@ -675,7 +675,7 @@ function SearchButton({ search, label }: { search: AppSearch; label: string }) {
           tooltip={text}
           aria-keyshortcuts={apple ? "Meta+K" : "Control+K"}
           onClick={() => onOpen.current()}
-          className="gap-[11px] rounded-full bg-background pe-1.5 text-muted-foreground ring-1 ring-sidebar-border transition-[width,height,padding,margin] ease-linear group-data-[collapsible=icon]:size-7! group-data-[collapsible=icon]:bg-transparent group-data-[collapsible=icon]:p-[5px]! group-data-[collapsible=icon]:ring-0 has-[>svg:first-child]:pl-[7px] [&_svg]:size-[18px]"
+          className="gap-[11px] rounded-full bg-background pe-1.5 text-muted-foreground ring-1 ring-sidebar-border transition-[width,height,padding,margin] ease-linear ring-inset group-data-[collapsible=icon]:size-7! group-data-[collapsible=icon]:bg-transparent group-data-[collapsible=icon]:p-[5px]! group-data-[collapsible=icon]:ring-0 has-[>svg:first-child]:pl-[7px] [&_svg]:size-[18px]"
         >
           <MagnifyingGlassIcon />
           <span className="flex-1">{text}</span>
