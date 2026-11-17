@@ -170,7 +170,7 @@
       "name": "tabs",
       "type": "registry:ui",
       "title": "Tabs",
-      "description": "Eridanus fork of the shadcn base-rhea tabs, installed in place of it at components/ui/tabs.tsx. The default list is a pill with pill triggers (16px corners when vertical); the line variant is unchanged. Same API as shadcn's.",
+      "description": "Eridanus fork of the shadcn base-rhea tabs, installed in place of it at components/ui/tabs.tsx. The default list is a pill with pill triggers (16px corners when vertical); TabsList takes size=\"sm\" (28px) to match small buttons and fields in a toolbar; the line variant is unchanged. Same API as shadcn's, plus that size.",
       "categories": ["navigation", "shadcn-fork"],
       "dependencies": ["@base-ui/react", "class-variance-authority", "cn"],
       "files": [

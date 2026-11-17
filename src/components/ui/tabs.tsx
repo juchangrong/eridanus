@@ -21,16 +21,21 @@ function Tabs({
 }
 
 const tabsListVariants = cva(
-  "group/tabs-list inline-flex w-fit items-center justify-center rounded-full group-data-vertical/tabs:rounded-[1rem] p-[3px] text-muted-foreground group-data-horizontal/tabs:h-8 group-data-vertical/tabs:h-fit group-data-vertical/tabs:flex-col group-data-vertical/tabs:p-1 data-[variant=line]:rounded-none",
+  "group/tabs-list inline-flex w-fit items-center justify-center rounded-full group-data-vertical/tabs:rounded-[1rem] p-[3px] text-muted-foreground group-data-vertical/tabs:h-fit group-data-vertical/tabs:flex-col group-data-vertical/tabs:p-1 data-[variant=line]:rounded-none",
   {
     variants: {
       variant: {
         default: "bg-muted",
         line: "gap-1 bg-transparent",
       },
+      size: {
+        default: "group-data-horizontal/tabs:h-8",
+        sm: "group-data-horizontal/tabs:h-7",
+      },
     },
     defaultVariants: {
       variant: "default",
+      size: "default",
     },
   }
 )
@@ -39,18 +44,21 @@ const tabsListVariants = cva(
  * Eridanus fork of shadcn's base-rhea tabs. The default list is a pill with
  * pill triggers inside (16px corners when vertical): each trigger fills the
  * list's height, 3px in on every side and concentric with it, with its text
- * 12px from its rounded ends. The line variant is unchanged. Upstream changes are merged by hand, see docs/plan.md.
+ * 12px from its rounded ends. `size="sm"` (28px) lines the list up with small
+ * buttons and fields in a toolbar. The line variant is unchanged. Upstream changes are merged by hand, see docs/plan.md.
  */
 function TabsList({
   className,
   variant = "default",
+  size = "default",
   ...props
 }: TabsPrimitive.List.Props & VariantProps<typeof tabsListVariants>) {
   return (
     <TabsPrimitive.List
       data-slot="tabs-list"
       data-variant={variant}
-      className={cn(tabsListVariants({ variant }), className)}
+      data-size={size}
+      className={cn(tabsListVariants({ variant, size }), className)}
       {...props}
     />
   )
