@@ -3,8 +3,8 @@ import {
   CircleIcon,
   ClockCounterClockwiseIcon,
   GearIcon,
+  MonitorPlayIcon,
   PlanetIcon,
-  PlayCircleIcon,
   PresentationChartIcon,
   StackIcon,
   UserIcon,
@@ -27,9 +27,10 @@ import {
 import { DropdownMenuItem } from "@/components/ui/dropdown-menu";
 
 const MAIN = [
-  { href: "/runs", label: "运行记录", icon: <PlayCircleIcon /> },
+  { href: "/runs", label: "运行记录", icon: <MonitorPlayIcon /> },
   { href: "/queues", label: "队列", icon: <StackIcon /> },
   { href: "/metrics", label: "监控", icon: <PresentationChartIcon /> },
+  { href: "/settings", label: "设置", icon: <GearIcon /> },
 ];
 // Pinned workflows, each marked by a colored dot.
 const PINNED = [
@@ -56,8 +57,7 @@ const RECENT = [
     icon: <ClockCounterClockwiseIcon />,
   },
 ];
-const SETTINGS = [{ href: "/settings", label: "设置", icon: <GearIcon /> }];
-const PAGES = [...MAIN, ...PINNED, ...RECENT, ...SETTINGS];
+const PAGES = [...MAIN, ...PINNED, ...RECENT];
 
 export default function AppShellDemo() {
   // In an app the router knows the current page; here a click sets it.
@@ -71,7 +71,6 @@ export default function AppShellDemo() {
     { items: mark(MAIN) },
     { title: "已固定", hideWhenCollapsed: true, items: mark(PINNED) },
     { title: "最近", hideWhenCollapsed: true, items: mark(RECENT) },
-    { items: mark(SETTINGS) },
   ];
   const go = (href: string) => {
     setCurrent(href);
@@ -147,7 +146,7 @@ export default function AppShellDemo() {
           <CommandList>
             <CommandEmpty>没有匹配的结果</CommandEmpty>
             <CommandGroup heading="页面">
-              {[...MAIN, ...SETTINGS].map((p) => (
+              {MAIN.map((p) => (
                 <CommandItem key={p.href} onSelect={() => go(p.href)}>
                   {p.icon}
                   {p.label}

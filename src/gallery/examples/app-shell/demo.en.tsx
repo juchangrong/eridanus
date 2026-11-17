@@ -3,8 +3,8 @@ import {
   CircleIcon,
   ClockCounterClockwiseIcon,
   GearIcon,
+  MonitorPlayIcon,
   PlanetIcon,
-  PlayCircleIcon,
   PresentationChartIcon,
   StackIcon,
   UserIcon,
@@ -27,9 +27,10 @@ import {
 import { DropdownMenuItem } from "@/components/ui/dropdown-menu";
 
 const MAIN = [
-  { href: "/runs", label: "Runs", icon: <PlayCircleIcon /> },
+  { href: "/runs", label: "Runs", icon: <MonitorPlayIcon /> },
   { href: "/queues", label: "Queues", icon: <StackIcon /> },
   { href: "/metrics", label: "Metrics", icon: <PresentationChartIcon /> },
+  { href: "/settings", label: "Settings", icon: <GearIcon /> },
 ];
 // Pinned workflows, each marked by a colored dot.
 const PINNED = [
@@ -56,8 +57,7 @@ const RECENT = [
     icon: <ClockCounterClockwiseIcon />,
   },
 ];
-const SETTINGS = [{ href: "/settings", label: "Settings", icon: <GearIcon /> }];
-const PAGES = [...MAIN, ...PINNED, ...RECENT, ...SETTINGS];
+const PAGES = [...MAIN, ...PINNED, ...RECENT];
 
 export default function AppShellDemo() {
   // In an app the router knows the current page; here a click sets it.
@@ -71,7 +71,6 @@ export default function AppShellDemo() {
     { items: mark(MAIN) },
     { title: "Pinned", hideWhenCollapsed: true, items: mark(PINNED) },
     { title: "Recent", hideWhenCollapsed: true, items: mark(RECENT) },
-    { items: mark(SETTINGS) },
   ];
   const go = (href: string) => {
     setCurrent(href);
@@ -152,7 +151,7 @@ export default function AppShellDemo() {
           <CommandList>
             <CommandEmpty>No results</CommandEmpty>
             <CommandGroup heading="Pages">
-              {[...MAIN, ...SETTINGS].map((p) => (
+              {MAIN.map((p) => (
                 <CommandItem key={p.href} onSelect={() => go(p.href)}>
                   {p.icon}
                   {p.label}
