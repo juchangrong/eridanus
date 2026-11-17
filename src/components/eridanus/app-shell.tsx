@@ -511,7 +511,11 @@ export function AppShell({
             <div className="flex-1" />
           )}
           {actions ? (
-            <div className="flex shrink-0 items-center gap-2">{actions}</div>
+            // In the card's corner, like the toggle: the last action as far
+            // from its right edge as from its top (6px for a 28px button).
+            <div className="-me-2.5 flex shrink-0 items-center gap-2 sm:-me-4.5">
+              {actions}
+            </div>
           ) : null}
         </div>
         <div className="min-h-0 flex-1 overflow-auto">{children}</div>
