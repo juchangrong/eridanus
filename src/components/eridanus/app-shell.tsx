@@ -383,8 +383,9 @@ export function AppShell({
           <SidebarMenu>
             {/* Clips what does not fit yet while the sidebar opens, leaving
                 room for focus rings. */}
-            {/* 40px tall in both states, so the nav below never moves. */}
-            <SidebarMenuItem className="flex h-10 items-center gap-1 overflow-clip [overflow-clip-margin:4px]">
+            {/* 48px tall in both states, so the nav below never moves, and
+                as tall as the card's top bar beside it. */}
+            <SidebarMenuItem className="flex h-12 items-center gap-1 overflow-clip [overflow-clip-margin:4px]">
               {tenants ? (
                 <TenantSwitcher tenants={tenants} labels={labels} />
               ) : (
@@ -498,14 +499,16 @@ export function AppShell({
       {/* The gap beside the sidebar stays 8px when it collapses, as the
           resize line sits in its middle, so the card does not move off. */}
       <SidebarInset className="min-w-0 overflow-hidden md:peer-data-[variant=inset]:rounded-xl md:peer-data-[variant=inset]:border md:peer-data-[variant=inset]:shadow-none md:peer-data-[variant=inset]:peer-data-[state=collapsed]:ml-0">
-        {/* Inset like a Page, so the toggle's icon lines up with the page's
-            text, and 40px tall, so its controls centre on the sidebar's
-            header row beside it. No rule under it: the page's own space
+        {/* One 16px inset for the card's corner and its page: the toggle's
+            icon 16px from the card's top and left, over the page's text,
+            which starts 16px in; the controls at either end 10px from the
+            edges. 48px tall, so they centre on the sidebar's header row
+            beside it. No rule under it: the page's own space
             sets it apart. Without a breadcrumb or actions only phones get
             the bar, to open the sidebar. */}
         <div
           className={cn(
-            "flex h-10 shrink-0 items-center gap-2 px-4 sm:px-6",
+            "flex h-12 shrink-0 items-center gap-2 px-4",
             !breadcrumb && !actions && "md:hidden",
           )}
         >
@@ -519,9 +522,9 @@ export function AppShell({
             <div className="flex-1" />
           )}
           {actions ? (
-            // In the card's corner, like the toggle: the last action as far
-            // from its right edge as from its top (6px for a 28px button).
-            <div className="-me-2.5 flex shrink-0 items-center gap-2 sm:-me-4.5">
+            // The last action 10px from the card's right edge, as from its
+            // top, like the toggle at the other end.
+            <div className="-me-1.5 flex shrink-0 items-center gap-2">
               {actions}
             </div>
           ) : null}
@@ -901,9 +904,9 @@ function BarToggle({
         aria-label={label}
         title={label}
         onClick={toggleSidebar}
-        // In the card's corner: the icon as far from its left edge as
-        // from its top (12px), past the bar's own inset.
-        className="-ms-2.5 text-muted-foreground sm:-ms-4.5"
+        // The icon 16px from the card's left edge, as from its top, over
+        // the page's text: the 28px button 10px in.
+        className="-ms-1.5 text-muted-foreground"
       >
         <SidebarSimpleIcon />
       </Button>

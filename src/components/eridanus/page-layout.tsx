@@ -3,7 +3,9 @@ import type { ReactNode } from "react";
 import { cn } from "@/lib/utils";
 
 /**
- * The page container. Document pages grow and let their parent scroll, with
+ * The page container, 16px in from its sides, the inset of the app shell's
+ * top bar, so the page's text lines up under the bar's toggle. Document
+ * pages grow and let their parent scroll, with
  * 32px between blocks, twice the 16px inside a section, so each block reads
  * as one group. `fill` pages take exactly the height they are
  * given, so a table or workbench can scroll inside itself with its header and
@@ -24,7 +26,7 @@ export function Page({
   return (
     <div
       className={cn(
-        "mx-auto flex w-full flex-col px-4 sm:px-6",
+        "mx-auto flex w-full flex-col px-4",
         fill ? "h-full min-h-[36rem] gap-3 py-4" : "gap-8 py-6",
         narrow ? "max-w-5xl" : "max-w-[1600px]",
         className,
