@@ -479,17 +479,17 @@ function NavButton({
   );
 }
 
-/** The header row: a 48px pill with a 32px tile 8px inside it, concentric
- * (the pill's 24px radius less 8 is the tile's 16), so the product reads
- * first. Collapsed it is a 32px button with a 24px tile, centred with the
+/** The header row: a 48px pill with a 28px tile 10px inside it, concentric
+ * (the pill's 24px radius less 10 is the tile's 14) and centred over the nav
+ * icons, the name where their labels start. Collapsed it is a 32px button with a 24px tile, centred with the
  * nav icons. */
 // min-w-8: while the sidebar opens, the collapse button is already there
 // and the row is still 32px wide; without a floor it squeezed the tile out
 // of sight for a moment, a flicker on every toggle.
 const HEADER_ROW =
-  "h-12 min-w-8 flex-1 gap-2 ps-2 group-data-[collapsible=icon]:p-1!";
+  "h-12 min-w-8 flex-1 gap-2.5 ps-2.5 group-data-[collapsible=icon]:p-1!";
 
-/** A round tile with a mark, or a name's first letter: the header's, 32px
+/** A round tile with a mark, or a name's first letter: the header's, 28px
  * and 24px collapsed, or a small one for menus. */
 function Tile({
   logo,
@@ -506,7 +506,7 @@ function Tile({
       className={cn(
         "flex shrink-0 items-center justify-center rounded-full bg-primary font-semibold text-primary-foreground",
         size === "md"
-          ? "size-8 text-[13px] transition-[width,height] duration-200 ease-linear group-data-[collapsible=icon]:size-6 group-data-[collapsible=icon]:text-[11px] [&_svg]:size-4! group-data-[collapsible=icon]:[&_svg]:size-3.5!"
+          ? "size-7 text-[12px] transition-[width,height] duration-200 ease-linear group-data-[collapsible=icon]:size-6 group-data-[collapsible=icon]:text-[11px] [&_svg]:size-4! group-data-[collapsible=icon]:[&_svg]:size-3.5!"
           : "size-5 text-[10px] [&_svg]:size-3!",
       )}
     >
