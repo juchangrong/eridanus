@@ -253,13 +253,13 @@ const defaultLink = (href: string) => <a href={href} />;
 
 /**
  * The frame of a console app. The sidebar sits on the window's own background
- * with the product (or, with `tenants`, a switcher between them, a card with
- * an optional second line), an optional search entry (⌘K), navigation
+ * with the product (or, with `tenants`, a switcher between them), an
+ * optional search entry (⌘K), navigation
  * groups under small headings and, at its
  * foot, the account menu beside a few icon buttons; the page sits in a card
- * inset from the window. A breadcrumb or page-wide actions get a top bar
- * inside the card, with the sidebar toggle; without them the page starts at
- * the card's top edge. On desktop the sidebar's edge drags to
+ * inset from the window. A breadcrumb or page-wide actions get an optional
+ * top bar inside the card, which also holds the sidebar toggle while the
+ * sidebar is collapsed; without them the page starts at the card's top edge. On desktop the sidebar's edge drags to
  * resize it, and it collapses to icons (⌘B, a click on the edge, or a drag
  * short of the minimum width); it remembers both across visits. Under 768px
  * it opens as a sheet, from a bar that phones always get.
@@ -450,23 +450,21 @@ export function AppShell({
           resize line sits in its middle, so the card does not move off. */}
       <SidebarInset className="min-w-0 overflow-hidden md:peer-data-[variant=inset]:rounded-xl md:peer-data-[variant=inset]:border md:peer-data-[variant=inset]:shadow-none md:peer-data-[variant=inset]:peer-data-[state=collapsed]:ml-0">
         {/* Inset like a Page, so the toggle's icon lines up with the page's
-            text. Without a breadcrumb or actions only phones get the bar, to
+            text, and 40px tall, so its controls centre on the sidebar's
+            header row beside it. Without a breadcrumb or actions only phones get the bar, to
             open the sidebar. */}
         <div
           className={cn(
-            "flex h-12 shrink-0 items-center gap-2 border-b px-4 sm:px-6",
+            "flex h-10 shrink-0 items-center gap-2 border-b px-4 sm:px-6",
             !breadcrumb && !actions && "md:hidden",
           )}
         >
-          <ToggleButton label={labels.toggleSidebar} />
+          <BarToggle
+            label={labels.toggleSidebar}
+            separator={Boolean(breadcrumb)}
+          />
           {breadcrumb ? (
-            <>
-              <Separator
-                orientation="vertical"
-                className="data-vertical:h-4 data-vertical:self-center"
-              />
-              <div className="min-w-0 flex-1 truncate">{breadcrumb}</div>
-            </>
+            <div className="min-w-0 flex-1 truncate">{breadcrumb}</div>
           ) : (
             <div className="flex-1" />
           )}
@@ -712,20 +710,40 @@ function CollapseButton({ label }: { label: string }) {
   );
 }
 
-/** shadcn's SidebarTrigger fixes its screen-reader name in English. */
-function ToggleButton({ label }: { label: string }) {
-  const { toggleSidebar } = useSidebar();
+/**
+ * The top bar's sidebar toggle, and a rule before the breadcrumb. Phones
+ * always get it, to open the sheet; on desktop it shows only while the
+ * sidebar is collapsed, as the open sidebar has its own collapse button.
+ * shadcn's SidebarTrigger fixes its screen-reader name in English.
+ */
+function BarToggle({
+  label,
+  separator,
+}: {
+  label: string;
+  separator: boolean;
+}) {
+  const { toggleSidebar, state } = useSidebar();
+  const hidden = state === "expanded" && "md:hidden";
   return (
-    <Button
-      variant="ghost"
-      size="icon-sm"
-      aria-label={label}
-      title={label}
-      onClick={toggleSidebar}
-      className="-ms-1.5"
-    >
-      <SidebarSimpleIcon />
-    </Button>
+    <>
+      <Button
+        variant="ghost"
+        size="icon-sm"
+        aria-label={label}
+        title={label}
+        onClick={toggleSidebar}
+        className={cn("-ms-1.5 text-muted-foreground", hidden)}
+      >
+        <SidebarSimpleIcon />
+      </Button>
+      {separator ? (
+        <Separator
+          orientation="vertical"
+          className={cn("data-vertical:h-4 data-vertical:self-center", hidden)}
+        />
+      ) : null}
+    </>
   );
 }
 

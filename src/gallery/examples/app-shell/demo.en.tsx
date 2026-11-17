@@ -6,6 +6,7 @@ import {
   MonitorPlayIcon,
   PlanetIcon,
   PresentationChartIcon,
+  QuestionIcon,
   StackIcon,
   UserIcon,
 } from "@phosphor-icons/react";
@@ -14,6 +15,13 @@ import { useState } from "react";
 import { type AppNavGroup, AppShell } from "@/components/eridanus/app-shell";
 import { Page, PageHeader, StatStrip } from "@/components/eridanus/page-layout";
 import { notify } from "@/components/eridanus/toaster";
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb";
 import { Button } from "@/components/ui/button";
 import {
   Command,
@@ -57,6 +65,15 @@ const RECENT = [
     icon: <ClockCounterClockwiseIcon />,
   },
 ];
+const TENANTS = [
+  {
+    id: "ops",
+    name: "Ops console",
+    logo: <PlanetIcon weight="fill" />,
+  },
+  { id: "growth", name: "Growth" },
+  { id: "lab", name: "Research lab" },
+];
 const PAGES = [...MAIN, ...PINNED, ...RECENT];
 
 export default function AppShellDemo() {
@@ -85,20 +102,41 @@ export default function AppShellDemo() {
         className="h-full"
         brand={{ name: "Ops console", logo: <PlanetIcon weight="fill" /> }}
         tenants={{
-          items: [
-            {
-              id: "ops",
-              name: "Ops console",
-              logo: <PlanetIcon weight="fill" />,
-            },
-            { id: "growth", name: "Growth" },
-            { id: "lab", name: "Research lab" },
-          ],
+          items: TENANTS,
           current: tenant,
           onSelect: setTenant,
           onCreate: () => notify("New tenant"),
         }}
         search={{ onOpen: () => setSearching(true) }}
+        breadcrumb={
+          <Breadcrumb>
+            <BreadcrumbList>
+              <BreadcrumbItem>
+                {TENANTS.find((t) => t.id === tenant)?.name}
+              </BreadcrumbItem>
+              <BreadcrumbSeparator />
+              <BreadcrumbItem>
+                <BreadcrumbPage>{page.label}</BreadcrumbPage>
+              </BreadcrumbItem>
+            </BreadcrumbList>
+          </Breadcrumb>
+        }
+        actions={
+          <>
+            <Button
+              variant="ghost"
+              size="icon-sm"
+              aria-label="Help"
+              title="Help"
+              className="text-muted-foreground"
+            >
+              <QuestionIcon />
+            </Button>
+            <Button size="sm" onClick={() => notify("New run")}>
+              New run
+            </Button>
+          </>
+        }
         nav={nav}
         renderLink={(href) => (
           // eslint-disable-next-line jsx-a11y/anchor-has-content -- the shell renders the label into it
