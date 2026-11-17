@@ -876,7 +876,9 @@ function BarToggle({
         aria-label={label}
         title={label}
         onClick={toggleSidebar}
-        className={cn("-ms-1.5 text-muted-foreground", hidden)}
+        // In the card's corner: the icon as far from its left edge as
+        // from its top (12px), past the bar's own inset.
+        className={cn("-ms-2.5 text-muted-foreground sm:-ms-4.5", hidden)}
       >
         <SidebarSimpleIcon />
       </Button>
