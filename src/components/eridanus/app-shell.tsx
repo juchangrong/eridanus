@@ -501,7 +501,7 @@ function NavButton({
 /** The header row: a 32px pill, like a nav item's, from under the nav pills
  * to the collapse button; the name fills it, the caret at its end. The 28px
  * tile sits 2px inside it (concentric: 16 less 2 is 14), centred over the
- * nav icons, the name where their labels start. Collapsed it is a 28px
+ * nav icons, the larger name 10px clear of it. Collapsed it is a 28px
  * button filled by the tile, the size of a nav icon's hover circle. */
 // min-w-8: while the sidebar opens, the collapse button is already there
 // and the row is still 32px wide; without a floor it squeezed the tile out
@@ -559,7 +559,7 @@ function TenantSwitcher({
         // the icon column. Collapsed it is the bare tile, like the icons.
         className={cn(
           HEADER_ROW,
-          "h-8 gap-1.5 rounded-full ps-0.5 data-popup-open:bg-sidebar-accent data-popup-open:text-sidebar-accent-foreground",
+          "h-8 gap-2.5 rounded-full ps-0.5 data-popup-open:bg-sidebar-accent data-popup-open:text-sidebar-accent-foreground",
         )}
         render={<DropdownMenuTrigger />}
       >
