@@ -377,10 +377,11 @@ export function AppShell({
                         // under the 32px logo, the label where the product's
                         // name starts. The pill starts under the logo, so
                         // its 7px around the icon is the same on every side,
-                        // and a badge keeps 7px at the other end.
+                        // and a badge keeps 7px at the other end. Inset 8px
+                        // at both ends, centred in the sidebar.
                         // Collapsed, the icon centres in its 32px button,
                         // with the logo and avatar.
-                        className="ms-2 w-[calc(100%-0.5rem)] gap-[15px] pe-[7px] group-data-[collapsible=icon]:ms-0 group-data-[collapsible=icon]:p-[7px]! has-[>svg:first-child]:pl-[7px] [&_svg]:size-[18px]"
+                        className="mx-2 w-[calc(100%-1rem)] gap-[15px] pe-[7px] group-data-[collapsible=icon]:mx-0 group-data-[collapsible=icon]:p-[7px]! has-[>svg:first-child]:pl-[7px] [&_svg]:size-[18px]"
                       >
                         {item.active ? filled(item.icon) : item.icon}
                         <span className="min-w-0 flex-1 truncate">
@@ -406,7 +407,9 @@ export function AppShell({
           <SidebarFooter className="flex-row items-center gap-1 overflow-clip px-0 pb-0 [overflow-clip-margin:4px] group-data-[collapsible=icon]:flex-col-reverse group-data-[collapsible=icon]:items-start">
             {account ? <AccountMenu account={account} labels={labels} /> : null}
             {footerActions ? (
-              <div className="ms-auto flex shrink-0 items-center gap-0.5 text-muted-foreground group-data-[collapsible=icon]:ms-0 group-data-[collapsible=icon]:flex-col">
+              // Inset 8px from the end, as the account's pill is from the
+              // start, so the row is centred like the nav.
+              <div className="ms-auto me-2 flex shrink-0 items-center gap-0.5 text-muted-foreground group-data-[collapsible=icon]:mx-0 group-data-[collapsible=icon]:flex-col">
                 {footerActions}
               </div>
             ) : null}
