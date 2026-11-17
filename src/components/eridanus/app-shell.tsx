@@ -494,8 +494,8 @@ export function AppShell({
           onWidthChange={setWidth}
         />
       </Sidebar>
-      {/* A card with a hairline edge, as on the reference console: the
-          border draws the structure, so there is no shadow. */}
+      {/* A card with a hairline edge: the border draws the structure, so
+          there is no shadow. */}
       {/* The gap beside the sidebar stays 8px when it collapses, as the
           resize line sits in its middle, so the card does not move off. */}
       <SidebarInset className="min-w-0 overflow-hidden md:peer-data-[variant=inset]:rounded-xl md:peer-data-[variant=inset]:border md:peer-data-[variant=inset]:shadow-none md:peer-data-[variant=inset]:peer-data-[state=collapsed]:ml-0">
@@ -1079,8 +1079,7 @@ function ResizeHandle({
       onPointerDown={onPointerDown}
       onKeyDown={onKeyDown}
       // Positioned in the sidebar's container, whose right edge is the
-      // card's: 12px wide, with the line against the card's border, as on
-      // the reference console.
+      // card's: 12px wide, with the line against the card's border.
       // Hidden while the sidebar is open on hover, over the card.
       className="group/resize absolute inset-y-0 -right-[5px] z-20 hidden w-3 cursor-col-resize touch-none outline-none in-data-peek:hidden! md:block"
     >

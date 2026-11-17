@@ -155,22 +155,6 @@ export function Installation({ entry }: { entry: DocEntry }) {
       </TabsList>
       <TabsContent value="cli" className="flex flex-col gap-3">
         <CommandBlock run={entry.install} />
-        {entry.kind === "eridanus" ? (
-          <p className="m-0 text-sm text-muted-foreground">
-            {zh ? (
-              <>
-                仓库是私有的，CLI 用你的 GitHub 凭据读取：先运行{" "}
-                <Code>gh auth login</Code>，或者设置 <Code>GH_TOKEN</Code>。
-              </>
-            ) : (
-              <>
-                The repository is private, so the CLI reads it with your GitHub
-                credentials: run <Code>gh auth login</Code> first, or set{" "}
-                <Code>GH_TOKEN</Code>.
-              </>
-            )}
-          </p>
-        ) : null}
       </TabsContent>
       <TabsContent value="manual">
         <Steps>

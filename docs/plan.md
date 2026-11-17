@@ -1,6 +1,6 @@
 # Eridanus plan
 
-Eridanus is a private shadcn registry on GitHub. It distributes the UI vocabulary an operations console settled on: a design-system base, composite components, hooks and agent guidelines, installable into any React project with the shadcn CLI:
+Eridanus is an open-source shadcn registry on GitHub. It distributes the UI vocabulary an operations console settled on: a design-system base, composite components, hooks and agent guidelines, installable into any React project with the shadcn CLI:
 
 ```bash
 npx shadcn@latest add juchangrong/eridanus/time
@@ -14,13 +14,13 @@ npx shadcn@latest add juchangrong/eridanus/time
 
 ## Non-goals
 
-- Domain blocks from that console (trace viewer, run timeline, project directory) and anything that names a company-internal product, domain, endpoint or identifier.
+- Domain blocks for one product (trace viewer, run timeline, project directory) and anything that names a particular company's product, domain, endpoint or identifier.
 - Radix-based styles. Items use Base UI's `render` prop, which Radix's `asChild` does not accept.
 - An npm package or a self-hosted JSON endpoint. The repository is the registry.
 
 ## How distribution works
 
-The shadcn CLI treats a GitHub repository with a root `registry.json` as a registry. `npx shadcn add juchangrong/eridanus/<item>` resolves `include`, reads the item, and fetches its files from the repository at the default branch or at `#<ref>`. The repository is private, so the CLI reads it through the GitHub CLI's stored credentials (`gh auth login`) or `GH_TOKEN`; nothing needs to be built or hosted.
+The shadcn CLI treats a GitHub repository with a root `registry.json` as a registry. `npx shadcn add juchangrong/eridanus/<item>` resolves `include`, reads the item, and fetches its files from the repository at the default branch or at `#<ref>`. The repository is public, so the CLI reads it without credentials; nothing needs to be built or hosted.
 
 Two rules of GitHub registries shape the source:
 
@@ -115,8 +115,3 @@ Releases are git tags `vX.Y.Z` with a `CHANGELOG.md` entry. Consumers pin with `
 2. **Remaining components** (done). Hooks, `theme-provider`, `confirm-dialog`, `form-input`, `search-field`, `filter-select`, `pager`, `table-kit`, `page-layout`, `person-avatar`, `meter`, `toaster`, `ui-guidelines`. Done when every item installs and builds in the smoke test and the gallery shows each one.
 3. **Shell and release.** `app-shell` (done), Chinese and English text with `locale-provider` and a bilingual gallery (done), the release script that pins dependencies, `v0.1.0`.
 4. **Adoption.** First consumers, and a scheduled job that diffs the shadcn primitives against upstream.
-
-## Open questions
-
-- Whether a company project may install from this repository is the owner's decision; the repository stays free of company-internal names either way.
-- A license, if the repository ever becomes public.
