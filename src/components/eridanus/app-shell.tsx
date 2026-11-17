@@ -375,7 +375,7 @@ export function AppShell({
                         // at both ends, centred in the sidebar.
                         // Collapsed, the icon centres in its 32px button,
                         // with the logo and avatar.
-                        className="mx-2 w-[calc(100%-1rem)] gap-[15px] pe-[7px] transition-[width,height,padding,margin] ease-linear group-data-[collapsible=icon]:mx-0 group-data-[collapsible=icon]:p-[7px]! has-[>svg:first-child]:pl-[7px] [&_svg]:size-[18px]"
+                        className="mx-2 w-[calc(100%-1rem)] gap-[11px] pe-[7px] transition-[width,height,padding,margin] ease-linear group-data-[collapsible=icon]:mx-0 group-data-[collapsible=icon]:p-[7px]! has-[>svg:first-child]:pl-[7px] [&_svg]:size-[18px]"
                       >
                         {item.icon}
                         <span className="min-w-0 flex-1 truncate">
@@ -481,7 +481,7 @@ function NavButton({
 // and the row is still 32px wide; without a floor it squeezed the tile out
 // of sight for a moment, a flicker on every toggle.
 const HEADER_ROW =
-  "ms-2 w-auto max-w-full min-w-8 flex-initial gap-3 ps-1 pe-3 transition-[width,height,padding,margin] ease-linear group-data-[collapsible=icon]:ms-0 group-data-[collapsible=icon]:p-1!";
+  "ms-2 w-auto max-w-full min-w-8 flex-initial gap-2 ps-1 pe-3 transition-[width,height,padding,margin] ease-linear group-data-[collapsible=icon]:ms-0 group-data-[collapsible=icon]:p-1!";
 
 /** A round tile with a mark, or a name's first letter: the header's 24px, or a small one for menus. */
 function Tile({
@@ -847,7 +847,7 @@ function AccountMenu({
             // The 24px avatar centred under the logo and nav icons, the name
             // in line with their labels; like theirs, the pill starts under
             // the logo, 4px from the avatar on every side.
-            className="ms-2 w-[calc(100%-0.5rem)] gap-3 rounded-full ps-1 transition-[width,height,padding,margin] ease-linear group-data-[collapsible=icon]:ms-0 group-data-[collapsible=icon]:p-1! data-popup-open:bg-sidebar-accent data-popup-open:text-sidebar-accent-foreground"
+            className="ms-2 w-[calc(100%-0.5rem)] gap-2 rounded-full ps-1 transition-[width,height,padding,margin] ease-linear group-data-[collapsible=icon]:ms-0 group-data-[collapsible=icon]:p-1! data-popup-open:bg-sidebar-accent data-popup-open:text-sidebar-accent-foreground"
             render={<DropdownMenuTrigger />}
           >
             <PersonAvatar name={account.name} src={account.avatar} size="sm" />
