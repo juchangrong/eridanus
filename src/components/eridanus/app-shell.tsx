@@ -8,10 +8,8 @@ import {
   SunIcon,
 } from "@phosphor-icons/react";
 import {
-  cloneElement,
   type ComponentProps,
   type CSSProperties,
-  isValidElement,
   type KeyboardEvent as ReactKeyboardEvent,
   type PointerEvent as ReactPointerEvent,
   type ReactElement,
@@ -89,8 +87,9 @@ export interface AppNavItem {
   label: string;
   href: string;
   /** A Phosphor icon element, such as <PlayCircleIcon />, in its outline
-   * weight; the current page's icon switches to the fill weight. Collapsed to
-   * icons, the sidebar shows only this, with the label in a tooltip. */
+   * weight; it stays outline on the current page, which the pill's
+   * background marks. Collapsed to icons, the sidebar shows only this, with
+   * the label in a tooltip. */
   icon?: ReactNode;
   /** The current page. The consumer's router decides; the shell marks it
    * with aria-current. */
@@ -228,13 +227,6 @@ function fadeScrollEdges(element: HTMLElement | null) {
     element.removeEventListener("scroll", update);
     observer.disconnect();
   };
-}
-
-/** The fill weight of a Phosphor icon element, which marks the current page. */
-function filled(icon: ReactNode): ReactNode {
-  return isValidElement<{ weight?: string }>(icon)
-    ? cloneElement(icon, { weight: "fill" })
-    : icon;
 }
 
 // A render element: the menu button supplies its children.
@@ -385,7 +377,7 @@ export function AppShell({
                         // with the logo and avatar.
                         className="mx-2 w-[calc(100%-1rem)] gap-[15px] pe-[7px] transition-[width,height,padding,margin] ease-linear group-data-[collapsible=icon]:mx-0 group-data-[collapsible=icon]:p-[7px]! has-[>svg:first-child]:pl-[7px] [&_svg]:size-[18px]"
                       >
-                        {item.active ? filled(item.icon) : item.icon}
+                        {item.icon}
                         <span className="min-w-0 flex-1 truncate">
                           {item.label}
                         </span>
