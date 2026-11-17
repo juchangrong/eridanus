@@ -305,9 +305,9 @@ export function AppShell({
       style={
         {
           "--sidebar-width": widthVar(width),
-          // Collapsed, the sidebar is the 32px icon buttons with 8px on
-          // either side: 48px, the last 8 being the gap before the card.
-          "--sidebar-width-icon": "2rem",
+          // Collapsed, the sidebar is 28px icon buttons with 8px on either
+          // side: 44px, the last 8 being the gap before the card.
+          "--sidebar-width-icon": "1.75rem",
         } as CSSProperties
       }
     >
@@ -316,7 +316,7 @@ export function AppShell({
       <Sidebar
         collapsible="icon"
         variant="inset"
-        className="group-data-[collapsible=icon]:w-12"
+        className="group-data-[collapsible=icon]:w-11"
       >
         {/* No vertical padding: the brand row starts level with the card,
             and the nav sits 8px under it. */}
@@ -378,7 +378,7 @@ export function AppShell({
                         // at both ends, centred in the sidebar.
                         // Collapsed, the icon centres in its 32px button,
                         // with the logo and avatar.
-                        className="mx-2 w-[calc(100%-1rem)] gap-[11px] pe-[7px] transition-[width,height,padding,margin] ease-linear group-data-[collapsible=icon]:mx-0 group-data-[collapsible=icon]:p-[7px]! has-[>svg:first-child]:pl-[7px] [&_svg]:size-[18px]"
+                        className="mx-2 w-[calc(100%-1rem)] gap-[11px] pe-[7px] transition-[width,height,padding,margin] ease-linear group-data-[collapsible=icon]:mx-0 group-data-[collapsible=icon]:size-7! group-data-[collapsible=icon]:p-[5px]! has-[>svg:first-child]:pl-[7px] [&_svg]:size-[18px]"
                       >
                         {item.icon}
                         <span className="min-w-0 flex-1 truncate">
@@ -478,17 +478,17 @@ function NavButton({
  * to the collapse button; the name fills it, the caret at its end.
  * It starts under the nav pills, the 24px tile 4px inside it (concentric:
  * 16 less 4 is 12) and centred over the nav icons, the name where their
- * labels start. Collapsed it is a 32px button filled by a 32px tile, the
+ * labels start. Collapsed it is a 28px button filled by a 28px tile, the
  * size of a nav icon's hover circle, centred like theirs, and its
  * margin glides with the sidebar. */
 // min-w-8: while the sidebar opens, the collapse button is already there
 // and the row is still 32px wide; without a floor it squeezed the tile out
 // of sight for a moment, a flicker on every toggle.
 const HEADER_ROW =
-  "ms-2 w-auto max-w-full min-w-8 flex-1 gap-2 ps-1 pe-3 transition-[width,height,padding,margin] ease-linear group-data-[collapsible=icon]:ms-0 group-data-[collapsible=icon]:p-0!";
+  "ms-2 w-auto max-w-full min-w-8 flex-1 gap-2 ps-1 pe-3 transition-[width,height,padding,margin] ease-linear group-data-[collapsible=icon]:ms-0 group-data-[collapsible=icon]:size-7! group-data-[collapsible=icon]:min-w-7 group-data-[collapsible=icon]:p-0!";
 
 /** A round tile with a mark, or a name's first letter: the header's, 24px
- * open and 32px collapsed, the size of a nav item's hover circle there; or a
+ * open and 28px collapsed, the size of a nav item's hover circle there; or a
  * small one for menus. */
 function Tile({
   logo,
@@ -505,7 +505,7 @@ function Tile({
       className={cn(
         "flex shrink-0 items-center justify-center rounded-full bg-primary font-semibold text-primary-foreground",
         size === "md"
-          ? "size-6 text-[11px] transition-[width,height,font-size] duration-200 ease-linear group-data-[collapsible=icon]:size-8 group-data-[collapsible=icon]:text-[13px] [&_svg]:size-3.5! group-data-[collapsible=icon]:[&_svg]:size-4!"
+          ? "size-6 text-[11px] transition-[width,height,font-size] duration-200 ease-linear group-data-[collapsible=icon]:size-7 group-data-[collapsible=icon]:text-[12px] [&_svg]:size-3.5!"
           : "size-5 text-[10px] [&_svg]:size-3!",
       )}
     >
@@ -609,7 +609,8 @@ function FooterActions({ children }: { children: ReactNode }) {
   return (
     <div
       ref={ref}
-      className="ms-auto me-2 flex shrink-0 items-center gap-0.5 text-muted-foreground group-data-[collapsible=icon]:mx-0 group-data-[collapsible=icon]:flex-col"
+      // Collapsed, the buttons shrink to 28px, the sidebar's width.
+      className="ms-auto me-2 flex shrink-0 items-center gap-0.5 text-muted-foreground group-data-[collapsible=icon]:mx-0 group-data-[collapsible=icon]:flex-col group-data-[collapsible=icon]:*:size-7!"
     >
       {children}
     </div>
@@ -853,10 +854,15 @@ function AccountMenu({
             // The 24px avatar centred under the logo and nav icons, the name
             // in line with their labels; like theirs, the pill starts under
             // the logo, 4px from the avatar on every side.
-            className="ms-2 w-[calc(100%-0.5rem)] gap-2 rounded-full ps-1 transition-[width,height,padding,margin] ease-linear group-data-[collapsible=icon]:ms-0 group-data-[collapsible=icon]:p-1! data-popup-open:bg-sidebar-accent data-popup-open:text-sidebar-accent-foreground"
+            className="ms-2 w-[calc(100%-0.5rem)] gap-2 rounded-full ps-1 transition-[width,height,padding,margin] ease-linear group-data-[collapsible=icon]:ms-0 group-data-[collapsible=icon]:size-7! group-data-[collapsible=icon]:p-1! data-popup-open:bg-sidebar-accent data-popup-open:text-sidebar-accent-foreground"
             render={<DropdownMenuTrigger />}
           >
-            <PersonAvatar name={account.name} src={account.avatar} size="sm" />
+            <PersonAvatar
+              name={account.name}
+              src={account.avatar}
+              size="sm"
+              className="transition-[width,height] duration-200 ease-linear group-data-[collapsible=icon]:size-5!"
+            />
             {/* The email waits in the menu, which leaves room for the
                 footer's buttons. */}
             <span className="truncate font-medium">{account.name}</span>
