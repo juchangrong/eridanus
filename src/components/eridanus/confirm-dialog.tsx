@@ -79,9 +79,10 @@ export function ConfirmDialog({
     >
       <AlertDialogTrigger render={trigger} />
       {/* Tighter than shadcn's 24px: 16px around and between text and
-          buttons, with corners concentric with the 32px pill buttons in the
-          bottom corner (their 16px radius plus the 16px inset is 32). */}
-      <AlertDialogContent className="gap-4 rounded-[32px] p-4">
+          buttons. The corners are 20px, a card's, not matched to the pill
+          buttons: at a 16px inset the button reads as its own shape, and a
+          32px corner looked oversized on a dialog this short. */}
+      <AlertDialogContent className="gap-4 rounded-[20px] p-4">
         <AlertDialogHeader>
           <AlertDialogTitle>{title}</AlertDialogTitle>
           <AlertDialogDescription>{description}</AlertDialogDescription>
