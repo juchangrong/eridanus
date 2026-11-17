@@ -113,6 +113,9 @@ export interface AppNavItem {
 export interface AppNavGroup {
   /** Heading over the group; leave it out for the first, main group. */
   title?: string;
+  /** Leave the group out of the collapsed rail, for lists whose icons
+   * don't tell their items apart there, such as pinned or recent ones. */
+  hideWhenCollapsed?: boolean;
   items: AppNavItem[];
 }
 
@@ -373,7 +376,11 @@ export function AppShell({
               key={group.title ?? i}
               // Groups part by space and their headings, with no rule; a
               // heading starts where the icons below it do.
-              className="px-0"
+              className={cn(
+                "px-0",
+                group.hideWhenCollapsed &&
+                  "group-data-[collapsible=icon]:hidden",
+              )}
             >
               {group.title ? (
                 <SidebarGroupLabel className="ps-[7px]">

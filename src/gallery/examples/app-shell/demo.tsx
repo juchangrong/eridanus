@@ -69,8 +69,8 @@ export default function AppShellDemo() {
     items.map((p) => ({ ...p, active: p.href === current }));
   const nav: AppNavGroup[] = [
     { items: mark(MAIN) },
-    { title: "已固定", items: mark(PINNED) },
-    { title: "最近", items: mark(RECENT) },
+    { title: "已固定", hideWhenCollapsed: true, items: mark(PINNED) },
+    { title: "最近", hideWhenCollapsed: true, items: mark(RECENT) },
     { items: mark(SETTINGS) },
   ];
   const go = (href: string) => {
