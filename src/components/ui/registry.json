@@ -5,7 +5,7 @@
       "name": "input",
       "type": "registry:ui",
       "title": "Input",
-      "description": "Eridanus fork of the shadcn base-rhea input, installed in place of it at components/ui/input.tsx. Focus and errors show on the border alone: no focus ring, a muted-foreground border on focus (3:1 or better against the field in both themes) and a solid destructive border when invalid. Same API as shadcn's. The field is a pill, with its text 12px in to line up with a Select's value.",
+      "description": "Eridanus fork of the shadcn base-rhea input, installed in place of it at components/ui/input.tsx. Focus and errors show on the border alone: no focus ring; at rest a muted-foreground border at 70%, 3:1 against the page in both themes so the field's edge meets WCAG 1.4.11, and a foreground border on focus and a solid destructive border when invalid. Same API as shadcn's. The field is a pill, with its text 12px in to line up with a Select's value.",
       "categories": ["form", "shadcn-fork"],
       "dependencies": ["@base-ui/react", "cn"],
       "files": [
@@ -19,7 +19,7 @@
       "name": "textarea",
       "type": "registry:ui",
       "title": "Textarea",
-      "description": "Eridanus fork of the shadcn base-rhea textarea, installed in place of it at components/ui/textarea.tsx. Focus and errors show on the border alone: no focus ring, a muted-foreground border on focus (3:1 or better against the field in both themes) and a solid destructive border when invalid. Same API as shadcn's. Its corners are 16px, the same as a multi-line input group.",
+      "description": "Eridanus fork of the shadcn base-rhea textarea, installed in place of it at components/ui/textarea.tsx. Focus and errors show on the border alone: no focus ring; at rest a muted-foreground border at 70%, 3:1 against the page in both themes so the field's edge meets WCAG 1.4.11, and a foreground border on focus and a solid destructive border when invalid. Same API as shadcn's. Its corners are 16px, the same as a multi-line input group.",
       "categories": ["form", "shadcn-fork"],
       "dependencies": ["cn"],
       "files": [
@@ -33,7 +33,7 @@
       "name": "select",
       "type": "registry:ui",
       "title": "Select",
-      "description": "Eridanus fork of the shadcn base-rhea select, installed in place of it at components/ui/select.tsx. Focus and errors show on the border alone: no focus ring, a muted-foreground border on focus (3:1 or better against the field in both themes) and a solid destructive border when invalid. The popup pads its list so the selected option lands on the value, grows to fit its longest option, and highlights options as pills inside concentric corners; the trigger is a pill too. Same API as shadcn's.",
+      "description": "Eridanus fork of the shadcn base-rhea select, installed in place of it at components/ui/select.tsx. Focus and errors show on the border alone: no focus ring; at rest a muted-foreground border at 70%, 3:1 against the page in both themes so the field's edge meets WCAG 1.4.11, and a foreground border on focus and a solid destructive border when invalid. The popup pads its list so the selected option lands on the value, grows to fit its longest option, and highlights options as pills inside concentric corners; the trigger is a pill too. Same API as shadcn's.",
       "categories": ["form", "shadcn-fork"],
       "dependencies": ["@base-ui/react", "cn", "@phosphor-icons/react"],
       "files": [
@@ -47,7 +47,7 @@
       "name": "input-group",
       "type": "registry:ui",
       "title": "Input Group",
-      "description": "Eridanus fork of the shadcn base-rhea input group, installed in place of it at components/ui/input-group.tsx, on the forked input and textarea. Focus and errors show on the border alone: no focus ring, a muted-foreground border on focus (3:1 or better against the field in both themes) and a solid destructive border when invalid. Same API as shadcn's. Its corners are 16px, a pill at the single-line height, with pill buttons inside.",
+      "description": "Eridanus fork of the shadcn base-rhea input group, installed in place of it at components/ui/input-group.tsx, on the forked input and textarea. Focus and errors show on the border alone: no focus ring; at rest a muted-foreground border at 70%, 3:1 against the page in both themes so the field's edge meets WCAG 1.4.11, and a foreground border on focus and a solid destructive border when invalid. Same API as shadcn's. Its corners are 16px, a pill at the single-line height, with pill buttons inside.",
       "categories": ["form", "shadcn-fork"],
       "dependencies": ["class-variance-authority", "cn"],
       "registryDependencies": [

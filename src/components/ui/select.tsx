@@ -29,8 +29,9 @@ function SelectValue({ className, ...props }: SelectPrimitive.Value.Props) {
 
 /**
  * Eridanus fork of shadcn's base-rhea select. Focus and errors show on the
- * border alone: no ring, a muted-foreground border on focus (3:1 or better
- * against the field in both themes) and a solid destructive border when
+ * border alone: no ring. At rest a muted-foreground border at 70% (3:1
+ * against the page in both themes, so the field's edge meets WCAG 1.4.11),
+ * on focus a foreground border and a solid destructive border when
  * invalid. The popup pads its list, so an option's text sits as far in as
  * the trigger's and the selected option lands on the value (groups add no
  * padding of their own), and it grows past the trigger to fit its longest
@@ -51,7 +52,7 @@ function SelectTrigger({
       data-slot="select-trigger"
       data-size={size}
       className={cn(
-        "flex w-fit items-center justify-between gap-1.5 rounded-full border border-transparent bg-input/50 px-3 py-2 text-sm whitespace-nowrap transition-[color,box-shadow] duration-200 outline-none focus-visible:border-muted-foreground disabled:cursor-not-allowed disabled:opacity-50 aria-invalid:border-destructive data-placeholder:text-muted-foreground data-[size=default]:h-8 data-[size=sm]:h-7 *:data-[slot=select-value]:line-clamp-1 *:data-[slot=select-value]:flex *:data-[slot=select-value]:items-center *:data-[slot=select-value]:gap-1.5 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
+        "flex w-fit items-center justify-between gap-1.5 rounded-full border border-muted-foreground/70 bg-input/50 px-3 py-2 text-sm whitespace-nowrap transition-[color,box-shadow] duration-200 outline-none focus-visible:border-foreground disabled:cursor-not-allowed disabled:opacity-50 aria-invalid:border-destructive data-placeholder:text-muted-foreground data-[size=default]:h-8 data-[size=sm]:h-7 *:data-[slot=select-value]:line-clamp-1 *:data-[slot=select-value]:flex *:data-[slot=select-value]:items-center *:data-[slot=select-value]:gap-1.5 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
         className
       )}
       {...props}
