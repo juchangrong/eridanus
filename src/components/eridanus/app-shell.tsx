@@ -478,15 +478,18 @@ function NavButton({
  * to the collapse button; the name fills it, the caret at its end.
  * It starts under the nav pills, the 24px tile 4px inside it (concentric:
  * 16 less 4 is 12) and centred over the nav icons, the name where their
- * labels start. Collapsed it is a 32px button centred like theirs, and its
+ * labels start. Collapsed it is a 32px button filled by a 32px tile, the
+ * size of a nav icon's hover circle, centred like theirs, and its
  * margin glides with the sidebar. */
 // min-w-8: while the sidebar opens, the collapse button is already there
 // and the row is still 32px wide; without a floor it squeezed the tile out
 // of sight for a moment, a flicker on every toggle.
 const HEADER_ROW =
-  "ms-2 w-auto max-w-full min-w-8 flex-1 gap-2 ps-1 pe-3 transition-[width,height,padding,margin] ease-linear group-data-[collapsible=icon]:ms-0 group-data-[collapsible=icon]:p-1!";
+  "ms-2 w-auto max-w-full min-w-8 flex-1 gap-2 ps-1 pe-3 transition-[width,height,padding,margin] ease-linear group-data-[collapsible=icon]:ms-0 group-data-[collapsible=icon]:p-0!";
 
-/** A round tile with a mark, or a name's first letter: the header's 24px, or a small one for menus. */
+/** A round tile with a mark, or a name's first letter: the header's, 24px
+ * open and 32px collapsed, the size of a nav item's hover circle there; or a
+ * small one for menus. */
 function Tile({
   logo,
   name,
@@ -502,7 +505,7 @@ function Tile({
       className={cn(
         "flex shrink-0 items-center justify-center rounded-full bg-primary font-semibold text-primary-foreground",
         size === "md"
-          ? "size-6 text-[11px] [&_svg]:size-3.5!"
+          ? "size-6 text-[11px] transition-[width,height,font-size] duration-200 ease-linear group-data-[collapsible=icon]:size-8 group-data-[collapsible=icon]:text-[13px] [&_svg]:size-3.5! group-data-[collapsible=icon]:[&_svg]:size-4!"
           : "size-5 text-[10px] [&_svg]:size-3!",
       )}
     >
