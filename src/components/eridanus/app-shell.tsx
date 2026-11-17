@@ -1,5 +1,5 @@
 import {
-  CaretUpDownIcon,
+  CaretDownIcon,
   DesktopIcon,
   MoonIcon,
   PlusIcon,
@@ -321,8 +321,8 @@ export function AppShell({
           <SidebarMenu>
             {/* Clips what does not fit yet while the sidebar opens, leaving
                 room for focus rings. */}
-            {/* 48px tall in both states, so the nav below never moves. */}
-            <SidebarMenuItem className="flex h-12 items-center gap-1 overflow-clip [overflow-clip-margin:4px]">
+            {/* 40px tall in both states, so the nav below never moves. */}
+            <SidebarMenuItem className="flex h-10 items-center gap-1 overflow-clip [overflow-clip-margin:4px]">
               {tenants ? (
                 <TenantSwitcher tenants={tenants} labels={labels} />
               ) : (
@@ -471,18 +471,19 @@ function NavButton({
   );
 }
 
-/** The header row: a 48px pill with a 28px tile 10px inside it, concentric
- * (the pill's 24px radius less 10 is the tile's 14) and centred over the nav
- * icons, the name where their labels start. Collapsed it is a 32px button with a 24px tile, centred with the
- * nav icons. */
+/** The header row: a 32px pill, like a nav item's, that hugs its tile and
+ * name rather than spanning the row, so its hover background stays small.
+ * It starts under the nav pills, the 24px tile 4px inside it (concentric:
+ * 16 less 4 is 12) and centred over the nav icons, the name where their
+ * labels start. Collapsed it is a 32px button centred like theirs, and its
+ * margin glides with the sidebar. */
 // min-w-8: while the sidebar opens, the collapse button is already there
 // and the row is still 32px wide; without a floor it squeezed the tile out
 // of sight for a moment, a flicker on every toggle.
 const HEADER_ROW =
-  "h-12 min-w-8 flex-1 gap-2.5 ps-2.5 group-data-[collapsible=icon]:p-1!";
+  "ms-2 w-auto max-w-full min-w-8 flex-initial gap-3 ps-1 pe-3 transition-[width,height,padding,margin] ease-linear group-data-[collapsible=icon]:ms-0 group-data-[collapsible=icon]:p-1!";
 
-/** A round tile with a mark, or a name's first letter: the header's, 28px
- * and 24px collapsed, or a small one for menus. */
+/** A round tile with a mark, or a name's first letter: the header's 24px, or a small one for menus. */
 function Tile({
   logo,
   name,
@@ -498,7 +499,7 @@ function Tile({
       className={cn(
         "flex shrink-0 items-center justify-center rounded-full bg-primary font-semibold text-primary-foreground",
         size === "md"
-          ? "size-7 text-[12px] transition-[width,height] duration-200 ease-linear group-data-[collapsible=icon]:size-6 group-data-[collapsible=icon]:text-[11px] [&_svg]:size-4! group-data-[collapsible=icon]:[&_svg]:size-3.5!"
+          ? "size-6 text-[11px] [&_svg]:size-3.5!"
           : "size-5 text-[10px] [&_svg]:size-3!",
       )}
     >
@@ -532,10 +533,10 @@ function TenantSwitcher({
         render={<DropdownMenuTrigger />}
       >
         <Tile logo={current.logo} name={current.name} />
-        <span className="min-w-0 flex-1 truncate font-heading font-medium">
+        <span className="min-w-0 truncate font-heading font-medium">
           {current.name}
         </span>
-        <CaretUpDownIcon className="text-muted-foreground" />
+        <CaretDownIcon className="-ms-1 size-3! text-muted-foreground" />
       </SidebarMenuButton>
       <DropdownMenuContent
         side="bottom"
@@ -622,7 +623,7 @@ function CollapseButton({ label }: { label: string }) {
       title={label}
       onClick={() => setOpen(false)}
       // Fades in as the sidebar opens, instead of popping in.
-      className="shrink-0 animate-in text-muted-foreground duration-200 fade-in group-data-[collapsible=icon]:hidden motion-reduce:animate-none"
+      className="ms-auto me-2 shrink-0 animate-in text-muted-foreground duration-200 fade-in group-data-[collapsible=icon]:hidden motion-reduce:animate-none"
     >
       <SidebarSimpleIcon />
     </Button>
