@@ -500,7 +500,7 @@ export function AppShell({
           resize line sits in its middle, so the card does not move off.
           isolate keeps the page's own layers (a table's sticky header, say)
           inside the card, so the sidebar open on hover lies over them. */}
-      <SidebarInset className="isolate min-w-0 overflow-hiddenmd:peer-data-[variant=inset]:rounded-xl md:peer-data-[variant=inset]:border md:peer-data-[variant=inset]:shadow-none md:peer-data-[variant=inset]:peer-data-[state=collapsed]:ml-0">
+      <SidebarInset className="isolate min-w-0 overflow-hidden md:peer-data-[variant=inset]:rounded-xl md:peer-data-[variant=inset]:border md:peer-data-[variant=inset]:shadow-none md:peer-data-[variant=inset]:peer-data-[state=collapsed]:ml-0">
         {/* One 16px inset for the card's corner and its page: the toggle's
             icon 16px from the card's top and left, over the page's text,
             which starts 16px in; the controls at either end 10px from the
