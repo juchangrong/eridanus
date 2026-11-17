@@ -1,9 +1,8 @@
 # Eridanus
 
-A private [shadcn registry](https://ui.shadcn.com/docs/registry/github) of React components, hooks and design tokens on Base UI, in the `base-rhea` style (preset `beqC918K`).
+An open-source [shadcn registry](https://ui.shadcn.com/docs/registry/github) of React components, hooks and design tokens on Base UI, in the `base-rhea` style (preset `beqC918K`).
 
 ```bash
-gh auth login                                          # once: the repository is private
 npx shadcn@latest init juchangrong/eridanus/base       # start a project on the Eridanus base
 npx shadcn@latest add juchangrong/eridanus/time        # add an item to a shadcn project
 ```
@@ -22,3 +21,7 @@ bun run test:install # install every item into a fresh app and build it
 Bun's linter ships only in canary builds so far: `bun upgrade --canary`.
 
 See [docs/plan.md](docs/plan.md) for the scope, layout and roadmap.
+
+## License
+
+MIT. The primitives in `src/components/ui` are adapted from [shadcn/ui](https://github.com/shadcn-ui/ui), also MIT; see [LICENSE](LICENSE).

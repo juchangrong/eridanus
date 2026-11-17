@@ -1,6 +1,7 @@
 {
   "name": "eridanus",
   "private": true,
+  "license": "MIT",
   "type": "module",
   "packageManager": "bun@1.4.4-canary.20261113.1",
   "scripts": {

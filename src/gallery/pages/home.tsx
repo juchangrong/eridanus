@@ -65,8 +65,7 @@ export function Home() {
               <InlineCode>
                 npx shadcn@latest add {REPOSITORY}/&lt;名称&gt;
               </InlineCode>
-              。仓库是私有的，先运行 <InlineCode>gh auth login</InlineCode>{" "}
-              或设置 <InlineCode>GH_TOKEN</InlineCode>。
+              。
             </>
           ) : (
             <>
@@ -74,9 +73,7 @@ export function Home() {
               <InlineCode>
                 npx shadcn@latest add {REPOSITORY}/&lt;name&gt;
               </InlineCode>
-              . The repository is private, so run{" "}
-              <InlineCode>gh auth login</InlineCode> or set{" "}
-              <InlineCode>GH_TOKEN</InlineCode> first.
+              .
             </>
           )}
         </p>
