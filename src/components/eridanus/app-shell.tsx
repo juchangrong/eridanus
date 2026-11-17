@@ -16,6 +16,8 @@ import {
   type PointerEvent as ReactPointerEvent,
   type ReactElement,
   type ReactNode,
+  useEffect,
+  useRef,
   useState,
 } from "react";
 
@@ -381,7 +383,7 @@ export function AppShell({
                         // at both ends, centred in the sidebar.
                         // Collapsed, the icon centres in its 32px button,
                         // with the logo and avatar.
-                        className="mx-2 w-[calc(100%-1rem)] gap-[15px] pe-[7px] group-data-[collapsible=icon]:mx-0 group-data-[collapsible=icon]:p-[7px]! has-[>svg:first-child]:pl-[7px] [&_svg]:size-[18px]"
+                        className="mx-2 w-[calc(100%-1rem)] gap-[15px] pe-[7px] transition-[width,height,padding,margin] ease-linear group-data-[collapsible=icon]:mx-0 group-data-[collapsible=icon]:p-[7px]! has-[>svg:first-child]:pl-[7px] [&_svg]:size-[18px]"
                       >
                         {item.active ? filled(item.icon) : item.icon}
                         <span className="min-w-0 flex-1 truncate">
@@ -407,11 +409,7 @@ export function AppShell({
           <SidebarFooter className="flex-row items-center gap-1 overflow-clip px-0 pb-0 [overflow-clip-margin:4px] group-data-[collapsible=icon]:flex-col-reverse group-data-[collapsible=icon]:items-start">
             {account ? <AccountMenu account={account} labels={labels} /> : null}
             {footerActions ? (
-              // Inset 8px from the end, as the account's pill is from the
-              // start, so the row is centred like the nav.
-              <div className="ms-auto me-2 flex shrink-0 items-center gap-0.5 text-muted-foreground group-data-[collapsible=icon]:mx-0 group-data-[collapsible=icon]:flex-col">
-                {footerActions}
-              </div>
+              <FooterActions>{footerActions}</FooterActions>
             ) : null}
           </SidebarFooter>
         ) : null}
@@ -589,6 +587,36 @@ function TenantSwitcher({
   );
 }
 
+/** The footer's buttons: in a row after the account, inset 8px from the end
+ * as the account's pill is from the start, so the row is centred like the
+ * nav; collapsed, stacked above the avatar. A row cannot glide into a
+ * column, so on each toggle they fade in at their new place rather than
+ * jump, replayed on the element itself so nothing remounts or loses focus. */
+function FooterActions({ children }: { children: ReactNode }) {
+  const { state } = useSidebar();
+  const ref = useRef<HTMLDivElement>(null);
+  const first = useRef(true);
+  useEffect(() => {
+    if (first.current) {
+      first.current = false;
+      return;
+    }
+    if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    ref.current?.animate([{ opacity: 0 }, { opacity: 1 }], {
+      duration: 200,
+      easing: "linear",
+    });
+  }, [state]);
+  return (
+    <div
+      ref={ref}
+      className="ms-auto me-2 flex shrink-0 items-center gap-0.5 text-muted-foreground group-data-[collapsible=icon]:mx-0 group-data-[collapsible=icon]:flex-col"
+    >
+      {children}
+    </div>
+  );
+}
+
 /** At the end of the brand row while the sidebar is open: the visible way
  * to collapse it, beside ⌘B and the edge. Collapsed, the edge or ⌘B opens
  * it again. */
@@ -601,7 +629,8 @@ function CollapseButton({ label }: { label: string }) {
       aria-label={label}
       title={label}
       onClick={() => setOpen(false)}
-      className="shrink-0 text-muted-foreground group-data-[collapsible=icon]:hidden"
+      // Fades in as the sidebar opens, instead of popping in.
+      className="shrink-0 animate-in text-muted-foreground duration-200 fade-in group-data-[collapsible=icon]:hidden motion-reduce:animate-none"
     >
       <SidebarSimpleIcon />
     </Button>
@@ -825,7 +854,7 @@ function AccountMenu({
             // The 24px avatar centred under the logo and nav icons, the name
             // in line with their labels; like theirs, the pill starts under
             // the logo, 4px from the avatar on every side.
-            className="ms-2 w-[calc(100%-0.5rem)] gap-3 rounded-full ps-1 group-data-[collapsible=icon]:ms-0 group-data-[collapsible=icon]:p-1! data-popup-open:bg-sidebar-accent data-popup-open:text-sidebar-accent-foreground"
+            className="ms-2 w-[calc(100%-0.5rem)] gap-3 rounded-full ps-1 transition-[width,height,padding,margin] ease-linear group-data-[collapsible=icon]:ms-0 group-data-[collapsible=icon]:p-1! data-popup-open:bg-sidebar-accent data-popup-open:text-sidebar-accent-foreground"
             render={<DropdownMenuTrigger />}
           >
             <PersonAvatar name={account.name} src={account.avatar} size="sm" />
