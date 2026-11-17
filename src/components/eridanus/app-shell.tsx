@@ -267,12 +267,13 @@ const defaultLink = (href: string) => <a href={href} />;
  * groups under small headings and, at its
  * foot, the account menu beside a few icon buttons; the page sits in a card
  * inset from the window. A breadcrumb or page-wide actions get an optional
- * top bar inside the card, which also holds the sidebar toggle while the
- * sidebar is collapsed; without them the page starts at the card's top edge. On desktop the sidebar's edge drags to
+ * top bar inside the card, which also holds the sidebar toggle in both
+ * states; without them the page starts at the card's top edge and the toggle
+ * sits beside the product in the sidebar. On desktop the sidebar's edge drags to
  * resize it, and it collapses to icons (⌘B, a click on the edge, or a drag
  * short of the minimum width); it remembers both across visits. Collapsed,
  * resting the pointer on it opens it over the card, without moving the page,
- * until the pointer leaves; its expand button opens it for good. Under 768px
+ * until the pointer leaves. Under 768px
  * it opens as a sheet, from a bar that phones always get.
  *
  * The card takes the rest of the viewport and scrolls by itself, so the top
@@ -396,12 +397,16 @@ export function AppShell({
                   <span className="font-heading font-medium">{brand.name}</span>
                 </NavButton>
               )}
-              <CollapseButton
-                label={
-                  peek.open ? labels.expandSidebar : labels.collapseSidebar
-                }
-                pin={peek.open}
-              />
+              {/* With a top bar the toggle stays there, in the card's
+                  corner, in both states; without one it is here. */}
+              {breadcrumb || actions ? null : (
+                <CollapseButton
+                  label={
+                    peek.open ? labels.expandSidebar : labels.collapseSidebar
+                  }
+                  pin={peek.open}
+                />
+              )}
             </SidebarMenuItem>
           </SidebarMenu>
           {search ? (
@@ -874,9 +879,10 @@ function usePeek(pinned: boolean) {
 }
 
 /**
- * The top bar's sidebar toggle, and a rule before the breadcrumb. Phones
- * always get it, to open the sheet; on desktop it shows only while the
- * sidebar is collapsed, as the open sidebar has its own collapse button.
+ * The top bar's sidebar toggle, and a rule before the breadcrumb. It stays
+ * in the card's corner whether the sidebar is open or collapsed (phones use
+ * it to open the sheet); the sidebar's own collapse button is left out
+ * while there is a top bar.
  * shadcn's SidebarTrigger fixes its screen-reader name in English.
  */
 function BarToggle({
@@ -886,8 +892,7 @@ function BarToggle({
   label: string;
   separator: boolean;
 }) {
-  const { toggleSidebar, state } = useSidebar();
-  const hidden = state === "expanded" && "md:hidden";
+  const { toggleSidebar } = useSidebar();
   return (
     <>
       <Button
@@ -898,14 +903,14 @@ function BarToggle({
         onClick={toggleSidebar}
         // In the card's corner: the icon as far from its left edge as
         // from its top (12px), past the bar's own inset.
-        className={cn("-ms-2.5 text-muted-foreground sm:-ms-4.5", hidden)}
+        className="-ms-2.5 text-muted-foreground sm:-ms-4.5"
       >
         <SidebarSimpleIcon />
       </Button>
       {separator ? (
         <Separator
           orientation="vertical"
-          className={cn("data-vertical:h-4 data-vertical:self-center", hidden)}
+          className="data-vertical:h-4 data-vertical:self-center"
         />
       ) : null}
     </>
