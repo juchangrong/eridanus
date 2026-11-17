@@ -4,6 +4,7 @@ import {
   MagnifyingGlassIcon,
   MoonIcon,
   PlusIcon,
+  PushPinIcon,
   SidebarSimpleIcon,
   SignOutIcon,
   SunIcon,
@@ -54,6 +55,7 @@ import {
   SidebarProvider,
   useSidebar,
 } from "@/components/ui/sidebar";
+import { useIsMobile } from "@/hooks/use-mobile";
 import type { Locale } from "@/lib/eridanus/locale";
 import { cn } from "@/lib/utils";
 
@@ -133,6 +135,9 @@ export interface AppShellLabels {
   toggleSidebar: string;
   resizeSidebar: string;
   collapseSidebar: string;
+  /** The collapse button while the collapsed sidebar is open on hover:
+   * it keeps the sidebar open. */
+  pinSidebar: string;
   navigation: string;
   /** The account button's accessible name, given the person's name. */
   account: (name: string) => string;
@@ -153,6 +158,7 @@ export const appShellLabels: Record<Locale, AppShellLabels> = {
     toggleSidebar: "切换侧边栏",
     resizeSidebar: "调整侧边栏宽度",
     collapseSidebar: "收起侧边栏",
+    pinSidebar: "固定展开侧边栏",
     navigation: "主导航",
     account: (name) => `账号菜单：${name}`,
     switchTenant: (name) => `切换租户：${name}`,
@@ -168,6 +174,7 @@ export const appShellLabels: Record<Locale, AppShellLabels> = {
     toggleSidebar: "Toggle sidebar",
     resizeSidebar: "Resize sidebar",
     collapseSidebar: "Collapse sidebar",
+    pinSidebar: "Keep sidebar open",
     navigation: "Main navigation",
     account: (name) => `Account menu: ${name}`,
     switchTenant: (name) => `Switch tenant: ${name}`,
@@ -261,7 +268,9 @@ const defaultLink = (href: string) => <a href={href} />;
  * top bar inside the card, which also holds the sidebar toggle while the
  * sidebar is collapsed; without them the page starts at the card's top edge. On desktop the sidebar's edge drags to
  * resize it, and it collapses to icons (⌘B, a click on the edge, or a drag
- * short of the minimum width); it remembers both across visits. Under 768px
+ * short of the minimum width); it remembers both across visits. Collapsed,
+ * resting the pointer on it opens it over the card, without moving the page,
+ * until the pointer leaves; its pin button keeps it open. Under 768px
  * it opens as a sheet, from a bar that phones always get.
  *
  * The card takes the rest of the viewport and scrolls by itself, so the top
@@ -310,14 +319,28 @@ export function AppShell({
   children: ReactNode;
 }) {
   const labels = { ...useMessages(appShellLabels), ...labelOverrides };
-  const [initialOpen] = useState(() => storedOpen() ?? defaultOpen ?? true);
+  const [pinned, setPinned] = useState(
+    () => storedOpen() ?? defaultOpen ?? true,
+  );
   const [width, setWidth] = useState(storedWidth);
+  const peek = usePeek(pinned);
   return (
     <SidebarProvider
-      defaultOpen={initialOpen}
+      // Open when the user opened it (stored in the cookie by shadcn's
+      // setOpen) or while the collapsed sidebar is open on hover, which is
+      // never stored.
+      open={pinned || peek.open}
+      onOpenChange={(open) => {
+        setPinned(open);
+        peek.close();
+      }}
+      data-peek={peek.open || undefined}
       // While the edge is dragged (data-resizing, set by the handle) the
       // sidebar follows the pointer at once, without its width transition.
       className={cn(
+        // Open on hover, the sidebar keeps its collapsed gap, so it lies over
+        // the card instead of moving it, as a floating panel.
+        "data-peek:**:data-[slot=sidebar-gap]:w-11! data-peek:**:data-[slot=sidebar-inner]:rounded-xl data-peek:**:data-[slot=sidebar-inner]:shadow-lg data-peek:**:data-[slot=sidebar-inner]:ring-1 data-peek:**:data-[slot=sidebar-inner]:ring-sidebar-border",
         "h-svh min-h-0 data-resizing:cursor-col-resize data-resizing:select-none data-resizing:**:data-[slot=sidebar-container]:transition-none data-resizing:**:data-[slot=sidebar-gap]:transition-none",
         className,
       )}
@@ -336,6 +359,7 @@ export function AppShell({
         collapsible="icon"
         variant="inset"
         className="group-data-[collapsible=icon]:w-11"
+        {...peek.handlers}
       >
         {/* No vertical padding: the brand row starts level with the card,
             and the nav sits 8px under it. */}
@@ -357,7 +381,10 @@ export function AppShell({
                   <span className="font-heading font-medium">{brand.name}</span>
                 </NavButton>
               )}
-              <CollapseButton label={labels.collapseSidebar} />
+              <CollapseButton
+                label={peek.open ? labels.pinSidebar : labels.collapseSidebar}
+                pin={peek.open}
+              />
             </SidebarMenuItem>
           </SidebarMenu>
           {search ? (
@@ -693,7 +720,14 @@ function SearchButton({ search, label }: { search: AppSearch; label: string }) {
 /** At the end of the brand row while the sidebar is open: the visible way
  * to collapse it, beside ⌘B and the edge. Collapsed, the edge or ⌘B opens
  * it again. */
-function CollapseButton({ label }: { label: string }) {
+function CollapseButton({
+  label,
+  pin,
+}: {
+  label: string;
+  /** The sidebar is open on hover: the button keeps it open instead. */
+  pin: boolean;
+}) {
   const { setOpen } = useSidebar();
   return (
     <Button
@@ -701,13 +735,76 @@ function CollapseButton({ label }: { label: string }) {
       size="icon"
       aria-label={label}
       title={label}
-      onClick={() => setOpen(false)}
+      onClick={() => setOpen(pin)}
       // Fades in as the sidebar opens, instead of popping in.
       className="ms-auto shrink-0 animate-in text-muted-foreground duration-200 fade-in group-data-[collapsible=icon]:hidden motion-reduce:animate-none"
     >
-      <SidebarSimpleIcon />
+      {pin ? <PushPinIcon /> : <SidebarSimpleIcon />}
     </Button>
   );
+}
+
+/** How long the pointer rests on the collapsed sidebar before it opens, and
+ * how long it may be away before it closes, so passing over it or slipping
+ * off its edge does nothing. */
+const PEEK_OPEN_DELAY = 120;
+const PEEK_CLOSE_DELAY = 240;
+
+/**
+ * Opens the collapsed sidebar while the pointer is over it, as a panel over
+ * the card. Desktop pointers only; it stays open while a menu opened from it
+ * is open, as the menu's popup is outside it, and closes when the user
+ * collapses or opens the sidebar for good. Keyboard users have the tooltips.
+ */
+function usePeek(pinned: boolean) {
+  const isMobile = useIsMobile();
+  const [open, setOpen] = useState(false);
+  const timer = useRef<number | undefined>(undefined);
+  const over = useRef(false);
+  const clear = () => window.clearTimeout(timer.current);
+  useEffect(() => clear, []);
+
+  const close = () => {
+    clear();
+    setOpen(false);
+  };
+  const closeLater = (container: HTMLElement) => {
+    clear();
+    timer.current = window.setTimeout(function check() {
+      if (over.current) return;
+      // A menu from the sidebar is open: wait until it closes.
+      if (container.querySelector("[data-popup-open]")) {
+        timer.current = window.setTimeout(check, PEEK_CLOSE_DELAY);
+        return;
+      }
+      setOpen(false);
+    }, PEEK_CLOSE_DELAY);
+  };
+
+  if (isMobile) return { open: false, close, handlers: {} };
+  return {
+    open: open && !pinned,
+    close,
+    handlers: {
+      onPointerEnter: (e: ReactPointerEvent<HTMLDivElement>) => {
+        over.current = true;
+        if (pinned || e.pointerType !== "mouse") return;
+        // Not while the edge is dragged.
+        if (e.currentTarget.closest("[data-resizing]")) return;
+        clear();
+        if (!open)
+          timer.current = window.setTimeout(
+            () => setOpen(true),
+            PEEK_OPEN_DELAY,
+          );
+      },
+      onPointerLeave: (e: ReactPointerEvent<HTMLDivElement>) => {
+        over.current = false;
+        if (pinned) return;
+        closeLater(e.currentTarget);
+      },
+    },
+  };
 }
 
 /**
@@ -908,7 +1005,8 @@ function ResizeHandle({
       // Positioned in the sidebar's container, whose right edge is the
       // card's: 12px wide, with the line against the card's border, as on
       // the reference console.
-      className="group/resize absolute inset-y-0 -right-[5px] z-20 hidden w-3 cursor-col-resize touch-none outline-none md:block"
+      // Hidden while the sidebar is open on hover, over the card.
+      className="group/resize absolute inset-y-0 -right-[5px] z-20 hidden w-3 cursor-col-resize touch-none outline-none in-data-peek:hidden! md:block"
     >
       <span className="pointer-events-none absolute inset-y-3 right-[5px] w-px bg-foreground mask-[linear-gradient(to_bottom,transparent,black_12%,black_88%,transparent)] opacity-0 transition-opacity group-hover/resize:opacity-20 group-focus-visible/resize:opacity-60" />
     </div>
