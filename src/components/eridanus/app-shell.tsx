@@ -404,16 +404,20 @@ export function AppShell({
                         // badge 7px from the other end. The pills span the
                         // sidebar's own 8px inset, the same at both sides.
                         // Collapsed, the icon centres in a 28px button.
-                        className="gap-[11px] pe-[7px] transition-[width,height,padding,margin] ease-linear group-data-[collapsible=icon]:size-7! group-data-[collapsible=icon]:p-[5px]! has-[>svg:first-child]:pl-[7px] [&_svg]:size-[18px]"
+                        // The icon takes the button's muted color, darkening
+                        // on hover and on the current page; the label and
+                        // badge keep the text color. An icon with a color of
+                        // its own (a status dot) keeps it.
+                        className="gap-[11px] pe-[7px] text-muted-foreground transition-[width,height,padding,margin] ease-linear group-data-[collapsible=icon]:size-7! group-data-[collapsible=icon]:p-[5px]! has-[>svg:first-child]:pl-[7px] [&_svg]:size-[18px]"
                       >
                         {item.icon}
-                        <span className="min-w-0 flex-1 truncate">
+                        <span className="min-w-0 flex-1 truncate text-sidebar-foreground">
                           {item.label}
                         </span>
                         {/* In the row, not over it, so a long label stops
                             short of a badge of any width. */}
                         {item.badge != null ? (
-                          <span className="shrink-0 text-xs font-medium tabular-nums group-data-[collapsible=icon]:hidden">
+                          <span className="shrink-0 text-xs font-medium text-sidebar-foreground tabular-nums group-data-[collapsible=icon]:hidden">
                             {item.badge}
                           </span>
                         ) : null}
