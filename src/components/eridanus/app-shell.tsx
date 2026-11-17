@@ -333,7 +333,7 @@ export function AppShell({
         setPinned(open);
         peek.close();
       }}
-      data-peek={peek.open || undefined}
+      data-peek={peek.over || undefined}
       // While the edge is dragged (data-resizing, set by the handle) the
       // sidebar follows the pointer at once, without its width transition.
       className={cn(
@@ -364,7 +364,14 @@ export function AppShell({
       <Sidebar
         collapsible="icon"
         variant="inset"
-        className="group-data-[collapsible=icon]:w-11"
+        className={cn(
+          "group-data-[collapsible=icon]:w-11",
+          // Over the card, the sidebar draws the card's own left edge
+          // beside it, its rounded corners and border, so the two meet as
+          // when the sidebar is open. A ring of the window's ground hides
+          // the card's straight edge outside the curve.
+          "in-data-peek:after:pointer-events-none in-data-peek:after:absolute in-data-peek:after:inset-y-2 in-data-peek:after:left-full in-data-peek:after:w-3 in-data-peek:after:rounded-l-xl in-data-peek:after:border in-data-peek:after:border-e-0 in-data-peek:after:border-border in-data-peek:after:shadow-[0_0_0_8px_var(--color-sidebar)] in-data-peek:after:[clip-path:inset(-8px_0_-8px_-8px)]",
+        )}
         {...peek.handlers}
       >
         {/* No vertical padding: the brand row starts level with the card,
@@ -770,14 +777,35 @@ const PEEK_CLOSE_DELAY = 1000;
 function usePeek(pinned: boolean) {
   const isMobile = useIsMobile();
   const [open, setOpen] = useState(false);
+  // Still over the card while it closes, until the animation ends.
+  const [closing, setClosing] = useState(false);
   const timer = useRef<number | undefined>(undefined);
+  const settle = useRef<number | undefined>(undefined);
   const over = useRef(false);
   const clear = () => window.clearTimeout(timer.current);
-  useEffect(() => clear, []);
+  useEffect(
+    () => () => {
+      clear();
+      window.clearTimeout(settle.current);
+    },
+    [],
+  );
 
+  /** Closed by the user opening or collapsing the sidebar for good. */
   const close = () => {
     clear();
+    window.clearTimeout(settle.current);
     setOpen(false);
+    setClosing(false);
+  };
+  const shut = () => {
+    setOpen(false);
+    setClosing(true);
+    window.clearTimeout(settle.current);
+    settle.current = window.setTimeout(
+      () => setClosing(false),
+      SIDEBAR_DURATION,
+    );
   };
   const closeLater = (container: HTMLElement) => {
     clear();
@@ -788,13 +816,15 @@ function usePeek(pinned: boolean) {
         timer.current = window.setTimeout(check, PEEK_CLOSE_DELAY);
         return;
       }
-      setOpen(false);
+      shut();
     }, PEEK_CLOSE_DELAY);
   };
 
-  if (isMobile) return { open: false, close, handlers: {} };
+  if (isMobile) return { open: false, over: false, close, handlers: {} };
   return {
     open: open && !pinned,
+    /** Lying over the card: open, or closing from open. */
+    over: (open || closing) && !pinned,
     close,
     handlers: {
       onPointerEnter: (e: ReactPointerEvent<HTMLDivElement>) => {
@@ -803,6 +833,8 @@ function usePeek(pinned: boolean) {
         // Not while the edge is dragged.
         if (e.currentTarget.closest("[data-resizing]")) return;
         clear();
+        window.clearTimeout(settle.current);
+        setClosing(false);
         if (!open)
           timer.current = window.setTimeout(
             () => setOpen(true),
