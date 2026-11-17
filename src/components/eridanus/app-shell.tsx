@@ -338,9 +338,10 @@ export function AppShell({
       // sidebar follows the pointer at once, without its width transition.
       className={cn(
         // Open on hover, the sidebar keeps its collapsed gap, so it lies over
-        // the card instead of moving it: a panel with the card's hairline
-        // edge and radius, and like the card no shadow.
-        "data-peek:**:data-[slot=sidebar-gap]:w-11! data-peek:**:data-[slot=sidebar-inner]:rounded-xl data-peek:**:data-[slot=sidebar-inner]:ring-1 data-peek:**:data-[slot=sidebar-inner]:ring-border",
+        // the card instead of moving it. It looks just as when open, its
+        // insets included: the window's ground fills it to its edge.
+        "data-peek:**:data-[slot=sidebar-container]:bg-sidebar data-peek:**:data-[slot=sidebar-gap]:w-11!",
+        "**:data-[slot=sidebar-container]:duration-(--sidebar-duration) **:data-[slot=sidebar-container]:ease-(--sidebar-ease) **:data-[slot=sidebar-gap]:duration-(--sidebar-duration) **:data-[slot=sidebar-gap]:ease-(--sidebar-ease) **:data-[slot=sidebar-group-label]:duration-(--sidebar-duration) **:data-[slot=sidebar-group-label]:ease-(--sidebar-ease)",
         "h-svh min-h-0 data-resizing:cursor-col-resize data-resizing:select-none data-resizing:**:data-[slot=sidebar-container]:transition-none data-resizing:**:data-[slot=sidebar-gap]:transition-none",
         className,
       )}
@@ -350,6 +351,11 @@ export function AppShell({
           // Collapsed, the sidebar is 28px icon buttons with 8px on either
           // side: 44px, the last 8 being the gap before the card.
           "--sidebar-width-icon": "1.75rem",
+          // How the sidebar opens and closes, after the Cloudflare
+          // dashboard: 250ms, easing in and out. Its width, the gap beside
+          // it and everything that moves with it share the timing.
+          "--sidebar-duration": `${SIDEBAR_DURATION}ms`,
+          "--sidebar-ease": SIDEBAR_EASE,
         } as CSSProperties
       }
     >
@@ -419,7 +425,7 @@ export function AppShell({
               <SidebarGroupContent>
                 {/* Collapsed, the 28px buttons part by 8px (a 36px pitch),
                     so the bare icons have room around them. */}
-                <SidebarMenu className="transition-[gap] duration-200 ease-linear group-data-[collapsible=icon]:gap-2">
+                <SidebarMenu className="transition-[gap] duration-(--sidebar-duration) ease-(--sidebar-ease) group-data-[collapsible=icon]:gap-2">
                   {group.items.map((item) => (
                     <SidebarMenuItem key={item.href}>
                       <NavButton
@@ -437,7 +443,7 @@ export function AppShell({
                         // on hover and on the current page; the label and
                         // badge keep the text color. An icon with a color of
                         // its own (a status dot) keeps it.
-                        className="gap-[11px] pe-[7px] text-muted-foreground transition-[width,height,padding,margin] ease-linear group-data-[collapsible=icon]:size-7! group-data-[collapsible=icon]:p-[5px]! has-[>svg:first-child]:pl-[7px] [&_svg]:size-[18px]"
+                        className="gap-[11px] pe-[7px] text-muted-foreground transition-[width,height,padding,margin] duration-(--sidebar-duration) ease-(--sidebar-ease) group-data-[collapsible=icon]:size-7! group-data-[collapsible=icon]:p-[5px]! has-[>svg:first-child]:pl-[7px] [&_svg]:size-[18px]"
                       >
                         {item.icon}
                         <span className="min-w-0 flex-1 truncate text-sidebar-foreground">
@@ -540,7 +546,7 @@ function NavButton({
 // and the row is still 32px wide; without a floor it squeezed the tile out
 // of sight for a moment, a flicker on every toggle.
 const HEADER_ROW =
-  "w-auto max-w-full min-w-8 flex-1 gap-1.5 ps-0.5 pe-3 transition-[width,height,padding,margin] ease-linear group-data-[collapsible=icon]:size-7! group-data-[collapsible=icon]:min-w-7 group-data-[collapsible=icon]:p-0!";
+  "w-auto max-w-full min-w-8 flex-1 gap-1.5 ps-0.5 pe-3 transition-[width,height,padding,margin] duration-(--sidebar-duration) ease-(--sidebar-ease) group-data-[collapsible=icon]:size-7! group-data-[collapsible=icon]:min-w-7 group-data-[collapsible=icon]:p-0!";
 
 /** A round tile with a mark, or a name's first letter: the header's, 28px
  * open and collapsed, the size of a collapsed nav item's hover circle; or a
@@ -659,8 +665,8 @@ function FooterActions({ children }: { children: ReactNode }) {
     }
     if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     ref.current?.animate([{ opacity: 0 }, { opacity: 1 }], {
-      duration: 200,
-      easing: "linear",
+      duration: SIDEBAR_DURATION,
+      easing: SIDEBAR_EASE,
     });
   }, [state]);
   return (
@@ -706,7 +712,7 @@ function SearchButton({ search, label }: { search: AppSearch; label: string }) {
           tooltip={text}
           aria-keyshortcuts={apple ? "Meta+K" : "Control+K"}
           onClick={() => onOpen.current()}
-          className="gap-[11px] rounded-full bg-background pe-1.5 text-muted-foreground ring-1 ring-sidebar-border transition-[width,height,padding,margin] ease-linear ring-inset group-data-[collapsible=icon]:size-7! group-data-[collapsible=icon]:bg-transparent group-data-[collapsible=icon]:p-[5px]! group-data-[collapsible=icon]:ring-0 has-[>svg:first-child]:pl-[7px] [&_svg]:size-[18px]"
+          className="gap-[11px] rounded-full bg-background pe-1.5 text-muted-foreground ring-1 ring-sidebar-border transition-[width,height,padding,margin] duration-(--sidebar-duration) ease-(--sidebar-ease) ring-inset group-data-[collapsible=icon]:size-7! group-data-[collapsible=icon]:bg-transparent group-data-[collapsible=icon]:p-[5px]! group-data-[collapsible=icon]:ring-0 has-[>svg:first-child]:pl-[7px] [&_svg]:size-[18px]"
         >
           <MagnifyingGlassIcon />
           <span className="flex-1">{text}</span>
@@ -739,12 +745,15 @@ function CollapseButton({
       title={label}
       onClick={() => setOpen(pin)}
       // Fades in as the sidebar opens, instead of popping in.
-      className="ms-auto shrink-0 animate-in text-muted-foreground duration-200 fade-in group-data-[collapsible=icon]:hidden motion-reduce:animate-none"
+      className="ms-auto shrink-0 animate-in text-muted-foreground duration-(--sidebar-duration) fade-in group-data-[collapsible=icon]:hidden motion-reduce:animate-none"
     >
       <SidebarSimpleIcon />
     </Button>
   );
 }
+
+const SIDEBAR_DURATION = 250;
+const SIDEBAR_EASE = "cubic-bezier(0.77, 0, 0.175, 1)";
 
 /** How long the pointer rests on the collapsed sidebar before it opens, and
  * how long it may be away before it closes, so passing over it or slipping
@@ -1046,14 +1055,14 @@ function AccountMenu({
             aria-label={labels.account(account.name)}
             // The 24px avatar centred under the logo and nav icons, 4px from
             // the pill on every side, the name in line with their labels.
-            className="gap-2 rounded-full ps-1 transition-[width,height,padding,margin] ease-linear group-data-[collapsible=icon]:size-7! group-data-[collapsible=icon]:p-1! data-popup-open:bg-sidebar-accent data-popup-open:text-sidebar-accent-foreground"
+            className="gap-2 rounded-full ps-1 transition-[width,height,padding,margin] duration-(--sidebar-duration) ease-(--sidebar-ease) group-data-[collapsible=icon]:size-7! group-data-[collapsible=icon]:p-1! data-popup-open:bg-sidebar-accent data-popup-open:text-sidebar-accent-foreground"
             render={<DropdownMenuTrigger />}
           >
             <PersonAvatar
               name={account.name}
               src={account.avatar}
               size="sm"
-              className="transition-[width,height] duration-200 ease-linear group-data-[collapsible=icon]:size-5!"
+              className="transition-[width,height] duration-(--sidebar-duration) ease-(--sidebar-ease) group-data-[collapsible=icon]:size-5!"
             />
             {/* The email waits in the menu, which leaves room for the
                 footer's buttons. */}
