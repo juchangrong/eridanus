@@ -471,8 +471,8 @@ function NavButton({
   );
 }
 
-/** The header row: a 32px pill, like a nav item's, that hugs its tile and
- * name rather than spanning the row, so its hover background stays small.
+/** The header row: a 32px pill, like a nav item's, from under the nav pills
+ * to the collapse button; the name fills it, the caret at its end.
  * It starts under the nav pills, the 24px tile 4px inside it (concentric:
  * 16 less 4 is 12) and centred over the nav icons, the name where their
  * labels start. Collapsed it is a 32px button centred like theirs, and its
@@ -481,7 +481,7 @@ function NavButton({
 // and the row is still 32px wide; without a floor it squeezed the tile out
 // of sight for a moment, a flicker on every toggle.
 const HEADER_ROW =
-  "ms-2 w-auto max-w-full min-w-8 flex-initial gap-2 ps-1 pe-3 transition-[width,height,padding,margin] ease-linear group-data-[collapsible=icon]:ms-0 group-data-[collapsible=icon]:p-1!";
+  "ms-2 w-auto max-w-full min-w-8 flex-1 gap-2 ps-1 pe-3 transition-[width,height,padding,margin] ease-linear group-data-[collapsible=icon]:ms-0 group-data-[collapsible=icon]:p-1!";
 
 /** A round tile with a mark, or a name's first letter: the header's 24px, or a small one for menus. */
 function Tile({
@@ -533,10 +533,10 @@ function TenantSwitcher({
         render={<DropdownMenuTrigger />}
       >
         <Tile logo={current.logo} name={current.name} />
-        <span className="min-w-0 truncate font-heading font-medium">
+        <span className="min-w-0 flex-1 truncate font-heading font-medium">
           {current.name}
         </span>
-        <CaretDownIcon className="-ms-1 size-3! text-muted-foreground" />
+        <CaretDownIcon className="size-3! text-muted-foreground" />
       </SidebarMenuButton>
       <DropdownMenuContent
         side="bottom"
