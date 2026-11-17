@@ -769,7 +769,7 @@ const SIDEBAR_EASE = "cubic-bezier(0.2, 0, 0, 1)";
  * how long it may be away before it closes, so passing over it or slipping
  * off its edge does nothing, yet short enough to feel immediate. */
 const PEEK_OPEN_DELAY = 200;
-const PEEK_CLOSE_DELAY = 300;
+const PEEK_CLOSE_DELAY = 150;
 
 /**
  * Opens the collapsed sidebar while the pointer is over it, as a panel over
