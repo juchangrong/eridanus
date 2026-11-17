@@ -492,11 +492,12 @@ export function AppShell({
       <SidebarInset className="min-w-0 overflow-hidden md:peer-data-[variant=inset]:rounded-xl md:peer-data-[variant=inset]:border md:peer-data-[variant=inset]:shadow-none md:peer-data-[variant=inset]:peer-data-[state=collapsed]:ml-0">
         {/* Inset like a Page, so the toggle's icon lines up with the page's
             text, and 40px tall, so its controls centre on the sidebar's
-            header row beside it. Without a breadcrumb or actions only phones get the bar, to
-            open the sidebar. */}
+            header row beside it. No rule under it: the page's own space
+            sets it apart. Without a breadcrumb or actions only phones get
+            the bar, to open the sidebar. */}
         <div
           className={cn(
-            "flex h-10 shrink-0 items-center gap-2 border-b px-4 sm:px-6",
+            "flex h-10 shrink-0 items-center gap-2 px-4 sm:px-6",
             !breadcrumb && !actions && "md:hidden",
           )}
         >
