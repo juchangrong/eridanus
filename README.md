@@ -24,4 +24,4 @@ See [docs/plan.md](docs/plan.md) for the scope, layout and roadmap.
 
 ## License
 
-MIT. The primitives in `src/components/ui` are adapted from [shadcn/ui](https://github.com/shadcn-ui/ui), also MIT; see [LICENSE](LICENSE).
+MIT. The primitives in `src/components/ui` are adapted from [shadcn/ui](https://github.com/shadcn-ui/ui), also MIT; see [LICENSE](LICENSE) and [THIRD_PARTY_LICENSES](THIRD_PARTY_LICENSES).
