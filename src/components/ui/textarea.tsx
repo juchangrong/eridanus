@@ -3,9 +3,8 @@ import { cn } from "cn"
 
 /**
  * Eridanus fork of shadcn's base-rhea textarea. Focus and errors show on the
- * border alone: no ring. At rest a muted-foreground border at 70% (3:1
- * against the page in both themes, so the field's edge meets WCAG 1.4.11),
- * on focus a foreground border and a solid destructive border when
+ * border alone: no ring, a muted-foreground border on focus (3:1 or better
+ * against the field in both themes) and a solid destructive border when
  * invalid. Its corners are 16px, the same as a multi-line input group.
  * Upstream changes are merged by hand, see docs/plan.md.
  */
@@ -14,7 +13,7 @@ function Textarea({ className, ...props }: React.ComponentProps<"textarea">) {
     <textarea
       data-slot="textarea"
       className={cn(
-        "flex field-sizing-content min-h-16 w-full resize-none rounded-[1rem] border border-muted-foreground/70 bg-input/50 px-2.5 py-2 text-base transition-[color,box-shadow] duration-200 outline-none placeholder:text-muted-foreground focus-visible:border-foreground disabled:cursor-not-allowed disabled:opacity-50 aria-invalid:border-destructive md:text-sm",
+        "flex field-sizing-content min-h-16 w-full resize-none rounded-[1rem] border border-transparent bg-input/50 px-2.5 py-2 text-base transition-[color,box-shadow] duration-200 outline-none placeholder:text-muted-foreground focus-visible:border-muted-foreground disabled:cursor-not-allowed disabled:opacity-50 aria-invalid:border-destructive md:text-sm",
         className
       )}
       {...props}

@@ -31,4 +31,4 @@ Soft, precise, calm. Every control is a pill and corners are rounded, but alignm
 
 ## Accessibility & Inclusion
 
-WCAG 2.2 AA in both light and dark themes: 4.5:1 for text (including status text on its tint), 3:1 for focus indicators and control boundaries, full keyboard operation, correct roles and names for screen readers, and reduced-motion alternatives for every animation. Status never relies on colour alone.
+WCAG 2.2 AA in both light and dark themes: 4.5:1 for text (including status text on its tint), 3:1 for focus indicators (fields are marked by a soft fill and their label rather than a 3:1 border, a deliberate choice for the calm look), full keyboard operation, correct roles and names for screen readers, and reduced-motion alternatives for every animation. Status never relies on colour alone.
