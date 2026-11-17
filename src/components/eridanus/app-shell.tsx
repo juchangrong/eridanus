@@ -357,7 +357,7 @@ export function AppShell({
               className="px-0"
             >
               {group.title ? (
-                <SidebarGroupLabel className="ps-[15px]">
+                <SidebarGroupLabel className="ps-[7px]">
                   {group.title}
                 </SidebarGroupLabel>
               ) : null}
@@ -371,14 +371,12 @@ export function AppShell({
                         tooltip={item.label}
                         link={renderLink(item.href)}
                         // One column with the header: the 18px icon centred
-                        // under the 32px logo, the label where the product's
-                        // name starts. The pill starts under the logo, so
-                        // its 7px around the icon is the same on every side,
-                        // and a badge keeps 7px at the other end. Inset 8px
-                        // at both ends, centred in the sidebar.
-                        // Collapsed, the icon centres in its 32px button,
-                        // with the logo and avatar.
-                        className="mx-2 w-[calc(100%-1rem)] gap-[11px] pe-[7px] transition-[width,height,padding,margin] ease-linear group-data-[collapsible=icon]:mx-0 group-data-[collapsible=icon]:size-7! group-data-[collapsible=icon]:p-[5px]! has-[>svg:first-child]:pl-[7px] [&_svg]:size-[18px]"
+                        // under the logo, the label where the product's name
+                        // starts, 7px around the icon on every side and a
+                        // badge 7px from the other end. The pills span the
+                        // sidebar's own 8px inset, the same at both sides.
+                        // Collapsed, the icon centres in a 28px button.
+                        className="gap-[11px] pe-[7px] transition-[width,height,padding,margin] ease-linear group-data-[collapsible=icon]:size-7! group-data-[collapsible=icon]:p-[5px]! has-[>svg:first-child]:pl-[7px] [&_svg]:size-[18px]"
                       >
                         {item.icon}
                         <span className="min-w-0 flex-1 truncate">
@@ -475,17 +473,15 @@ function NavButton({
 }
 
 /** The header row: a 32px pill, like a nav item's, from under the nav pills
- * to the collapse button; the name fills it, the caret at its end.
- * It starts under the nav pills, the 28px tile 2px inside it (concentric:
- * 16 less 2 is 14) and centred over the nav icons, the name where their
- * labels start. Collapsed it is a 28px button filled by a 28px tile, the
- * size of a nav icon's hover circle, centred like theirs, and its
- * margin glides with the sidebar. */
+ * to the collapse button; the name fills it, the caret at its end. The 28px
+ * tile sits 2px inside it (concentric: 16 less 2 is 14), centred over the
+ * nav icons, the name where their labels start. Collapsed it is a 28px
+ * button filled by the tile, the size of a nav icon's hover circle. */
 // min-w-8: while the sidebar opens, the collapse button is already there
 // and the row is still 32px wide; without a floor it squeezed the tile out
 // of sight for a moment, a flicker on every toggle.
 const HEADER_ROW =
-  "ms-2 w-auto max-w-full min-w-8 flex-1 gap-1.5 ps-0.5 pe-3 transition-[width,height,padding,margin] ease-linear group-data-[collapsible=icon]:ms-0 group-data-[collapsible=icon]:size-7! group-data-[collapsible=icon]:min-w-7 group-data-[collapsible=icon]:p-0!";
+  "w-auto max-w-full min-w-8 flex-1 gap-1.5 ps-0.5 pe-3 transition-[width,height,padding,margin] ease-linear group-data-[collapsible=icon]:size-7! group-data-[collapsible=icon]:min-w-7 group-data-[collapsible=icon]:p-0!";
 
 /** A round tile with a mark, or a name's first letter: the header's, 28px
  * open and collapsed, the size of a collapsed nav item's hover circle; or a
@@ -586,9 +582,8 @@ function TenantSwitcher({
   );
 }
 
-/** The footer's buttons: in a row after the account, inset 8px from the end
- * as the account's pill is from the start, so the row is centred like the
- * nav; collapsed, stacked above the avatar. A row cannot glide into a
+/** The footer's buttons: in a row after the account, ending where the nav
+ * pills do; collapsed, stacked above the avatar. A row cannot glide into a
  * column, so on each toggle they fade in at their new place rather than
  * jump, replayed on the element itself so nothing remounts or loses focus. */
 function FooterActions({ children }: { children: ReactNode }) {
@@ -610,7 +605,7 @@ function FooterActions({ children }: { children: ReactNode }) {
     <div
       ref={ref}
       // Collapsed, the buttons shrink to 28px, the sidebar's width.
-      className="ms-auto me-2 flex shrink-0 items-center gap-0.5 text-muted-foreground group-data-[collapsible=icon]:mx-0 group-data-[collapsible=icon]:flex-col group-data-[collapsible=icon]:*:size-7!"
+      className="ms-auto flex shrink-0 items-center gap-0.5 text-muted-foreground group-data-[collapsible=icon]:mx-0 group-data-[collapsible=icon]:flex-col group-data-[collapsible=icon]:*:size-7!"
     >
       {children}
     </div>
@@ -630,7 +625,7 @@ function CollapseButton({ label }: { label: string }) {
       title={label}
       onClick={() => setOpen(false)}
       // Fades in as the sidebar opens, instead of popping in.
-      className="ms-auto me-2 shrink-0 animate-in text-muted-foreground duration-200 fade-in group-data-[collapsible=icon]:hidden motion-reduce:animate-none"
+      className="ms-auto shrink-0 animate-in text-muted-foreground duration-200 fade-in group-data-[collapsible=icon]:hidden motion-reduce:animate-none"
     >
       <SidebarSimpleIcon />
     </Button>
@@ -851,10 +846,9 @@ function AccountMenu({
               the trigger's element to open. */}
           <SidebarMenuButton
             aria-label={labels.account(account.name)}
-            // The 24px avatar centred under the logo and nav icons, the name
-            // in line with their labels; like theirs, the pill starts under
-            // the logo, 4px from the avatar on every side.
-            className="ms-2 w-[calc(100%-0.5rem)] gap-2 rounded-full ps-1 transition-[width,height,padding,margin] ease-linear group-data-[collapsible=icon]:ms-0 group-data-[collapsible=icon]:size-7! group-data-[collapsible=icon]:p-1! data-popup-open:bg-sidebar-accent data-popup-open:text-sidebar-accent-foreground"
+            // The 24px avatar centred under the logo and nav icons, 4px from
+            // the pill on every side, the name in line with their labels.
+            className="gap-2 rounded-full ps-1 transition-[width,height,padding,margin] ease-linear group-data-[collapsible=icon]:size-7! group-data-[collapsible=icon]:p-1! data-popup-open:bg-sidebar-accent data-popup-open:text-sidebar-accent-foreground"
             render={<DropdownMenuTrigger />}
           >
             <PersonAvatar
