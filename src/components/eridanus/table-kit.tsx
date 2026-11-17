@@ -146,8 +146,8 @@ const ROW_TONE = {
 
 /**
  * A row that opens or selects something through clickFirstControl.
- * `selected` marks it with the table's selected ground and an inset bar on
- * the leading edge, and outranks `tone`, which tints rows that need attention.
+ * `selected` marks it with the table's selected ground, and outranks `tone`,
+ * which tints rows that need attention.
  */
 export function ClickableRow({
   selected,
@@ -166,9 +166,7 @@ export function ClickableRow({
       aria-selected={selected || undefined}
       className={cn(
         "cursor-pointer",
-        selected
-          ? "shadow-[inset_2px_0_0_var(--color-primary)]"
-          : tone && ROW_TONE[tone],
+        !selected && tone && ROW_TONE[tone],
         className,
       )}
       onClick={clickFirstControl}
