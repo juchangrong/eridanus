@@ -15,13 +15,15 @@ const MESSAGES: Record<Locale, { loading: string }> = {
  * The area a table scrolls in, open on the page rather than in a card. It
  * scrolls both ways and keeps a TableHeaderRow pinned. Body rows keep
  * shadcn's rule under each row; `rules={false}` leaves them out, with padding
- * and the hover ground keeping the rows apart. `bleed` pulls the area into the page gutter by a cell's padding, so
- * the first column lines up with the headings above. `fill` keeps a minimum
- * height inside a page that gives the table the remaining height.
+ * and the hover ground keeping the rows apart. The rules start and end where
+ * the toolbar and headings above do. `bleed` pulls the area into the page
+ * gutter by a cell's padding instead, so the first column's text lines up
+ * with them; it suits a table without rules. `fill` keeps a minimum height
+ * inside a page that gives the table the remaining height.
  */
 export function TableScroll({
   children,
-  bleed = true,
+  bleed = false,
   rules = true,
   fill = false,
   className,

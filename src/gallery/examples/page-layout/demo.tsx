@@ -1,7 +1,7 @@
 import {
   GearIcon,
+  MonitorPlayIcon,
   PlanetIcon,
-  PlayCircleIcon,
   PresentationChartIcon,
   StackIcon,
 } from "@phosphor-icons/react";
@@ -22,14 +22,11 @@ import { Button } from "@/components/ui/button";
 const NAV = [
   {
     items: [
-      { href: "/runs", label: "运行记录", icon: <PlayCircleIcon /> },
+      { href: "/runs", label: "运行记录", icon: <MonitorPlayIcon /> },
       { href: "/flows", label: "工作流", icon: <StackIcon />, active: true },
       { href: "/metrics", label: "监控", icon: <PresentationChartIcon /> },
+      { href: "/settings", label: "设置", icon: <GearIcon /> },
     ],
-  },
-  {
-    title: "管理",
-    items: [{ href: "/settings", label: "设置", icon: <GearIcon /> }],
   },
 ];
 

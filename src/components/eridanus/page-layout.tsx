@@ -3,8 +3,11 @@ import type { ReactNode } from "react";
 import { cn } from "@/lib/utils";
 
 /**
- * The page container. Document pages grow and let their parent scroll, with
- * wide gaps between sections. `fill` pages take exactly the height they are
+ * The page container, 16px in from its sides, the inset of the app shell's
+ * top bar, so the page's text lines up under the bar's toggle. Document
+ * pages grow and let their parent scroll, with
+ * 32px between blocks, twice the 16px inside a section, so each block reads
+ * as one group. `fill` pages take exactly the height they are
  * given, so a table or workbench can scroll inside itself with its header and
  * pager in view. `narrow` is for forms and settings, where full-width lines of
  * text stop being readable.
@@ -23,8 +26,8 @@ export function Page({
   return (
     <div
       className={cn(
-        "mx-auto flex w-full flex-col px-4 sm:px-6",
-        fill ? "h-full min-h-[36rem] gap-3 py-4" : "gap-10 py-6",
+        "mx-auto flex w-full flex-col px-4",
+        fill ? "h-full min-h-[36rem] gap-3 py-4" : "gap-8 py-6",
         narrow ? "max-w-5xl" : "max-w-[1600px]",
         className,
       )}
@@ -191,7 +194,9 @@ export function Facts({
 }
 
 /** Headline figures in a row, label above figure, spaced apart rather than
- * boxed. Only a figure that needs action takes a color. */
+ * boxed. They pack from the leading edge, each as wide as it needs (at least
+ * 7rem) with 48px between, so a wide page does not pull them apart. Only a
+ * figure that needs action takes a color. */
 export function StatStrip({
   items,
 }: {
@@ -203,10 +208,10 @@ export function StatStrip({
   }[];
 }) {
   return (
-    <dl className="m-0 grid shrink-0 grid-cols-[repeat(auto-fit,minmax(7rem,1fr))] gap-x-6 gap-y-4">
+    <dl className="m-0 flex shrink-0 flex-wrap gap-x-12 gap-y-4">
       {items.map((item, i) => (
         // eslint-disable-next-line react/no-array-index-key -- items have no id and keep the caller's order
-        <div key={i} className="flex min-w-0 flex-col gap-1">
+        <div key={i} className="flex min-w-28 flex-col gap-1">
           <dt className="truncate text-sm text-muted-foreground">
             {item.label}
           </dt>

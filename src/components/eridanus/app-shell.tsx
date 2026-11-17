@@ -1,6 +1,7 @@
 import {
-  CaretDownIcon,
+  CaretUpDownIcon,
   DesktopIcon,
+  MagnifyingGlassIcon,
   MoonIcon,
   PlusIcon,
   SidebarSimpleIcon,
@@ -53,6 +54,7 @@ import {
   SidebarProvider,
   useSidebar,
 } from "@/components/ui/sidebar";
+import { useIsMobile } from "@/hooks/use-mobile";
 import type { Locale } from "@/lib/eridanus/locale";
 import { cn } from "@/lib/utils";
 
@@ -74,11 +76,22 @@ export interface AppTenant {
   logo?: ReactNode;
 }
 
+/** The search entry under the header: a field-like button that opens the
+ * app's own search or command palette, also on ⌘K (Ctrl+K elsewhere). */
+export interface AppSearch {
+  onOpen: () => void;
+  /** The button's text; defaults to the built-in "Search". */
+  placeholder?: string;
+}
+
 export interface AppTenants {
   items: AppTenant[];
   /** The id of the tenant the app is in. */
   current: string;
   onSelect: (id: string) => void;
+  /** Items under the tenants, before "new tenant", such as a link to the
+   * admin console. The icon sits in the tiles' 20px column. */
+  actions?: { label: string; icon?: ReactNode; onSelect: () => void }[];
   /** Adds a "new tenant" item at the end of the menu. */
   onCreate?: () => void;
 }
@@ -104,6 +117,9 @@ export interface AppNavItem {
 export interface AppNavGroup {
   /** Heading over the group; leave it out for the first, main group. */
   title?: string;
+  /** Leave the group out of the collapsed rail, for lists whose icons
+   * don't tell their items apart there, such as pinned or recent ones. */
+  hideWhenCollapsed?: boolean;
   items: AppNavItem[];
 }
 
@@ -121,12 +137,16 @@ export interface AppShellLabels {
   toggleSidebar: string;
   resizeSidebar: string;
   collapseSidebar: string;
+  /** The collapse button while the collapsed sidebar is open on hover:
+   * it opens the sidebar for good. */
+  expandSidebar: string;
   navigation: string;
   /** The account button's accessible name, given the person's name. */
   account: (name: string) => string;
   /** The tenant switcher's accessible name, given the current tenant. */
   switchTenant: (name: string) => string;
   newTenant: string;
+  search: string;
   theme: string;
   system: string;
   light: string;
@@ -140,10 +160,12 @@ export const appShellLabels: Record<Locale, AppShellLabels> = {
     toggleSidebar: "切换侧边栏",
     resizeSidebar: "调整侧边栏宽度",
     collapseSidebar: "收起侧边栏",
+    expandSidebar: "展开侧边栏",
     navigation: "主导航",
     account: (name) => `账号菜单：${name}`,
     switchTenant: (name) => `切换租户：${name}`,
     newTenant: "新建租户",
+    search: "搜索",
     theme: "主题",
     system: "跟随系统",
     light: "浅色",
@@ -154,10 +176,12 @@ export const appShellLabels: Record<Locale, AppShellLabels> = {
     toggleSidebar: "Toggle sidebar",
     resizeSidebar: "Resize sidebar",
     collapseSidebar: "Collapse sidebar",
+    expandSidebar: "Expand sidebar",
     navigation: "Main navigation",
     account: (name) => `Account menu: ${name}`,
     switchTenant: (name) => `Switch tenant: ${name}`,
     newTenant: "New tenant",
+    search: "Search",
     theme: "Theme",
     system: "System",
     light: "Light",
@@ -238,14 +262,18 @@ const defaultLink = (href: string) => <a href={href} />;
 
 /**
  * The frame of a console app. The sidebar sits on the window's own background
- * with the product (or, with `tenants`, a switcher between them), navigation
+ * with the product (or, with `tenants`, a switcher between them), an
+ * optional search entry (⌘K), navigation
  * groups under small headings and, at its
  * foot, the account menu beside a few icon buttons; the page sits in a card
- * inset from the window. A breadcrumb or page-wide actions get a top bar
- * inside the card, with the sidebar toggle; without them the page starts at
- * the card's top edge. On desktop the sidebar's edge drags to
+ * inset from the window. A breadcrumb or page-wide actions get an optional
+ * top bar inside the card, which also holds the sidebar toggle in both
+ * states; without them the page starts at the card's top edge and the toggle
+ * sits beside the product in the sidebar. On desktop the sidebar's edge drags to
  * resize it, and it collapses to icons (⌘B, a click on the edge, or a drag
- * short of the minimum width); it remembers both across visits. Under 768px
+ * short of the minimum width); it remembers both across visits. Collapsed,
+ * resting the pointer on it opens it over the card, without moving the page,
+ * until the pointer leaves. Under 768px
  * it opens as a sheet, from a bar that phones always get.
  *
  * The card takes the rest of the viewport and scrolls by itself, so the top
@@ -258,6 +286,7 @@ const defaultLink = (href: string) => <a href={href} />;
 export function AppShell({
   brand,
   tenants,
+  search,
   nav,
   account,
   breadcrumb,
@@ -273,6 +302,8 @@ export function AppShell({
   /** Makes the header a tenant switcher, in place of the brand link: the
    * current tenant's tile and name, opening a menu of the others. */
   tenants?: AppTenants;
+  /** A search button under the header, with ⌘K to open it. */
+  search?: AppSearch;
   nav: AppNavGroup[];
   account?: AppAccount;
   /** A Breadcrumb for the current page, in a top bar inside the card. */
@@ -291,14 +322,30 @@ export function AppShell({
   children: ReactNode;
 }) {
   const labels = { ...useMessages(appShellLabels), ...labelOverrides };
-  const [initialOpen] = useState(() => storedOpen() ?? defaultOpen ?? true);
+  const [pinned, setPinned] = useState(
+    () => storedOpen() ?? defaultOpen ?? true,
+  );
   const [width, setWidth] = useState(storedWidth);
+  const peek = usePeek(pinned);
   return (
     <SidebarProvider
-      defaultOpen={initialOpen}
+      // Open when the user opened it (stored in the cookie by shadcn's
+      // setOpen) or while the collapsed sidebar is open on hover, which is
+      // never stored.
+      open={pinned || peek.open}
+      onOpenChange={(open) => {
+        setPinned(open);
+        peek.close();
+      }}
+      data-peek={peek.over || undefined}
       // While the edge is dragged (data-resizing, set by the handle) the
       // sidebar follows the pointer at once, without its width transition.
       className={cn(
+        // Open on hover, the sidebar keeps its collapsed gap, so it lies over
+        // the card instead of moving it. It looks just as when open, its
+        // insets included: the window's ground fills it to its edge.
+        "data-peek:**:data-[slot=sidebar-container]:bg-sidebar data-peek:**:data-[slot=sidebar-gap]:w-11!",
+        "**:data-[slot=sidebar-container]:duration-(--sidebar-duration) **:data-[slot=sidebar-container]:ease-(--sidebar-ease) **:data-[slot=sidebar-gap]:duration-(--sidebar-duration) **:data-[slot=sidebar-gap]:ease-(--sidebar-ease) **:data-[slot=sidebar-group-label]:duration-(--sidebar-duration) **:data-[slot=sidebar-group-label]:ease-(--sidebar-ease)",
         "h-svh min-h-0 data-resizing:cursor-col-resize data-resizing:select-none data-resizing:**:data-[slot=sidebar-container]:transition-none data-resizing:**:data-[slot=sidebar-gap]:transition-none",
         className,
       )}
@@ -308,6 +355,10 @@ export function AppShell({
           // Collapsed, the sidebar is 28px icon buttons with 8px on either
           // side: 44px, the last 8 being the gap before the card.
           "--sidebar-width-icon": "1.75rem",
+          // Its width, the gap beside it and everything that moves with it
+          // share one timing.
+          "--sidebar-duration": `${SIDEBAR_DURATION}ms`,
+          "--sidebar-ease": SIDEBAR_EASE,
         } as CSSProperties
       }
     >
@@ -316,7 +367,15 @@ export function AppShell({
       <Sidebar
         collapsible="icon"
         variant="inset"
-        className="group-data-[collapsible=icon]:w-11"
+        className={cn(
+          "group-data-[collapsible=icon]:w-11",
+          // Over the card, the sidebar draws the card's own left edge
+          // beside it, its rounded corners and border, so the two meet as
+          // when the sidebar is open. A ring of the window's ground hides
+          // the card's straight edge outside the curve.
+          "in-data-peek:after:pointer-events-none in-data-peek:after:absolute in-data-peek:after:inset-y-2 in-data-peek:after:left-full in-data-peek:after:w-3 in-data-peek:after:rounded-l-xl in-data-peek:after:border in-data-peek:after:border-e-0 in-data-peek:after:border-border in-data-peek:after:shadow-[0_0_0_8px_var(--color-sidebar)] in-data-peek:after:[clip-path:inset(-8px_0_-8px_-8px)]",
+        )}
+        {...peek.handlers}
       >
         {/* No vertical padding: the brand row starts level with the card,
             and the nav sits 8px under it. */}
@@ -324,8 +383,9 @@ export function AppShell({
           <SidebarMenu>
             {/* Clips what does not fit yet while the sidebar opens, leaving
                 room for focus rings. */}
-            {/* 40px tall in both states, so the nav below never moves. */}
-            <SidebarMenuItem className="flex h-10 items-center gap-1 overflow-clip [overflow-clip-margin:4px]">
+            {/* 48px tall in both states, so the nav below never moves, and
+                as tall as the card's top bar beside it. */}
+            <SidebarMenuItem className="flex h-12 items-center gap-1 overflow-clip [overflow-clip-margin:4px]">
               {tenants ? (
                 <TenantSwitcher tenants={tenants} labels={labels} />
               ) : (
@@ -338,9 +398,21 @@ export function AppShell({
                   <span className="font-heading font-medium">{brand.name}</span>
                 </NavButton>
               )}
-              <CollapseButton label={labels.collapseSidebar} />
+              {/* With a top bar the toggle stays there, in the card's
+                  corner, in both states; without one it is here. */}
+              {breadcrumb || actions ? null : (
+                <CollapseButton
+                  label={
+                    peek.open ? labels.expandSidebar : labels.collapseSidebar
+                  }
+                  pin={peek.open}
+                />
+              )}
             </SidebarMenuItem>
           </SidebarMenu>
+          {search ? (
+            <SearchButton search={search} label={labels.search} />
+          ) : null}
         </SidebarHeader>
         <SidebarContent
           ref={fadeScrollEdges}
@@ -354,7 +426,11 @@ export function AppShell({
               key={group.title ?? i}
               // Groups part by space and their headings, with no rule; a
               // heading starts where the icons below it do.
-              className="px-0"
+              className={cn(
+                "px-0",
+                group.hideWhenCollapsed &&
+                  "group-data-[collapsible=icon]:hidden",
+              )}
             >
               {group.title ? (
                 <SidebarGroupLabel className="ps-[7px]">
@@ -362,7 +438,9 @@ export function AppShell({
                 </SidebarGroupLabel>
               ) : null}
               <SidebarGroupContent>
-                <SidebarMenu>
+                {/* Collapsed, the 28px buttons part by 8px (a 36px pitch),
+                    so the bare icons have room around them. */}
+                <SidebarMenu className="transition-[gap] duration-(--sidebar-duration) ease-(--sidebar-ease) group-data-[collapsible=icon]:gap-2">
                   {group.items.map((item) => (
                     <SidebarMenuItem key={item.href}>
                       <NavButton
@@ -376,16 +454,20 @@ export function AppShell({
                         // badge 7px from the other end. The pills span the
                         // sidebar's own 8px inset, the same at both sides.
                         // Collapsed, the icon centres in a 28px button.
-                        className="gap-[11px] pe-[7px] transition-[width,height,padding,margin] ease-linear group-data-[collapsible=icon]:size-7! group-data-[collapsible=icon]:p-[5px]! has-[>svg:first-child]:pl-[7px] [&_svg]:size-[18px]"
+                        // The icon takes the button's muted color, darkening
+                        // on hover and on the current page; the label and
+                        // badge keep the text color. An icon with a color of
+                        // its own (a status dot) keeps it.
+                        className="gap-[11px] pe-[7px] text-muted-foreground transition-[width,height,padding,margin] duration-(--sidebar-duration) ease-(--sidebar-ease) group-data-[collapsible=icon]:size-7! group-data-[collapsible=icon]:p-[5px]! has-[>svg:first-child]:pl-[7px] [&_svg]:size-[18px]"
                       >
                         {item.icon}
-                        <span className="min-w-0 flex-1 truncate">
+                        <span className="min-w-0 flex-1 truncate text-sidebar-foreground">
                           {item.label}
                         </span>
                         {/* In the row, not over it, so a long label stops
                             short of a badge of any width. */}
                         {item.badge != null ? (
-                          <span className="shrink-0 text-xs font-medium tabular-nums group-data-[collapsible=icon]:hidden">
+                          <span className="shrink-0 text-xs font-medium text-sidebar-foreground tabular-nums group-data-[collapsible=icon]:hidden">
                             {item.badge}
                           </span>
                         ) : null}
@@ -417,29 +499,34 @@ export function AppShell({
       {/* The gap beside the sidebar stays 8px when it collapses, as the
           resize line sits in its middle, so the card does not move off. */}
       <SidebarInset className="min-w-0 overflow-hidden md:peer-data-[variant=inset]:rounded-xl md:peer-data-[variant=inset]:border md:peer-data-[variant=inset]:shadow-none md:peer-data-[variant=inset]:peer-data-[state=collapsed]:ml-0">
-        {/* Inset like a Page, so the toggle's icon lines up with the page's
-            text. Without a breadcrumb or actions only phones get the bar, to
-            open the sidebar. */}
+        {/* One 16px inset for the card's corner and its page: the toggle's
+            icon 16px from the card's top and left, over the page's text,
+            which starts 16px in; the controls at either end 10px from the
+            edges. 48px tall, so they centre on the sidebar's header row
+            beside it. No rule under it: the page's own space
+            sets it apart. Without a breadcrumb or actions only phones get
+            the bar, to open the sidebar. */}
         <div
           className={cn(
-            "flex h-12 shrink-0 items-center gap-2 border-b px-4 sm:px-6",
+            "flex h-12 shrink-0 items-center gap-2 px-4",
             !breadcrumb && !actions && "md:hidden",
           )}
         >
-          <ToggleButton label={labels.toggleSidebar} />
+          <BarToggle
+            label={labels.toggleSidebar}
+            separator={Boolean(breadcrumb)}
+          />
           {breadcrumb ? (
-            <>
-              <Separator
-                orientation="vertical"
-                className="data-vertical:h-4 data-vertical:self-center"
-              />
-              <div className="min-w-0 flex-1 truncate">{breadcrumb}</div>
-            </>
+            <div className="min-w-0 flex-1 truncate">{breadcrumb}</div>
           ) : (
             <div className="flex-1" />
           )}
           {actions ? (
-            <div className="flex shrink-0 items-center gap-2">{actions}</div>
+            // The last action 10px from the card's right edge, as from its
+            // top, like the toggle at the other end.
+            <div className="-me-1.5 flex shrink-0 items-center gap-2">
+              {actions}
+            </div>
           ) : null}
         </div>
         <div className="min-h-0 flex-1 overflow-auto">{children}</div>
@@ -475,13 +562,13 @@ function NavButton({
 /** The header row: a 32px pill, like a nav item's, from under the nav pills
  * to the collapse button; the name fills it, the caret at its end. The 28px
  * tile sits 2px inside it (concentric: 16 less 2 is 14), centred over the
- * nav icons, the name where their labels start. Collapsed it is a 28px
+ * nav icons, the larger name 10px clear of it. Collapsed it is a 28px
  * button filled by the tile, the size of a nav icon's hover circle. */
 // min-w-8: while the sidebar opens, the collapse button is already there
 // and the row is still 32px wide; without a floor it squeezed the tile out
 // of sight for a moment, a flicker on every toggle.
 const HEADER_ROW =
-  "w-auto max-w-full min-w-8 flex-1 gap-1.5 ps-0.5 pe-3 transition-[width,height,padding,margin] ease-linear group-data-[collapsible=icon]:size-7! group-data-[collapsible=icon]:min-w-7 group-data-[collapsible=icon]:p-0!";
+  "w-auto max-w-full min-w-8 flex-1 gap-1.5 ps-0.5 pe-3 transition-[width,height,padding,margin] duration-(--sidebar-duration) ease-(--sidebar-ease) group-data-[collapsible=icon]:size-7! group-data-[collapsible=icon]:min-w-7 group-data-[collapsible=icon]:p-0!";
 
 /** A round tile with a mark, or a name's first letter: the header's, 28px
  * open and collapsed, the size of a collapsed nav item's hover circle; or a
@@ -528,17 +615,20 @@ function TenantSwitcher({
       {/* The menu button renders the trigger, as in the account menu. */}
       <SidebarMenuButton
         aria-label={labels.switchTenant(current.name)}
+        // The tenant's tile and name in a 32px row like a nav pill, the
+        // 28px tile 2px inside (concentric: 16 less 2 is 14), centred on
+        // the icon column. Collapsed it is the bare tile, like the icons.
         className={cn(
           HEADER_ROW,
-          "rounded-full data-popup-open:bg-sidebar-accent data-popup-open:text-sidebar-accent-foreground",
+          "h-8 gap-2.5 rounded-full ps-0.5 data-popup-open:bg-sidebar-accent data-popup-open:text-sidebar-accent-foreground",
         )}
         render={<DropdownMenuTrigger />}
       >
         <Tile logo={current.logo} name={current.name} />
-        <span className="min-w-0 flex-1 truncate font-heading font-medium">
+        <span className="min-w-0 flex-1 truncate text-left font-heading text-base font-medium">
           {current.name}
         </span>
-        <CaretDownIcon className="size-3! text-muted-foreground" />
+        <CaretUpDownIcon className="size-3.5! text-muted-foreground" />
       </SidebarMenuButton>
       <DropdownMenuContent
         side="bottom"
@@ -560,9 +650,22 @@ function TenantSwitcher({
             </DropdownMenuRadioItem>
           ))}
         </DropdownMenuRadioGroup>
+        {tenants.actions?.length || tenants.onCreate ? (
+          <DropdownMenuSeparator />
+        ) : null}
+        {tenants.actions?.map((action) => (
+          <DropdownMenuItem key={action.label} onClick={action.onSelect}>
+            <span
+              aria-hidden
+              className="flex size-5 shrink-0 items-center justify-center text-muted-foreground"
+            >
+              {action.icon}
+            </span>
+            {action.label}
+          </DropdownMenuItem>
+        ))}
         {tenants.onCreate ? (
           <>
-            <DropdownMenuSeparator />
             <DropdownMenuItem
               onClick={tenants.onCreate}
               className="text-muted-foreground"
@@ -597,8 +700,8 @@ function FooterActions({ children }: { children: ReactNode }) {
     }
     if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     ref.current?.animate([{ opacity: 0 }, { opacity: 1 }], {
-      duration: 200,
-      easing: "linear",
+      duration: SIDEBAR_DURATION,
+      easing: SIDEBAR_EASE,
     });
   }, [state]);
   return (
@@ -612,10 +715,62 @@ function FooterActions({ children }: { children: ReactNode }) {
   );
 }
 
+/** The search entry: a field-like pill with the nav's icon column, opening
+ * the app's search on click or ⌘K (Ctrl+K off Apple systems). Collapsed it
+ * is a bare icon button with a tooltip. */
+function SearchButton({ search, label }: { search: AppSearch; label: string }) {
+  const onOpen = useRef(search.onOpen);
+  onOpen.current = search.onOpen;
+  const [apple, setApple] = useState(false);
+  useEffect(() => {
+    setApple(/Mac|iPhone|iPad/.test(navigator.platform || navigator.userAgent));
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (
+        event.key.toLowerCase() === "k" &&
+        (event.metaKey || event.ctrlKey) &&
+        !event.altKey &&
+        !event.shiftKey
+      ) {
+        event.preventDefault();
+        onOpen.current();
+      }
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, []);
+  const text = search.placeholder ?? label;
+  return (
+    <SidebarMenu>
+      {/* 32px tall in both states, so the nav below never moves. */}
+      <SidebarMenuItem className="flex h-8 items-center">
+        <SidebarMenuButton
+          tooltip={text}
+          aria-keyshortcuts={apple ? "Meta+K" : "Control+K"}
+          onClick={() => onOpen.current()}
+          className="gap-[11px] rounded-full bg-background pe-1.5 text-muted-foreground ring-1 ring-sidebar-border transition-[width,height,padding,margin] duration-(--sidebar-duration) ease-(--sidebar-ease) ring-inset group-data-[collapsible=icon]:size-7! group-data-[collapsible=icon]:bg-transparent group-data-[collapsible=icon]:p-[5px]! group-data-[collapsible=icon]:ring-0 has-[>svg:first-child]:pl-[7px] [&_svg]:size-[18px]"
+        >
+          <MagnifyingGlassIcon />
+          <span className="flex-1">{text}</span>
+          <kbd className="rounded-full bg-muted px-2 py-0.5 font-sans text-[11px] font-medium text-muted-foreground">
+            {apple ? "⌘K" : "Ctrl K"}
+          </kbd>
+        </SidebarMenuButton>
+      </SidebarMenuItem>
+    </SidebarMenu>
+  );
+}
+
 /** At the end of the brand row while the sidebar is open: the visible way
  * to collapse it, beside ⌘B and the edge. Collapsed, the edge or ⌘B opens
  * it again. */
-function CollapseButton({ label }: { label: string }) {
+function CollapseButton({
+  label,
+  pin,
+}: {
+  label: string;
+  /** The sidebar is open on hover: the button opens it for good. */
+  pin: boolean;
+}) {
   const { setOpen } = useSidebar();
   return (
     <Button
@@ -623,29 +778,145 @@ function CollapseButton({ label }: { label: string }) {
       size="icon"
       aria-label={label}
       title={label}
-      onClick={() => setOpen(false)}
+      onClick={() => setOpen(pin)}
       // Fades in as the sidebar opens, instead of popping in.
-      className="ms-auto shrink-0 animate-in text-muted-foreground duration-200 fade-in group-data-[collapsible=icon]:hidden motion-reduce:animate-none"
+      className="ms-auto shrink-0 animate-in text-muted-foreground duration-(--sidebar-duration) fade-in group-data-[collapsible=icon]:hidden motion-reduce:animate-none"
     >
       <SidebarSimpleIcon />
     </Button>
   );
 }
 
-/** shadcn's SidebarTrigger fixes its screen-reader name in English. */
-function ToggleButton({ label }: { label: string }) {
+/** How the sidebar opens and closes: an ease-out that moves at once and
+ * settles, rather than an ease-in-out, whose slow start and fast middle read
+ * as a stall and a jump. */
+const SIDEBAR_DURATION = 200;
+const SIDEBAR_EASE = "cubic-bezier(0.2, 0, 0, 1)";
+
+/** How long the pointer rests on the collapsed sidebar before it opens, and
+ * how long it may be away before it closes, so passing over it or slipping
+ * off its edge does nothing, yet short enough to feel immediate. */
+const PEEK_OPEN_DELAY = 200;
+const PEEK_CLOSE_DELAY = 150;
+
+/**
+ * Opens the collapsed sidebar while the pointer is over it, as a panel over
+ * the card. Desktop pointers only; it stays open while a menu opened from it
+ * is open, as the menu's popup is outside it, and closes when the user
+ * collapses or opens the sidebar for good. Keyboard users have the tooltips.
+ */
+function usePeek(pinned: boolean) {
+  const isMobile = useIsMobile();
+  const [open, setOpen] = useState(false);
+  // Still over the card while it closes, until the animation ends.
+  const [closing, setClosing] = useState(false);
+  const timer = useRef<number | undefined>(undefined);
+  const settle = useRef<number | undefined>(undefined);
+  const over = useRef(false);
+  const clear = () => window.clearTimeout(timer.current);
+  useEffect(
+    () => () => {
+      clear();
+      window.clearTimeout(settle.current);
+    },
+    [],
+  );
+
+  /** Closed by the user opening or collapsing the sidebar for good. */
+  const close = () => {
+    clear();
+    window.clearTimeout(settle.current);
+    setOpen(false);
+    setClosing(false);
+  };
+  const shut = () => {
+    setOpen(false);
+    setClosing(true);
+    window.clearTimeout(settle.current);
+    settle.current = window.setTimeout(
+      () => setClosing(false),
+      SIDEBAR_DURATION,
+    );
+  };
+  const closeLater = (container: HTMLElement) => {
+    clear();
+    timer.current = window.setTimeout(function check() {
+      if (over.current) return;
+      // A menu from the sidebar is open: wait until it closes.
+      if (container.querySelector("[data-popup-open]")) {
+        timer.current = window.setTimeout(check, PEEK_CLOSE_DELAY);
+        return;
+      }
+      shut();
+    }, PEEK_CLOSE_DELAY);
+  };
+
+  if (isMobile) return { open: false, over: false, close, handlers: {} };
+  return {
+    open: open && !pinned,
+    /** Lying over the card: open, or closing from open. */
+    over: (open || closing) && !pinned,
+    close,
+    handlers: {
+      onPointerEnter: (e: ReactPointerEvent<HTMLDivElement>) => {
+        over.current = true;
+        if (pinned || e.pointerType !== "mouse") return;
+        // Not while the edge is dragged.
+        if (e.currentTarget.closest("[data-resizing]")) return;
+        clear();
+        window.clearTimeout(settle.current);
+        setClosing(false);
+        if (!open)
+          timer.current = window.setTimeout(
+            () => setOpen(true),
+            PEEK_OPEN_DELAY,
+          );
+      },
+      onPointerLeave: (e: ReactPointerEvent<HTMLDivElement>) => {
+        over.current = false;
+        if (pinned) return;
+        closeLater(e.currentTarget);
+      },
+    },
+  };
+}
+
+/**
+ * The top bar's sidebar toggle, and a rule before the breadcrumb. It stays
+ * in the card's corner whether the sidebar is open or collapsed (phones use
+ * it to open the sheet); the sidebar's own collapse button is left out
+ * while there is a top bar.
+ * shadcn's SidebarTrigger fixes its screen-reader name in English.
+ */
+function BarToggle({
+  label,
+  separator,
+}: {
+  label: string;
+  separator: boolean;
+}) {
   const { toggleSidebar } = useSidebar();
   return (
-    <Button
-      variant="ghost"
-      size="icon-sm"
-      aria-label={label}
-      title={label}
-      onClick={toggleSidebar}
-      className="-ms-1.5"
-    >
-      <SidebarSimpleIcon />
-    </Button>
+    <>
+      <Button
+        variant="ghost"
+        size="icon-sm"
+        aria-label={label}
+        title={label}
+        onClick={toggleSidebar}
+        // The icon 16px from the card's left edge, as from its top, over
+        // the page's text: the 28px button 10px in.
+        className="-ms-1.5 text-muted-foreground"
+      >
+        <SidebarSimpleIcon />
+      </Button>
+      {separator ? (
+        <Separator
+          orientation="vertical"
+          className="data-vertical:h-4 data-vertical:self-center"
+        />
+      ) : null}
+    </>
   );
 }
 
@@ -810,7 +1081,8 @@ function ResizeHandle({
       // Positioned in the sidebar's container, whose right edge is the
       // card's: 12px wide, with the line against the card's border, as on
       // the reference console.
-      className="group/resize absolute inset-y-0 -right-[5px] z-20 hidden w-3 cursor-col-resize touch-none outline-none md:block"
+      // Hidden while the sidebar is open on hover, over the card.
+      className="group/resize absolute inset-y-0 -right-[5px] z-20 hidden w-3 cursor-col-resize touch-none outline-none in-data-peek:hidden! md:block"
     >
       <span className="pointer-events-none absolute inset-y-3 right-[5px] w-px bg-foreground mask-[linear-gradient(to_bottom,transparent,black_12%,black_88%,transparent)] opacity-0 transition-opacity group-hover/resize:opacity-20 group-focus-visible/resize:opacity-60" />
     </div>
@@ -848,14 +1120,14 @@ function AccountMenu({
             aria-label={labels.account(account.name)}
             // The 24px avatar centred under the logo and nav icons, 4px from
             // the pill on every side, the name in line with their labels.
-            className="gap-2 rounded-full ps-1 transition-[width,height,padding,margin] ease-linear group-data-[collapsible=icon]:size-7! group-data-[collapsible=icon]:p-1! data-popup-open:bg-sidebar-accent data-popup-open:text-sidebar-accent-foreground"
+            className="gap-2 rounded-full ps-1 transition-[width,height,padding,margin] duration-(--sidebar-duration) ease-(--sidebar-ease) group-data-[collapsible=icon]:size-7! group-data-[collapsible=icon]:p-1! data-popup-open:bg-sidebar-accent data-popup-open:text-sidebar-accent-foreground"
             render={<DropdownMenuTrigger />}
           >
             <PersonAvatar
               name={account.name}
               src={account.avatar}
               size="sm"
-              className="transition-[width,height] duration-200 ease-linear group-data-[collapsible=icon]:size-5!"
+              className="transition-[width,height] duration-(--sidebar-duration) ease-(--sidebar-ease) group-data-[collapsible=icon]:size-5!"
             />
             {/* The email waits in the menu, which leaves room for the
                 footer's buttons. */}

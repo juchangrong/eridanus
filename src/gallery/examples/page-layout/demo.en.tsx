@@ -1,7 +1,7 @@
 import {
   GearIcon,
+  MonitorPlayIcon,
   PlanetIcon,
-  PlayCircleIcon,
   PresentationChartIcon,
   StackIcon,
 } from "@phosphor-icons/react";
@@ -22,14 +22,11 @@ import { Button } from "@/components/ui/button";
 const NAV = [
   {
     items: [
-      { href: "/runs", label: "Runs", icon: <PlayCircleIcon /> },
+      { href: "/runs", label: "Runs", icon: <MonitorPlayIcon /> },
       { href: "/flows", label: "Workflows", icon: <StackIcon />, active: true },
       { href: "/metrics", label: "Metrics", icon: <PresentationChartIcon /> },
+      { href: "/settings", label: "Settings", icon: <GearIcon /> },
     ],
-  },
-  {
-    title: "Admin",
-    items: [{ href: "/settings", label: "Settings", icon: <GearIcon /> }],
   },
 ];
 
