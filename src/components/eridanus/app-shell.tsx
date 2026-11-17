@@ -1,6 +1,7 @@
 import {
-  CaretDownIcon,
+  CaretUpDownIcon,
   DesktopIcon,
+  MagnifyingGlassIcon,
   MoonIcon,
   PlusIcon,
   SidebarSimpleIcon,
@@ -72,6 +73,16 @@ export interface AppTenant {
   /** A mark for the tile; without one, the tile shows the name's first
    * letter. */
   logo?: ReactNode;
+  /** A second line under the name, such as the environment ("Production"). */
+  description?: ReactNode;
+}
+
+/** The search entry under the header: a field-like button that opens the
+ * app's own search or command palette, also on ⌘K (Ctrl+K elsewhere). */
+export interface AppSearch {
+  onOpen: () => void;
+  /** The button's text; defaults to the built-in "Search". */
+  placeholder?: string;
 }
 
 export interface AppTenants {
@@ -127,6 +138,7 @@ export interface AppShellLabels {
   /** The tenant switcher's accessible name, given the current tenant. */
   switchTenant: (name: string) => string;
   newTenant: string;
+  search: string;
   theme: string;
   system: string;
   light: string;
@@ -144,6 +156,7 @@ export const appShellLabels: Record<Locale, AppShellLabels> = {
     account: (name) => `账号菜单：${name}`,
     switchTenant: (name) => `切换租户：${name}`,
     newTenant: "新建租户",
+    search: "搜索",
     theme: "主题",
     system: "跟随系统",
     light: "浅色",
@@ -158,6 +171,7 @@ export const appShellLabels: Record<Locale, AppShellLabels> = {
     account: (name) => `Account menu: ${name}`,
     switchTenant: (name) => `Switch tenant: ${name}`,
     newTenant: "New tenant",
+    search: "Search",
     theme: "Theme",
     system: "System",
     light: "Light",
@@ -238,7 +252,8 @@ const defaultLink = (href: string) => <a href={href} />;
 
 /**
  * The frame of a console app. The sidebar sits on the window's own background
- * with the product (or, with `tenants`, a switcher between them), navigation
+ * with the product (or, with `tenants`, a switcher between them, a card with
+ * an optional second line), an optional search entry (⌘K), navigation
  * groups under small headings and, at its
  * foot, the account menu beside a few icon buttons; the page sits in a card
  * inset from the window. A breadcrumb or page-wide actions get a top bar
@@ -258,6 +273,7 @@ const defaultLink = (href: string) => <a href={href} />;
 export function AppShell({
   brand,
   tenants,
+  search,
   nav,
   account,
   breadcrumb,
@@ -273,6 +289,8 @@ export function AppShell({
   /** Makes the header a tenant switcher, in place of the brand link: the
    * current tenant's tile and name, opening a menu of the others. */
   tenants?: AppTenants;
+  /** A search button under the header, with ⌘K to open it. */
+  search?: AppSearch;
   nav: AppNavGroup[];
   account?: AppAccount;
   /** A Breadcrumb for the current page, in a top bar inside the card. */
@@ -341,6 +359,9 @@ export function AppShell({
               <CollapseButton label={labels.collapseSidebar} />
             </SidebarMenuItem>
           </SidebarMenu>
+          {search ? (
+            <SearchButton search={search} label={labels.search} />
+          ) : null}
         </SidebarHeader>
         <SidebarContent
           ref={fadeScrollEdges}
@@ -528,17 +549,27 @@ function TenantSwitcher({
       {/* The menu button renders the trigger, as in the account menu. */}
       <SidebarMenuButton
         aria-label={labels.switchTenant(current.name)}
+        // A card: the tenant on the window's ground, with its name and a
+        // second line, the 28px tile 6px inside (concentric: 20 less 6 is
+        // 14). Collapsed it is the bare tile, like the other icons.
         className={cn(
           HEADER_ROW,
-          "rounded-full data-popup-open:bg-sidebar-accent data-popup-open:text-sidebar-accent-foreground",
+          "h-10 gap-2.5 rounded-full bg-background ps-1.5 ring-1 ring-sidebar-border group-data-[collapsible=icon]:bg-transparent group-data-[collapsible=icon]:ring-0 data-popup-open:bg-sidebar-accent data-popup-open:text-sidebar-accent-foreground",
         )}
         render={<DropdownMenuTrigger />}
       >
         <Tile logo={current.logo} name={current.name} />
-        <span className="min-w-0 flex-1 truncate font-heading font-medium">
-          {current.name}
+        <span className="grid min-w-0 flex-1 text-left leading-tight">
+          <span className="truncate font-heading font-medium">
+            {current.name}
+          </span>
+          {current.description ? (
+            <span className="truncate text-xs text-muted-foreground">
+              {current.description}
+            </span>
+          ) : null}
         </span>
-        <CaretDownIcon className="size-3! text-muted-foreground" />
+        <CaretUpDownIcon className="size-3.5! text-muted-foreground" />
       </SidebarMenuButton>
       <DropdownMenuContent
         side="bottom"
@@ -609,6 +640,51 @@ function FooterActions({ children }: { children: ReactNode }) {
     >
       {children}
     </div>
+  );
+}
+
+/** The search entry: a field-like pill with the nav's icon column, opening
+ * the app's search on click or ⌘K (Ctrl+K off Apple systems). Collapsed it
+ * is a bare icon button with a tooltip. */
+function SearchButton({ search, label }: { search: AppSearch; label: string }) {
+  const onOpen = useRef(search.onOpen);
+  onOpen.current = search.onOpen;
+  const [apple, setApple] = useState(false);
+  useEffect(() => {
+    setApple(/Mac|iPhone|iPad/.test(navigator.platform || navigator.userAgent));
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (
+        event.key.toLowerCase() === "k" &&
+        (event.metaKey || event.ctrlKey) &&
+        !event.altKey &&
+        !event.shiftKey
+      ) {
+        event.preventDefault();
+        onOpen.current();
+      }
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, []);
+  const text = search.placeholder ?? label;
+  return (
+    <SidebarMenu>
+      {/* 32px tall in both states, so the nav below never moves. */}
+      <SidebarMenuItem className="flex h-8 items-center">
+        <SidebarMenuButton
+          tooltip={text}
+          aria-keyshortcuts={apple ? "Meta+K" : "Control+K"}
+          onClick={() => onOpen.current()}
+          className="gap-[11px] rounded-full bg-background pe-1.5 text-muted-foreground ring-1 ring-sidebar-border transition-[width,height,padding,margin] ease-linear group-data-[collapsible=icon]:size-7! group-data-[collapsible=icon]:bg-transparent group-data-[collapsible=icon]:p-[5px]! group-data-[collapsible=icon]:ring-0 has-[>svg:first-child]:pl-[7px] [&_svg]:size-[18px]"
+        >
+          <MagnifyingGlassIcon />
+          <span className="flex-1">{text}</span>
+          <kbd className="rounded-full bg-muted px-2 py-0.5 font-sans text-[11px] font-medium text-muted-foreground">
+            {apple ? "⌘K" : "Ctrl K"}
+          </kbd>
+        </SidebarMenuButton>
+      </SidebarMenuItem>
+    </SidebarMenu>
   );
 }
 
