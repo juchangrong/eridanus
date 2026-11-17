@@ -79,9 +79,9 @@ export function ConfirmDialog({
     >
       <AlertDialogTrigger render={trigger} />
       {/* Tighter than shadcn's 24px: 16px around and between text and
-          buttons, with corners concentric with the 28px pill buttons in the
-          bottom corner (their 14px radius plus the 16px inset is 30). */}
-      <AlertDialogContent className="gap-4 rounded-[30px] p-4">
+          buttons, with corners concentric with the 32px pill buttons in the
+          bottom corner (their 16px radius plus the 16px inset is 32). */}
+      <AlertDialogContent className="gap-4 rounded-[32px] p-4">
         <AlertDialogHeader>
           <AlertDialogTitle>{title}</AlertDialogTitle>
           <AlertDialogDescription>{description}</AlertDialogDescription>
@@ -93,11 +93,10 @@ export function ConfirmDialog({
           />
         ) : null}
         <AlertDialogFooter>
-          <AlertDialogCancel size="sm" disabled={pending}>
+          <AlertDialogCancel disabled={pending}>
             {cancelLabel ?? t.cancel}
           </AlertDialogCancel>
           <Button
-            size="sm"
             variant={destructive ? "destructive" : "default"}
             disabled={pending}
             aria-busy={pending || undefined}
