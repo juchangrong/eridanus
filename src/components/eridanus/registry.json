@@ -154,7 +154,10 @@
       "title": "FormInput",
       "description": "A labelled text input with a hint and an error, both linked through aria-describedby, aria-invalid while there is an error, and a required marker. Accepts every input prop.",
       "categories": ["forms"],
-      "registryDependencies": ["field", "juchangrong/eridanus/input"],
+      "registryDependencies": [
+        "juchangrong/eridanus/field",
+        "juchangrong/eridanus/input"
+      ],
       "files": [
         {
           "path": "form-input.tsx",

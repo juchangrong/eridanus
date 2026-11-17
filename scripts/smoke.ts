@@ -282,6 +282,7 @@ for (const fork of [
   "badge",
   "tabs",
   "command",
+  "field",
 ]) {
   const file = join(app, "src", "components", "ui", `${fork}.tsx`);
   if (

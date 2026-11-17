@@ -152,6 +152,21 @@
       ]
     },
     {
+      "name": "field",
+      "type": "registry:ui",
+      "title": "Field",
+      "description": "Eridanus fork of the shadcn base-rhea field, installed in place of it at components/ui/field.tsx. Stacked, a field's label, control, description and error sit 8px apart instead of 12, so the label reads as its control's heading and fields (24px apart in a FieldGroup) stand clearly apart; side by side they keep 12px. Same API as shadcn's.",
+      "categories": ["forms", "shadcn-fork"],
+      "dependencies": ["class-variance-authority", "cn"],
+      "registryDependencies": ["label", "separator"],
+      "files": [
+        {
+          "path": "field.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
       "name": "tabs",
       "type": "registry:ui",
       "title": "Tabs",

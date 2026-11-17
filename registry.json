@@ -48,7 +48,8 @@
         "juchangrong/eridanus/toggle",
         "juchangrong/eridanus/toggle-group",
         "juchangrong/eridanus/badge",
-        "juchangrong/eridanus/tabs"
+        "juchangrong/eridanus/tabs",
+        "juchangrong/eridanus/field"
       ],
       "cssVars": {
         "theme": {
