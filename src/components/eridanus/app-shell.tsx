@@ -351,9 +351,8 @@ export function AppShell({
           // Collapsed, the sidebar is 28px icon buttons with 8px on either
           // side: 44px, the last 8 being the gap before the card.
           "--sidebar-width-icon": "1.75rem",
-          // How the sidebar opens and closes, after the Cloudflare
-          // dashboard: 250ms, easing in and out. Its width, the gap beside
-          // it and everything that moves with it share the timing.
+          // Its width, the gap beside it and everything that moves with it
+          // share one timing.
           "--sidebar-duration": `${SIDEBAR_DURATION}ms`,
           "--sidebar-ease": SIDEBAR_EASE,
         } as CSSProperties
@@ -759,14 +758,17 @@ function CollapseButton({
   );
 }
 
-const SIDEBAR_DURATION = 250;
-const SIDEBAR_EASE = "cubic-bezier(0.77, 0, 0.175, 1)";
+/** How the sidebar opens and closes: an ease-out that moves at once and
+ * settles, rather than an ease-in-out, whose slow start and fast middle read
+ * as a stall and a jump. */
+const SIDEBAR_DURATION = 200;
+const SIDEBAR_EASE = "cubic-bezier(0.2, 0, 0, 1)";
 
 /** How long the pointer rests on the collapsed sidebar before it opens, and
  * how long it may be away before it closes, so passing over it or slipping
- * off its edge does nothing; the Cloudflare dashboard's timings. */
-const PEEK_OPEN_DELAY = 450;
-const PEEK_CLOSE_DELAY = 1000;
+ * off its edge does nothing, yet short enough to feel immediate. */
+const PEEK_OPEN_DELAY = 200;
+const PEEK_CLOSE_DELAY = 300;
 
 /**
  * Opens the collapsed sidebar while the pointer is over it, as a panel over
