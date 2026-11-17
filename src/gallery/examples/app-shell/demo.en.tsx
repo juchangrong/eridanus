@@ -7,6 +7,7 @@ import {
   PlanetIcon,
   PresentationChartIcon,
   QuestionIcon,
+  ShieldCheckIcon,
   StackIcon,
   UserIcon,
 } from "@phosphor-icons/react";
@@ -105,6 +106,13 @@ export default function AppShellDemo() {
           items: TENANTS,
           current: tenant,
           onSelect: setTenant,
+          actions: [
+            {
+              label: "Admin Console",
+              icon: <ShieldCheckIcon />,
+              onSelect: () => notify("Open the admin console"),
+            },
+          ],
           onCreate: () => notify("New tenant"),
         }}
         search={{ onOpen: () => setSearching(true) }}

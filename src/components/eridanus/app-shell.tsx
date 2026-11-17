@@ -89,6 +89,9 @@ export interface AppTenants {
   /** The id of the tenant the app is in. */
   current: string;
   onSelect: (id: string) => void;
+  /** Items under the tenants, before "new tenant", such as a link to the
+   * admin console. The icon sits in the tiles' 20px column. */
+  actions?: { label: string; icon?: ReactNode; onSelect: () => void }[];
   /** Adds a "new tenant" item at the end of the menu. */
   onCreate?: () => void;
 }
@@ -639,9 +642,22 @@ function TenantSwitcher({
             </DropdownMenuRadioItem>
           ))}
         </DropdownMenuRadioGroup>
+        {tenants.actions?.length || tenants.onCreate ? (
+          <DropdownMenuSeparator />
+        ) : null}
+        {tenants.actions?.map((action) => (
+          <DropdownMenuItem key={action.label} onClick={action.onSelect}>
+            <span
+              aria-hidden
+              className="flex size-5 shrink-0 items-center justify-center text-muted-foreground"
+            >
+              {action.icon}
+            </span>
+            {action.label}
+          </DropdownMenuItem>
+        ))}
         {tenants.onCreate ? (
           <>
-            <DropdownMenuSeparator />
             <DropdownMenuItem
               onClick={tenants.onCreate}
               className="text-muted-foreground"

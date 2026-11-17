@@ -7,6 +7,7 @@ import {
   PlanetIcon,
   PresentationChartIcon,
   QuestionIcon,
+  ShieldCheckIcon,
   StackIcon,
   UserIcon,
 } from "@phosphor-icons/react";
@@ -105,6 +106,13 @@ export default function AppShellDemo() {
           items: TENANTS,
           current: tenant,
           onSelect: setTenant,
+          actions: [
+            {
+              label: "管理控制台",
+              icon: <ShieldCheckIcon />,
+              onSelect: () => notify("打开管理控制台"),
+            },
+          ],
           onCreate: () => notify("新建租户"),
         }}
         search={{ onOpen: () => setSearching(true) }}
