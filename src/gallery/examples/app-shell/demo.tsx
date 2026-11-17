@@ -1,40 +1,34 @@
 import {
   BellIcon,
-  ChartLineIcon,
-  GearSixIcon,
-  ListChecksIcon,
+  GearIcon,
+  LightningIcon,
   PlanetIcon,
-  QueueIcon,
+  PlayCircleIcon,
+  PresentationChartIcon,
+  StackIcon,
+  UserCircleIcon,
   UserIcon,
-  UsersThreeIcon,
 } from "@phosphor-icons/react";
 import { useState } from "react";
 
 import { type AppNavGroup, AppShell } from "@/components/eridanus/app-shell";
 import { Page, PageHeader, StatStrip } from "@/components/eridanus/page-layout";
 import { notify } from "@/components/eridanus/toaster";
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbList,
-  BreadcrumbPage,
-  BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb";
 import { Button } from "@/components/ui/button";
 import { DropdownMenuItem } from "@/components/ui/dropdown-menu";
 
 const PAGES = [
-  { href: "/runs", label: "运行记录", icon: <ListChecksIcon />, badge: 3 },
-  { href: "/queues", label: "队列", icon: <QueueIcon /> },
-  { href: "/metrics", label: "监控", icon: <ChartLineIcon /> },
-  { href: "/members", label: "成员", icon: <UsersThreeIcon /> },
-  { href: "/settings", label: "设置", icon: <GearSixIcon /> },
+  { href: "/runs", label: "运行记录", icon: <PlayCircleIcon /> },
+  { href: "/queues", label: "队列", icon: <StackIcon /> },
+  { href: "/metrics", label: "监控", icon: <PresentationChartIcon /> },
+  { href: "/members", label: "成员", icon: <UserCircleIcon /> },
+  { href: "/settings", label: "设置", icon: <GearIcon /> },
 ];
 
 export default function AppShellDemo() {
   // In an app the router knows the current page; here a click sets it.
   const [current, setCurrent] = useState("/runs");
+  const [tenant, setTenant] = useState("ops");
   const page = PAGES.find((p) => p.href === current)!;
   const items = PAGES.map((p) => ({ ...p, active: p.href === current }));
   const nav: AppNavGroup[] = [
@@ -45,10 +39,20 @@ export default function AppShellDemo() {
   return (
     // The shell fills the viewport; the docs frame it in a box, which the
     // transform makes the containing block for the sidebar's fixed panel.
-    <div className="h-[34rem] w-full transform-gpu overflow-hidden rounded-lg border [&_[data-slot=sidebar-container]]:h-full">
+    <div className="h-[34rem] w-full transform-gpu overflow-hidden rounded-lg border in-data-fullscreen:h-full [&_[data-slot=sidebar-container]]:h-full">
       <AppShell
         className="h-full"
         brand={{ name: "运营台", logo: <PlanetIcon weight="fill" /> }}
+        tenants={{
+          items: [
+            { id: "ops", name: "运营台", logo: <PlanetIcon weight="fill" /> },
+            { id: "growth", name: "增长团队" },
+            { id: "lab", name: "实验室" },
+          ],
+          current: tenant,
+          onSelect: setTenant,
+          onCreate: () => notify("新建租户"),
+        }}
         nav={nav}
         renderLink={(href) => (
           // eslint-disable-next-line jsx-a11y/anchor-has-content -- the shell renders the label into it
@@ -60,23 +64,20 @@ export default function AppShellDemo() {
             }}
           />
         )}
-        breadcrumb={
-          <Breadcrumb>
-            <BreadcrumbList>
-              <BreadcrumbItem>
-                <BreadcrumbLink href="/">运营台</BreadcrumbLink>
-              </BreadcrumbItem>
-              <BreadcrumbSeparator />
-              <BreadcrumbItem>
-                <BreadcrumbPage>{page.label}</BreadcrumbPage>
-              </BreadcrumbItem>
-            </BreadcrumbList>
-          </Breadcrumb>
-        }
-        actions={
-          <Button variant="ghost" size="icon-sm" aria-label="通知" title="通知">
-            <BellIcon />
-          </Button>
+        footerActions={
+          <>
+            <Button
+              variant="ghost"
+              size="icon"
+              aria-label="最新动态"
+              title="最新动态"
+            >
+              <LightningIcon />
+            </Button>
+            <Button variant="ghost" size="icon" aria-label="通知" title="通知">
+              <BellIcon />
+            </Button>
+          </>
         }
         account={{
           name: "林小雨",

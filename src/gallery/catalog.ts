@@ -118,6 +118,7 @@ const GROUPS: { id: string; title: Localized; names: string[] }[] = [
     id: "forms",
     title: { "zh-CN": "表单与筛选", "en-US": "Forms and filters" },
     names: [
+      "field",
       "form-input",
       "search-field",
       "filter-select",
@@ -231,14 +232,6 @@ const PRIMITIVE_PAGES: Record<
       "zh-CN": "没有内容时的占位区域：图标、标题、说明和下一步操作。",
       "en-US":
         "The placeholder for no content: an icon, a title, a description and a next step.",
-    },
-  },
-  field: {
-    title: "Field",
-    description: {
-      "zh-CN": "表单字段的结构：标签、控件、说明和错误信息，并为读屏器关联好。",
-      "en-US":
-        "The structure of a form field: label, control, description and error, wired for screen readers.",
     },
   },
   label: {

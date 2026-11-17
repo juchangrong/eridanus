@@ -1,40 +1,34 @@
 import {
   BellIcon,
-  ChartLineIcon,
-  GearSixIcon,
-  ListChecksIcon,
+  GearIcon,
+  LightningIcon,
   PlanetIcon,
-  QueueIcon,
+  PlayCircleIcon,
+  PresentationChartIcon,
+  StackIcon,
+  UserCircleIcon,
   UserIcon,
-  UsersThreeIcon,
 } from "@phosphor-icons/react";
 import { useState } from "react";
 
 import { type AppNavGroup, AppShell } from "@/components/eridanus/app-shell";
 import { Page, PageHeader, StatStrip } from "@/components/eridanus/page-layout";
 import { notify } from "@/components/eridanus/toaster";
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbList,
-  BreadcrumbPage,
-  BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb";
 import { Button } from "@/components/ui/button";
 import { DropdownMenuItem } from "@/components/ui/dropdown-menu";
 
 const PAGES = [
-  { href: "/runs", label: "Runs", icon: <ListChecksIcon />, badge: 3 },
-  { href: "/queues", label: "Queues", icon: <QueueIcon /> },
-  { href: "/metrics", label: "Metrics", icon: <ChartLineIcon /> },
-  { href: "/members", label: "Members", icon: <UsersThreeIcon /> },
-  { href: "/settings", label: "Settings", icon: <GearSixIcon /> },
+  { href: "/runs", label: "Runs", icon: <PlayCircleIcon /> },
+  { href: "/queues", label: "Queues", icon: <StackIcon /> },
+  { href: "/metrics", label: "Metrics", icon: <PresentationChartIcon /> },
+  { href: "/members", label: "Members", icon: <UserCircleIcon /> },
+  { href: "/settings", label: "Settings", icon: <GearIcon /> },
 ];
 
 export default function AppShellDemo() {
   // In an app the router knows the current page; here a click sets it.
   const [current, setCurrent] = useState("/runs");
+  const [tenant, setTenant] = useState("ops");
   const page = PAGES.find((p) => p.href === current)!;
   const items = PAGES.map((p) => ({ ...p, active: p.href === current }));
   const nav: AppNavGroup[] = [
@@ -45,10 +39,24 @@ export default function AppShellDemo() {
   return (
     // The shell fills the viewport; the docs frame it in a box, which the
     // transform makes the containing block for the sidebar's fixed panel.
-    <div className="h-[34rem] w-full transform-gpu overflow-hidden rounded-lg border [&_[data-slot=sidebar-container]]:h-full">
+    <div className="h-[34rem] w-full transform-gpu overflow-hidden rounded-lg border in-data-fullscreen:h-full [&_[data-slot=sidebar-container]]:h-full">
       <AppShell
         className="h-full"
         brand={{ name: "Ops console", logo: <PlanetIcon weight="fill" /> }}
+        tenants={{
+          items: [
+            {
+              id: "ops",
+              name: "Ops console",
+              logo: <PlanetIcon weight="fill" />,
+            },
+            { id: "growth", name: "Growth" },
+            { id: "lab", name: "Research lab" },
+          ],
+          current: tenant,
+          onSelect: setTenant,
+          onCreate: () => notify("New tenant"),
+        }}
         nav={nav}
         renderLink={(href) => (
           // eslint-disable-next-line jsx-a11y/anchor-has-content -- the shell renders the label into it
@@ -60,28 +68,25 @@ export default function AppShellDemo() {
             }}
           />
         )}
-        breadcrumb={
-          <Breadcrumb>
-            <BreadcrumbList>
-              <BreadcrumbItem>
-                <BreadcrumbLink href="/">Ops console</BreadcrumbLink>
-              </BreadcrumbItem>
-              <BreadcrumbSeparator />
-              <BreadcrumbItem>
-                <BreadcrumbPage>{page.label}</BreadcrumbPage>
-              </BreadcrumbItem>
-            </BreadcrumbList>
-          </Breadcrumb>
-        }
-        actions={
-          <Button
-            variant="ghost"
-            size="icon-sm"
-            aria-label="Notifications"
-            title="Notifications"
-          >
-            <BellIcon />
-          </Button>
+        footerActions={
+          <>
+            <Button
+              variant="ghost"
+              size="icon"
+              aria-label="What's new"
+              title="What's new"
+            >
+              <LightningIcon />
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon"
+              aria-label="Notifications"
+              title="Notifications"
+            >
+              <BellIcon />
+            </Button>
+          </>
         }
         account={{
           name: "Avery Lin",

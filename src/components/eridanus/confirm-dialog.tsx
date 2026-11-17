@@ -78,7 +78,11 @@ export function ConfirmDialog({
       }}
     >
       <AlertDialogTrigger render={trigger} />
-      <AlertDialogContent>
+      {/* Tighter than shadcn's 24px: 16px around and between text and
+          buttons. The corners are 20px, a card's, not matched to the pill
+          buttons: at a 16px inset the button reads as its own shape, and a
+          32px corner looked oversized on a dialog this short. */}
+      <AlertDialogContent className="gap-4 rounded-[20px] p-4">
         <AlertDialogHeader>
           <AlertDialogTitle>{title}</AlertDialogTitle>
           <AlertDialogDescription>{description}</AlertDialogDescription>
@@ -90,11 +94,10 @@ export function ConfirmDialog({
           />
         ) : null}
         <AlertDialogFooter>
-          <AlertDialogCancel size="sm" disabled={pending}>
+          <AlertDialogCancel disabled={pending}>
             {cancelLabel ?? t.cancel}
           </AlertDialogCancel>
           <Button
-            size="sm"
             variant={destructive ? "destructive" : "default"}
             disabled={pending}
             aria-busy={pending || undefined}
