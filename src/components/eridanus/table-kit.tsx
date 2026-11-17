@@ -13,16 +13,16 @@ const MESSAGES: Record<Locale, { loading: string }> = {
 
 /**
  * The area a table scrolls in, open on the page rather than in a card. It
- * scrolls both ways and keeps a TableHeaderRow pinned. Body rows have no rules
- * between them unless `rules` is set; padding and the hover ground keep them
- * apart. `bleed` pulls the area into the page gutter by a cell's padding, so
+ * scrolls both ways and keeps a TableHeaderRow pinned. Body rows keep
+ * shadcn's rule under each row; `rules={false}` leaves them out, with padding
+ * and the hover ground keeping the rows apart. `bleed` pulls the area into the page gutter by a cell's padding, so
  * the first column lines up with the headings above. `fill` keeps a minimum
  * height inside a page that gives the table the remaining height.
  */
 export function TableScroll({
   children,
   bleed = true,
-  rules = false,
+  rules = true,
   fill = false,
   className,
 }: {
@@ -51,8 +51,8 @@ export function TableScroll({
 }
 
 /**
- * The column header row: small muted labels on one line, pinned while the
- * table scrolls. Its rule is an inset shadow, because a pinned row's border
+ * The column header row, as shadcn's table draws it (medium-weight labels in
+ * the text color, 40px tall), pinned while the table scrolls. Its rule is an inset shadow, because a pinned row's border
  * stays behind as the rows scroll under it. Put TableHead cells inside.
  */
 export function TableHeaderRow({
@@ -69,7 +69,7 @@ export function TableHeaderRow({
         className,
       )}
     >
-      <TableRow className="border-b-0 hover:bg-transparent [&_th]:h-9 [&_th]:text-xs [&_th]:text-muted-foreground [&_th]:shadow-[inset_0_-1px_0_var(--color-border)]">
+      <TableRow className="border-b-0 hover:bg-transparent [&_th]:shadow-[inset_0_-1px_0_var(--color-border)]">
         {children}
       </TableRow>
     </TableHeader>

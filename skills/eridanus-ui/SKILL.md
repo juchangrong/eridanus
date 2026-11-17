@@ -15,7 +15,7 @@ Installed files live in `components/eridanus/`, `lib/eridanus/` and `hooks/erida
 
 ## Rules
 
-1. **Open layout.** Sections, tables and figures sit on the page ground, separated by space, headings and padding. Do not wrap page content in cards or bordered boxes, and do not draw rules between table or list rows. Cards are for self-contained panels such as a sidebar status box.
+1. **Open layout.** Sections, tables and figures sit on the page ground, separated by space, headings and padding. Do not wrap page content in cards or bordered boxes. Tables keep shadcn's table look, a rule under each row, without a frame around them. Cards are for self-contained panels such as a sidebar status box.
 2. **Exact on demand.** Show times with `Time` (readable on the surface, exact in the tooltip and for screen readers). A shortened ID, name or value keeps its full form one hover away: `IdText` for identifiers, `title` or a tooltip otherwise.
 3. **Status never relies on color alone.** Use `ToneBadge` with the status word. Color marks only what needs action: failures (`error`, `text-destructive`), backlog or stale work (`warning`, `text-warning`). Everything else stays neutral.
 4. **Contrast.** Text keeps 4.5:1 in both themes. Use the tokens (`text-muted-foreground`, `text-success`, `bg-warning/10`, …), never raw palette colors, and check any new tint.

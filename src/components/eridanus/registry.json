@@ -228,7 +228,7 @@
       "name": "table-kit",
       "type": "registry:component",
       "title": "Table kit",
-      "description": "Helpers for open tables built on the shadcn table: TableScroll (scrolls both ways, no rules between body rows, pins the header), TableHeaderRow (compact muted pinned header), TableRows (loading, empty and rows states), ClickableRow (whole-row click forwarded to the row's first link or button, selected and warning/error tints) and clickFirstControl.",
+      "description": "Helpers for open tables built on the shadcn table: TableScroll (scrolls both ways, pins the header, keeps shadcn's rule under each row unless rules={false}), TableHeaderRow (shadcn's header row, pinned), TableRows (loading, empty and rows states), ClickableRow (whole-row click forwarded to the row's first link or button, selected and warning/error tints) and clickFirstControl.",
       "categories": ["table", "data-display"],
       "registryDependencies": [
         "table",
