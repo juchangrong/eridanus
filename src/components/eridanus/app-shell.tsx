@@ -88,7 +88,10 @@ export interface AppNavItem {
   href: string;
   /** A Phosphor icon element, such as <PlayCircleIcon />, in its outline
    * weight; it stays outline on the current page, which the pill's
-   * background marks. Collapsed to icons, the sidebar shows only this, with
+   * background marks. It sits centred on the pill's rounded end, so pick
+   * icons of one visual size whose ink balances on their centre (a circle,
+   * a stack, a gear); a lopsided glyph, such as a chart with its axes on one
+   * side, looks off-centre there. Collapsed to icons, the sidebar shows only this, with
    * the label in a tooltip. */
   icon?: ReactNode;
   /** The current page. The consumer's router decides; the shell marks it

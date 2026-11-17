@@ -1,13 +1,13 @@
 import {
   BellIcon,
-  ChartLineUpIcon,
   GearIcon,
   LightningIcon,
   PlanetIcon,
   PlayCircleIcon,
+  PresentationChartIcon,
   StackIcon,
+  UserCircleIcon,
   UserIcon,
-  UsersIcon,
 } from "@phosphor-icons/react";
 import { useState } from "react";
 
@@ -20,8 +20,8 @@ import { DropdownMenuItem } from "@/components/ui/dropdown-menu";
 const PAGES = [
   { href: "/runs", label: "运行记录", icon: <PlayCircleIcon /> },
   { href: "/queues", label: "队列", icon: <StackIcon /> },
-  { href: "/metrics", label: "监控", icon: <ChartLineUpIcon /> },
-  { href: "/members", label: "成员", icon: <UsersIcon /> },
+  { href: "/metrics", label: "监控", icon: <PresentationChartIcon /> },
+  { href: "/members", label: "成员", icon: <UserCircleIcon /> },
   { href: "/settings", label: "设置", icon: <GearIcon /> },
 ];
 
