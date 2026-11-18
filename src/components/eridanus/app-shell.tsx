@@ -653,16 +653,22 @@ function TenantSwitcher({
         aria-label={labels.switchTenant(current.name)}
         // A bordered 32px pill like the search entry below it: the 20px
         // tile 6px in, centred on the icon column, the name at the nav's
-        // size. Collapsed it is the same 20px tile in a bare 28px button,
-        // like the nav's icons; only the padding, ring and ground change,
-        // so the tile glides between the two places.
+        // size. Collapsed it is a bare 28px button holding a 24px tile,
+        // a touch larger than the nav's icons as the header's mark; the
+        // tile grows as the padding, ring and ground change, all
+        // transitioned, so it glides between the two places.
         className={cn(
           HEADER_ROW,
-          "h-8 gap-2 rounded-full bg-background ps-1.5 pe-2.5 ring-1 ring-sidebar-border transition-[width,height,padding,margin,box-shadow,background-color] ring-inset group-data-[collapsible=icon]:bg-transparent group-data-[collapsible=icon]:p-1! group-data-[collapsible=icon]:ring-0 data-popup-open:bg-sidebar-accent data-popup-open:text-sidebar-accent-foreground",
+          "h-8 gap-2 rounded-full bg-background ps-1.5 pe-2.5 ring-1 ring-sidebar-border transition-[width,height,padding,margin,box-shadow,background-color] ring-inset group-data-[collapsible=icon]:bg-transparent group-data-[collapsible=icon]:p-0.5! group-data-[collapsible=icon]:ring-0 data-popup-open:bg-sidebar-accent data-popup-open:text-sidebar-accent-foreground",
         )}
         render={<DropdownMenuTrigger />}
       >
-        <Tile logo={current.logo} name={current.name} size="sm" />
+        <Tile
+          logo={current.logo}
+          name={current.name}
+          size="sm"
+          className="transition-[width,height,font-size] duration-(--sidebar-duration) ease-(--sidebar-ease) group-data-[collapsible=icon]:size-6 group-data-[collapsible=icon]:text-[11px]"
+        />
         <span className="min-w-0 flex-1 truncate text-left text-sm font-medium">
           {current.name}
         </span>
