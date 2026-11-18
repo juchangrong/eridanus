@@ -331,6 +331,7 @@ export function AppShell({
   );
   const [width, setWidth] = useState(storedWidth);
   const peek = usePeek(pinned);
+  useNoRootBounce();
   const barSearch = search?.placement === "topbar" ? search : undefined;
   const bar = Boolean(breadcrumb || actions || barSearch);
   return (
@@ -874,6 +875,23 @@ const PEEK_CLOSE_DELAY = 150;
  * is open, as the menu's popup is outside it, and closes when the user
  * collapses or opens the sidebar for good. Keyboard users have the tooltips.
  */
+/** No rubber-band on the page while the shell is mounted. The shell fills
+ * the viewport and the card scrolls by itself, so the page has nothing to
+ * scroll, yet macOS still bounces it on a trackpad: the card then slides
+ * while the fixed sidebar stays, and the sidebar open on hover, which draws
+ * the card's left edge beside it, comes apart from the card. Scrolling inside
+ * the card still bounces there. Restored on unmount. */
+function useNoRootBounce() {
+  useEffect(() => {
+    const root = document.documentElement;
+    const before = root.style.overscrollBehavior;
+    root.style.overscrollBehavior = "none";
+    return () => {
+      root.style.overscrollBehavior = before;
+    };
+  }, []);
+}
+
 function usePeek(pinned: boolean) {
   const isMobile = useIsMobile();
   const [open, setOpen] = useState(false);
