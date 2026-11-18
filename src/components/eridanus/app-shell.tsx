@@ -440,11 +440,13 @@ export function AppShell({
               )}
             >
               {/* Collapsed, the headings fade away, so a short rule centred
-                  on the icon column parts the groups instead. */}
+                  on the icon column parts the groups instead: out of the
+                  flow, midway between the last button above and the first
+                  below (10px from each). */}
               {i > 0 ? (
                 <div
                   aria-hidden
-                  className="ms-1.5 mb-2 hidden h-px w-4 bg-sidebar-border group-data-[collapsible=icon]:block"
+                  className="absolute -top-1.5 left-1.5 hidden h-px w-4 bg-sidebar-border group-data-[collapsible=icon]:block"
                 />
               ) : null}
               {group.title ? (
