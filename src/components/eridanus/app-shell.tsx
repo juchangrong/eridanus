@@ -396,13 +396,28 @@ export function AppShell({
               {tenants ? (
                 <TenantSwitcher tenants={tenants} labels={labels} />
               ) : (
+                // The mark sized as the tenant switcher's tile: 20px, 6px
+                // in, on the icon column; collapsed 24px in its 28px
+                // button, gliding between the two. A link home, not a
+                // control, so it shows no hover ground.
                 <NavButton
                   tooltip={brand.name}
                   link={renderLink(brand.href ?? "/")}
-                  className={HEADER_ROW}
+                  className={cn(
+                    HEADER_ROW,
+                    "gap-2 ps-1.5 transition-[width,height,padding,margin] group-data-[collapsible=icon]:p-0.5! hover:bg-transparent active:bg-transparent",
+                  )}
                 >
-                  {brand.logo ? <Tile logo={brand.logo} /> : null}
-                  <span className="font-heading font-medium">{brand.name}</span>
+                  {brand.logo ? (
+                    <Tile
+                      logo={brand.logo}
+                      size="sm"
+                      className="transition-[width,height] duration-(--sidebar-duration) ease-(--sidebar-ease) group-data-[collapsible=icon]:size-6 group-data-[collapsible=icon]:[&_svg]:size-3.5!"
+                    />
+                  ) : null}
+                  <span className="truncate text-sm font-medium">
+                    {brand.name}
+                  </span>
                 </NavButton>
               )}
               {/* With a top bar the toggle stays there, in the card's
