@@ -1026,9 +1026,12 @@ function BarToggle({
         <SidebarSimpleIcon />
       </Button>
       {separator ? (
+        // 12px of clear space on each side: the bar's 8px gap less 2px
+        // after the button, whose icon sits 6px inside it, and plus 4px
+        // before the breadcrumb.
         <Separator
           orientation="vertical"
-          className="data-vertical:h-4 data-vertical:self-center"
+          className="-ms-0.5 me-1 data-vertical:h-4 data-vertical:self-center"
         />
       ) : null}
     </>
