@@ -579,10 +579,12 @@ function Tile({
   logo,
   name,
   size = "md",
+  className,
 }: {
   logo?: ReactNode;
   name?: string;
   size?: "sm" | "md";
+  className?: string;
 }) {
   return (
     <span
@@ -592,6 +594,7 @@ function Tile({
         size === "md"
           ? "size-7 text-[12px] [&_svg]:size-3.5!"
           : "size-5 text-[10px] [&_svg]:size-3!",
+        className,
       )}
     >
       {logo ?? Array.from(name?.trim() ?? "")[0]?.toUpperCase()}
@@ -617,17 +620,22 @@ function TenantSwitcher({
       {/* The menu button renders the trigger, as in the account menu. */}
       <SidebarMenuButton
         aria-label={labels.switchTenant(current.name)}
-        // The tenant's tile and name in a 32px row like a nav pill, the
-        // 28px tile 2px inside (concentric: 16 less 2 is 14), centred on
-        // the icon column. Collapsed it is the bare tile, like the icons.
+        // A bordered 32px pill like the search entry below it: the 20px
+        // tile 6px in, centred on the icon column, the name at the nav's
+        // size. Collapsed it is the bare 28px tile, like the icons.
         className={cn(
           HEADER_ROW,
-          "h-8 gap-2.5 rounded-full ps-0.5 data-popup-open:bg-sidebar-accent data-popup-open:text-sidebar-accent-foreground",
+          "h-8 gap-2 rounded-full bg-background ps-1.5 pe-2.5 ring-1 ring-sidebar-border ring-inset group-data-[collapsible=icon]:bg-transparent group-data-[collapsible=icon]:ring-0 data-popup-open:bg-sidebar-accent data-popup-open:text-sidebar-accent-foreground",
         )}
         render={<DropdownMenuTrigger />}
       >
-        <Tile logo={current.logo} name={current.name} />
-        <span className="min-w-0 flex-1 truncate text-left font-heading text-base font-medium">
+        <Tile
+          logo={current.logo}
+          name={current.name}
+          size="sm"
+          className="group-data-[collapsible=icon]:size-7 group-data-[collapsible=icon]:text-[12px]"
+        />
+        <span className="min-w-0 flex-1 truncate text-left text-sm font-medium">
           {current.name}
         </span>
         <CaretUpDownIcon className="size-3.5! text-muted-foreground" />
