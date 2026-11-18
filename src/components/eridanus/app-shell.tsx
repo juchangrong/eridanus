@@ -1235,17 +1235,18 @@ function AccountMenu({
               the trigger's element to open. */}
           <SidebarMenuButton
             aria-label={labels.account(account.name)}
-            // The 20px avatar, the size it keeps collapsed, centred under
-            // the logo and nav icons (6px in), the name in line with their
-            // labels.
-            className="w-auto max-w-full gap-2 rounded-full ps-1.5 pe-3 text-[13px] transition-[width,height,padding,margin] duration-(--sidebar-duration) ease-(--sidebar-ease) group-data-[collapsible=icon]:size-7! group-data-[collapsible=icon]:p-1! data-popup-open:bg-sidebar-accent data-popup-open:text-sidebar-accent-foreground"
+            // The 24px avatar, as the header's tile, in both states: 4px
+            // in, centred under the logo and nav icons, the name in line
+            // with their labels. Collapsed the 28px button sits 2px up, so
+            // the avatar keeps the open row's height.
+            className="w-auto max-w-full gap-2 rounded-full ps-1 pe-3 text-[13px] transition-[width,height,padding,margin] duration-(--sidebar-duration) ease-(--sidebar-ease) group-data-[collapsible=icon]:mb-0.5 group-data-[collapsible=icon]:size-7! group-data-[collapsible=icon]:p-0.5! data-popup-open:bg-sidebar-accent data-popup-open:text-sidebar-accent-foreground"
             render={<DropdownMenuTrigger />}
           >
             <PersonAvatar
               name={account.name}
               src={account.avatar}
               size="sm"
-              className="size-5! **:data-[slot=avatar-fallback]:text-[10px]"
+              className="size-6! **:data-[slot=avatar-fallback]:text-[11px]"
             />
             {/* The email waits in the menu, which leaves room for the
                 footer's buttons. */}
