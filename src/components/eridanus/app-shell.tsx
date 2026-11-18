@@ -1236,16 +1236,17 @@ function AccountMenu({
               the trigger's element to open. */}
           <SidebarMenuButton
             aria-label={labels.account(account.name)}
-            // The 24px avatar centred under the logo and nav icons, 4px from
-            // the pill on every side, the name in line with their labels.
-            className="w-auto max-w-full gap-2 rounded-full ps-1 pe-3 text-[13px] transition-[width,height,padding,margin] duration-(--sidebar-duration) ease-(--sidebar-ease) group-data-[collapsible=icon]:size-7! group-data-[collapsible=icon]:p-1! data-popup-open:bg-sidebar-accent data-popup-open:text-sidebar-accent-foreground"
+            // The 20px avatar, the size it keeps collapsed, centred under
+            // the logo and nav icons (6px in), the name in line with their
+            // labels.
+            className="w-auto max-w-full gap-2 rounded-full ps-1.5 pe-3 text-[13px] transition-[width,height,padding,margin] duration-(--sidebar-duration) ease-(--sidebar-ease) group-data-[collapsible=icon]:size-7! group-data-[collapsible=icon]:p-1! data-popup-open:bg-sidebar-accent data-popup-open:text-sidebar-accent-foreground"
             render={<DropdownMenuTrigger />}
           >
             <PersonAvatar
               name={account.name}
               src={account.avatar}
               size="sm"
-              className="transition-[width,height] duration-(--sidebar-duration) ease-(--sidebar-ease) group-data-[collapsible=icon]:size-5!"
+              className="size-5! **:data-[slot=avatar-fallback]:text-[10px]"
             />
             {/* The email waits in the menu, which leaves room for the
                 footer's buttons. */}
