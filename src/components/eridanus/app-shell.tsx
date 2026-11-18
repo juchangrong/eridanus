@@ -16,6 +16,7 @@ import {
   type ReactElement,
   type ReactNode,
   useEffect,
+  useLayoutEffect,
   useRef,
   useState,
 } from "react";
@@ -750,17 +751,31 @@ function TenantSwitcher({
 function FooterActions({ children }: { children: ReactNode }) {
   const { state } = useSidebar();
   const ref = useRef<HTMLDivElement>(null);
-  const first = useRef(true);
-  useEffect(() => {
-    if (first.current) {
-      first.current = false;
+  // Where the buttons sat in the footer before the last layout change:
+  // beside the account open, stacked above it collapsed.
+  const last = useRef<{ x: number; y: number } | null>(null);
+  useLayoutEffect(() => {
+    const el = ref.current;
+    const footer = el?.parentElement;
+    if (!el || !footer) return;
+    const box = el.getBoundingClientRect();
+    const frame = footer.getBoundingClientRect();
+    const now = { x: box.left - frame.left, y: box.top - frame.top };
+    const before = last.current;
+    last.current = now;
+    if (!before || matchMedia("(prefers-reduced-motion: reduce)").matches)
       return;
-    }
-    if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    ref.current?.animate([{ opacity: 0 }, { opacity: 1 }], {
-      duration: SIDEBAR_DURATION,
-      easing: SIDEBAR_EASE,
-    });
+    // The layout jumps at once; slide the buttons from where they were,
+    // in the sidebar's own timing, while its width eases alongside.
+    el.animate(
+      [
+        {
+          transform: `translate(${before.x - now.x}px, ${before.y - now.y}px)`,
+        },
+        { transform: "none" },
+      ],
+      { duration: SIDEBAR_DURATION, easing: SIDEBAR_EASE },
+    );
   }, [state]);
   return (
     <div
