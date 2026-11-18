@@ -396,26 +396,26 @@ export function AppShell({
               {tenants ? (
                 <TenantSwitcher tenants={tenants} labels={labels} />
               ) : (
-                // The mark sized as the tenant switcher's tile: 20px, 6px
-                // in, on the icon column; collapsed 24px in its 28px
-                // button, gliding between the two. A link home, not a
+                // The mark sized as the tenant switcher's tile: 24px in
+                // both states, 4px in, centred on the icon column, the
+                // name a step above the nav and bold. A link home, not a
                 // control, so it shows no hover ground.
                 <NavButton
                   tooltip={brand.name}
                   link={renderLink(brand.href ?? "/")}
                   className={cn(
                     HEADER_ROW,
-                    "gap-2 ps-1.5 transition-[width,height,padding,margin] group-data-[collapsible=icon]:p-0.5! hover:bg-transparent active:bg-transparent",
+                    "gap-2 ps-1 transition-[width,height,padding,margin] group-data-[collapsible=icon]:p-0.5! hover:bg-transparent active:bg-transparent",
                   )}
                 >
                   {brand.logo ? (
                     <Tile
                       logo={brand.logo}
                       size="sm"
-                      className="transition-[width,height] duration-(--sidebar-duration) ease-(--sidebar-ease) group-data-[collapsible=icon]:size-6 group-data-[collapsible=icon]:[&_svg]:size-3.5!"
+                      className="size-6 [&_svg]:size-3.5!"
                     />
                   ) : null}
-                  <span className="truncate text-sm font-medium">
+                  <span className="truncate text-[15px] font-semibold">
                     {brand.name}
                   </span>
                 </NavButton>
@@ -666,15 +666,14 @@ function TenantSwitcher({
       {/* The menu button renders the trigger, as in the account menu. */}
       <SidebarMenuButton
         aria-label={labels.switchTenant(current.name)}
-        // A bordered 32px pill like the search entry below it: the 20px
-        // tile 6px in, centred on the icon column, the name at the nav's
-        // size. Collapsed it is a bare 28px button holding a 24px tile,
-        // a touch larger than the nav's icons as the header's mark; the
-        // tile grows as the padding, ring and ground change, all
-        // transitioned, so it glides between the two places.
+        // A bordered 32px pill: the 24px tile 4px in, centred on the icon
+        // column, the name a step above the nav and bold, as the header's
+        // mark. Collapsed it is a bare 28px button holding the same tile;
+        // the padding, ring and ground change, all transitioned, so the
+        // tile glides between the two places without resizing.
         className={cn(
           HEADER_ROW,
-          "h-8 gap-2 rounded-full bg-background ps-1.5 pe-2.5 ring-1 ring-sidebar-border transition-[width,height,padding,margin,box-shadow,background-color] ring-inset group-data-[collapsible=icon]:bg-transparent group-data-[collapsible=icon]:p-0.5! group-data-[collapsible=icon]:ring-0 data-popup-open:bg-sidebar-accent data-popup-open:text-sidebar-accent-foreground",
+          "h-8 gap-2 rounded-full bg-background ps-1 pe-2.5 ring-1 ring-sidebar-border transition-[width,height,padding,margin,box-shadow,background-color] ring-inset group-data-[collapsible=icon]:bg-transparent group-data-[collapsible=icon]:p-0.5! group-data-[collapsible=icon]:ring-0 data-popup-open:bg-sidebar-accent data-popup-open:text-sidebar-accent-foreground",
         )}
         render={<DropdownMenuTrigger />}
       >
@@ -682,9 +681,9 @@ function TenantSwitcher({
           logo={current.logo}
           name={current.name}
           size="sm"
-          className="transition-[width,height,font-size] duration-(--sidebar-duration) ease-(--sidebar-ease) group-data-[collapsible=icon]:size-6 group-data-[collapsible=icon]:text-[11px]"
+          className="size-6"
         />
-        <span className="min-w-0 flex-1 truncate text-left text-sm font-medium">
+        <span className="min-w-0 flex-1 truncate text-left text-[15px] font-semibold">
           {current.name}
         </span>
         <CaretUpDownIcon className="size-3.5! text-muted-foreground" />
