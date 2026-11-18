@@ -539,12 +539,12 @@ export function AppShell({
             icon 16px from the card's top and left, over the page's text,
             which starts 16px in; the controls at either end 10px from the
             edges. 48px tall, so they centre on the sidebar's header row
-            beside it. No rule under it: the page's own space
-            sets it apart. Without a breadcrumb or actions only phones get
+            beside it. A hairline under it, in the card's border color,
+            parts it from the page that scrolls beneath. Without a breadcrumb or actions only phones get
             the bar, to open the sidebar. */}
         <div
           className={cn(
-            "flex h-12 shrink-0 items-center gap-2 px-4",
+            "flex h-12 shrink-0 items-center gap-2 border-b px-4",
             !bar && "md:hidden",
           )}
         >
