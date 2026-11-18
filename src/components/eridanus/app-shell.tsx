@@ -439,14 +439,14 @@ export function AppShell({
               )}
             >
               {group.title ? (
-                <SidebarGroupLabel className="ps-[7px]">
+                <SidebarGroupLabel className="h-7 ps-2 text-[11px]">
                   {group.title}
                 </SidebarGroupLabel>
               ) : null}
               <SidebarGroupContent>
                 {/* Collapsed, the 28px buttons part by 8px (a 36px pitch),
                     so the bare icons have room around them. */}
-                <SidebarMenu className="transition-[gap] duration-(--sidebar-duration) ease-(--sidebar-ease) group-data-[collapsible=icon]:gap-2">
+                <SidebarMenu className="gap-px transition-[gap] duration-(--sidebar-duration) ease-(--sidebar-ease) group-data-[collapsible=icon]:gap-2">
                   {group.items.map((item) => (
                     <SidebarMenuItem key={item.href}>
                       <NavButton
@@ -454,17 +454,19 @@ export function AppShell({
                         aria-current={item.active ? "page" : undefined}
                         tooltip={item.label}
                         link={renderLink(item.href)}
-                        // One column with the header: the 18px icon centred
-                        // under the logo, the label where the product's name
-                        // starts, 7px around the icon on every side and a
-                        // badge 7px from the other end. The pills span the
-                        // sidebar's own 8px inset, the same at both sides.
-                        // Collapsed, the icon centres in a 28px button.
+                        // Dense, like Linear's: 28px rows with 13px labels.
+                        // One column with the header: the 16px icon centred
+                        // under the logo (8px in, as the search's 18px icon
+                        // sits 7px in), the label where the product's name
+                        // starts and a badge 8px from the other end. The
+                        // pills span the sidebar's own 8px inset, the same
+                        // at both sides. Collapsed, the icon centres in the
+                        // same 28px button.
                         // The icon takes the button's muted color, darkening
                         // on hover and on the current page; the label and
                         // badge keep the text color. An icon with a color of
                         // its own (a status dot) keeps it.
-                        className="gap-[11px] pe-[7px] text-muted-foreground transition-[width,height,padding,margin] duration-(--sidebar-duration) ease-(--sidebar-ease) group-data-[collapsible=icon]:size-7! group-data-[collapsible=icon]:p-[5px]! has-[>svg:first-child]:pl-[7px] [&_svg]:size-[18px]"
+                        className="h-7 gap-[12px] pe-2 text-[13px] text-muted-foreground transition-[width,height,padding,margin] duration-(--sidebar-duration) ease-(--sidebar-ease) group-data-[collapsible=icon]:size-7! group-data-[collapsible=icon]:p-1.5! has-[>svg:first-child]:pl-2 [&_svg]:size-4"
                       >
                         {item.icon}
                         <span className="min-w-0 flex-1 truncate text-sidebar-foreground">
@@ -814,7 +816,7 @@ function SearchButton({ search, label }: { search: AppSearch; label: string }) {
           tooltip={text}
           aria-keyshortcuts={apple ? "Meta+K" : "Control+K"}
           onClick={open}
-          className="gap-[11px] rounded-full bg-background pe-1.5 text-muted-foreground ring-1 ring-sidebar-border transition-[width,height,padding,margin] duration-(--sidebar-duration) ease-(--sidebar-ease) ring-inset group-data-[collapsible=icon]:size-7! group-data-[collapsible=icon]:bg-transparent group-data-[collapsible=icon]:p-[5px]! group-data-[collapsible=icon]:ring-0 has-[>svg:first-child]:pl-[7px] [&_svg]:size-[18px]"
+          className="gap-[11px] rounded-full bg-background pe-1.5 text-[13px] text-muted-foreground ring-1 ring-sidebar-border transition-[width,height,padding,margin] duration-(--sidebar-duration) ease-(--sidebar-ease) ring-inset group-data-[collapsible=icon]:size-7! group-data-[collapsible=icon]:bg-transparent group-data-[collapsible=icon]:p-[5px]! group-data-[collapsible=icon]:ring-0 has-[>svg:first-child]:pl-[7px] [&_svg]:size-[18px]"
         >
           <MagnifyingGlassIcon />
           <span className="flex-1">{text}</span>
