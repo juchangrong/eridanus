@@ -82,6 +82,9 @@ export interface AppSearch {
   onOpen: () => void;
   /** The button's text; defaults to the built-in "Search". */
   placeholder?: string;
+  /** Where the entry sits: under the sidebar's header (the default) or in
+   * the middle of the card's top bar, which it then always shows. */
+  placement?: "sidebar" | "topbar";
 }
 
 export interface AppTenants {
@@ -302,7 +305,8 @@ export function AppShell({
   /** Makes the header a tenant switcher, in place of the brand link: the
    * current tenant's tile and name, opening a menu of the others. */
   tenants?: AppTenants;
-  /** A search button under the header, with ⌘K to open it. */
+  /** A search button under the header, or in the top bar with
+   * `placement: "topbar"`, with ⌘K to open it. */
   search?: AppSearch;
   nav: AppNavGroup[];
   account?: AppAccount;
@@ -327,6 +331,8 @@ export function AppShell({
   );
   const [width, setWidth] = useState(storedWidth);
   const peek = usePeek(pinned);
+  const barSearch = search?.placement === "topbar" ? search : undefined;
+  const bar = Boolean(breadcrumb || actions || barSearch);
   return (
     <SidebarProvider
       // Open when the user opened it (stored in the cookie by shadcn's
@@ -400,7 +406,7 @@ export function AppShell({
               )}
               {/* With a top bar the toggle stays there, in the card's
                   corner, in both states; without one it is here. */}
-              {breadcrumb || actions ? null : (
+              {bar ? null : (
                 <CollapseButton
                   label={
                     peek.open ? labels.expandSidebar : labels.collapseSidebar
@@ -410,7 +416,7 @@ export function AppShell({
               )}
             </SidebarMenuItem>
           </SidebarMenu>
-          {search ? (
+          {search && search.placement !== "topbar" ? (
             <SearchButton search={search} label={labels.search} />
           ) : null}
         </SidebarHeader>
@@ -511,22 +517,34 @@ export function AppShell({
         <div
           className={cn(
             "flex h-12 shrink-0 items-center gap-2 px-4",
-            !breadcrumb && !actions && "md:hidden",
+            !bar && "md:hidden",
           )}
         >
-          <BarToggle
-            label={labels.toggleSidebar}
-            separator={Boolean(breadcrumb)}
-          />
-          {breadcrumb ? (
-            <div className="min-w-0 flex-1 truncate">{breadcrumb}</div>
-          ) : (
-            <div className="flex-1" />
-          )}
-          {actions ? (
+          {/* With search in the bar, the ends grow alike, so the search
+              sits on the card's centre line between them. */}
+          <div className="flex min-w-0 flex-1 items-center gap-2">
+            <BarToggle
+              label={labels.toggleSidebar}
+              separator={Boolean(breadcrumb)}
+            />
+            {breadcrumb ? (
+              <div className="min-w-0 flex-1 truncate [&_ol]:flex-nowrap [&_ol]:whitespace-nowrap">
+                {breadcrumb}
+              </div>
+            ) : null}
+          </div>
+          {barSearch ? (
+            <TopBarSearch search={barSearch} label={labels.search} />
+          ) : null}
+          {actions || barSearch ? (
             // The last action 10px from the card's right edge, as from its
             // top, like the toggle at the other end.
-            <div className="-me-1.5 flex shrink-0 items-center gap-2">
+            <div
+              className={cn(
+                "-me-1.5 flex items-center justify-end gap-2",
+                barSearch ? "min-w-0 flex-1" : "shrink-0",
+              )}
+            >
               {actions}
             </div>
           ) : null}
@@ -728,7 +746,7 @@ function FooterActions({ children }: { children: ReactNode }) {
 /** The search entry: a field-like pill with the nav's icon column, opening
  * the app's search on click or ⌘K (Ctrl+K off Apple systems). Collapsed it
  * is a bare icon button with a tooltip. */
-function SearchButton({ search, label }: { search: AppSearch; label: string }) {
+function useSearchShortcut(search: AppSearch) {
   const onOpen = useRef(search.onOpen);
   onOpen.current = search.onOpen;
   const [apple, setApple] = useState(false);
@@ -748,6 +766,45 @@ function SearchButton({ search, label }: { search: AppSearch; label: string }) {
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
   }, []);
+  return { apple, open: () => onOpen.current() };
+}
+
+/** The search entry in the top bar: a 32px field-like pill on the card's
+ * centre line, up to 480px wide, shrinking before the bar's ends do; a bare
+ * icon button on phones. */
+function TopBarSearch({ search, label }: { search: AppSearch; label: string }) {
+  const { apple, open } = useSearchShortcut(search);
+  const text = search.placeholder ?? label;
+  return (
+    <>
+      <Button
+        variant="ghost"
+        size="icon"
+        aria-label={text}
+        aria-keyshortcuts={apple ? "Meta+K" : "Control+K"}
+        onClick={open}
+        className="md:hidden"
+      >
+        <MagnifyingGlassIcon />
+      </Button>
+      <button
+        type="button"
+        aria-keyshortcuts={apple ? "Meta+K" : "Control+K"}
+        onClick={open}
+        className="hidden h-8 w-120 max-w-[40%] min-w-40 shrink items-center gap-2 rounded-full bg-sidebar ps-3 pe-1.5 text-sm text-muted-foreground ring-1 ring-sidebar-border transition-colors outline-none ring-inset hover:bg-sidebar-accent focus-visible:ring-2 focus-visible:ring-ring md:flex [&_svg]:size-4 [&_svg]:shrink-0"
+      >
+        <MagnifyingGlassIcon />
+        <span className="min-w-0 flex-1 truncate text-left">{text}</span>
+        <kbd className="rounded-full bg-muted px-2 py-0.5 font-sans text-[11px] font-medium text-muted-foreground">
+          {apple ? "⌘K" : "Ctrl K"}
+        </kbd>
+      </button>
+    </>
+  );
+}
+
+function SearchButton({ search, label }: { search: AppSearch; label: string }) {
+  const { apple, open } = useSearchShortcut(search);
   const text = search.placeholder ?? label;
   return (
     <SidebarMenu>
@@ -756,7 +813,7 @@ function SearchButton({ search, label }: { search: AppSearch; label: string }) {
         <SidebarMenuButton
           tooltip={text}
           aria-keyshortcuts={apple ? "Meta+K" : "Control+K"}
-          onClick={() => onOpen.current()}
+          onClick={open}
           className="gap-[11px] rounded-full bg-background pe-1.5 text-muted-foreground ring-1 ring-sidebar-border transition-[width,height,padding,margin] duration-(--sidebar-duration) ease-(--sidebar-ease) ring-inset group-data-[collapsible=icon]:size-7! group-data-[collapsible=icon]:bg-transparent group-data-[collapsible=icon]:p-[5px]! group-data-[collapsible=icon]:ring-0 has-[>svg:first-child]:pl-[7px] [&_svg]:size-[18px]"
         >
           <MagnifyingGlassIcon />
