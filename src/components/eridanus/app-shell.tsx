@@ -439,6 +439,14 @@ export function AppShell({
                   "group-data-[collapsible=icon]:hidden",
               )}
             >
+              {/* Collapsed, the headings fade away, so a short rule centred
+                  on the icon column parts the groups instead. */}
+              {i > 0 ? (
+                <div
+                  aria-hidden
+                  className="ms-1.5 mb-2 hidden h-px w-4 bg-sidebar-border group-data-[collapsible=icon]:block"
+                />
+              ) : null}
               {group.title ? (
                 <SidebarGroupLabel className="h-7 ps-2 text-[11px]">
                   {group.title}
