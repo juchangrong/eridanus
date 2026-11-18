@@ -1176,9 +1176,10 @@ function AccountMenu({
   const { isMobile } = useSidebar();
   const { preference, setPreference } = useTheme();
   return (
-    // min-w-8, as in the header: the footer's buttons never squeeze the
-    // avatar while the sidebar opens.
-    <SidebarMenu className="w-auto min-w-8 flex-1">
+    // As wide as the avatar and name, so the hover pill hugs them and the
+    // footer's buttons keep the rest of the row; min-w-8, as in the header:
+    // they never squeeze the avatar while the sidebar opens.
+    <SidebarMenu className="w-auto min-w-8 shrink">
       <SidebarMenuItem>
         <DropdownMenu>
           {/* The menu button renders the trigger, not the other way round:
@@ -1188,7 +1189,7 @@ function AccountMenu({
             aria-label={labels.account(account.name)}
             // The 24px avatar centred under the logo and nav icons, 4px from
             // the pill on every side, the name in line with their labels.
-            className="gap-2 rounded-full ps-1 transition-[width,height,padding,margin] duration-(--sidebar-duration) ease-(--sidebar-ease) group-data-[collapsible=icon]:size-7! group-data-[collapsible=icon]:p-1! data-popup-open:bg-sidebar-accent data-popup-open:text-sidebar-accent-foreground"
+            className="w-auto max-w-full gap-2 rounded-full ps-1 pe-3 text-[13px] transition-[width,height,padding,margin] duration-(--sidebar-duration) ease-(--sidebar-ease) group-data-[collapsible=icon]:size-7! group-data-[collapsible=icon]:p-1! data-popup-open:bg-sidebar-accent data-popup-open:text-sidebar-accent-foreground"
             render={<DropdownMenuTrigger />}
           >
             <PersonAvatar
