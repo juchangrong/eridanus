@@ -12,7 +12,7 @@
   margin: 0;
   padding: 1rem;
   overflow-x: auto;
-  font-family: var(--font-mono);
+  font-family: var(--font-code);
   font-size: 13px;
   line-height: 1.6;
   background: transparent;
