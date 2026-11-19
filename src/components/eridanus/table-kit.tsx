@@ -19,19 +19,23 @@ const MESSAGES: Record<Locale, { loading: string }> = {
  * the toolbar and headings above do. `bleed` pulls the area into the page
  * gutter by a cell's padding instead, so the first column's text lines up
  * with them; it suits a table without rules. `fill` keeps a minimum height
- * inside a page that gives the table the remaining height.
+ * inside a page that gives the table the remaining height. `page` lets the
+ * page do the vertical scrolling on desktop, the header row pinned under the
+ * top bar, so a long list reads as one page; phones still scroll it sideways.
  */
 export function TableScroll({
   children,
   bleed = false,
   rules = true,
   fill = false,
+  page = false,
   className,
 }: {
   children: ReactNode;
   bleed?: boolean;
   rules?: boolean;
   fill?: boolean;
+  page?: boolean;
   className?: string;
 }) {
   return (
@@ -44,6 +48,7 @@ export function TableScroll({
         !rules && "[&_[data-slot=table-body]>[data-slot=table-row]]:border-b-0",
         bleed && "-mx-2",
         fill && "min-h-40",
+        page && "md:overflow-visible",
         className,
       )}
     >
@@ -53,21 +58,34 @@ export function TableScroll({
 }
 
 /**
- * The column header row, as shadcn's table draws it (medium-weight labels in
- * the text color, 40px tall), pinned while the table scrolls. Its rule is an inset shadow, because a pinned row's border
- * stays behind as the rows scroll under it. Put TableHead cells inside.
+ * The column header row, pinned while the table scrolls. `rule` (the
+ * default) is shadcn's look: medium-weight labels in the text color, 40px
+ * tall, over a rule drawn as an inset shadow, because a pinned row's border
+ * stays behind as the rows scroll under it. `filled` is a quieter 32px band
+ * on the muted ground with rounded ends and small muted labels; pinned, it
+ * stops 8px under the top of the scrolling area, and that gap and the
+ * corners outside its rounded ends take the page's ground, so no row shows
+ * through them. Put TableHead cells inside.
  */
 export function TableHeaderRow({
   children,
+  variant = "rule",
   className,
 }: {
   children: ReactNode;
+  variant?: "rule" | "filled";
   className?: string;
 }) {
   return (
     <TableHeader
       className={cn(
         "sticky top-0 z-10 bg-background [&_tr]:border-b-0",
+        variant === "filled" &&
+          // Each cell's ::before, below its own ground inside the pinned
+          // header, reaches 8px up and fills the cell's whole box, so the
+          // gap above and the corners beside the rounded ends cover the
+          // rows scrolling past.
+          "top-2 [&_th]:relative [&_th]:h-8 [&_th]:bg-muted [&_th]:text-xs [&_th]:font-normal [&_th]:text-muted-foreground [&_th]:shadow-none! [&_th]:before:absolute [&_th]:before:inset-x-0 [&_th]:before:-top-2 [&_th]:before:bottom-0 [&_th]:before:-z-10 [&_th]:before:bg-background [&_th:first-child]:rounded-s-lg [&_th:last-child]:rounded-e-lg",
         className,
       )}
     >
@@ -172,6 +190,35 @@ export function ClickableRow({
         className,
       )}
       onClick={clickFirstControl}
+    >
+      {children}
+    </TableRow>
+  );
+}
+
+/**
+ * A row the person can see but not open, such as a project they have no
+ * access to: faded, with no hover ground, no pointer and nothing to focus.
+ * Render its name as plain text, leave out its row actions, and show a dash
+ * for figures they may not read; `reason` is the hover text that says why.
+ */
+export function LockedRow({
+  reason,
+  className,
+  children,
+}: {
+  reason?: string;
+  className?: string;
+  children: ReactNode;
+}) {
+  return (
+    <TableRow
+      aria-disabled
+      title={reason}
+      className={cn(
+        "cursor-default opacity-50 hover:bg-transparent",
+        className,
+      )}
     >
       {children}
     </TableRow>

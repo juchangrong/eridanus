@@ -207,7 +207,7 @@
       "name": "pager",
       "type": "registry:component",
       "title": "Pager",
-      "description": "Paging controls under a table: the range shown (第 1–50 条，共 173 条 or 1–50 of 173), an optional page-size select, first/previous/next/last buttons and a page field. Zero-based; folds back to the last page when the total shrinks. Text follows LocaleProvider; the labels prop replaces any part of it.",
+      "description": "Paging controls under a table: the range shown (第 1–50 条，共 173 条 or 1–50 of 173), an optional page-size select, first/previous/next/last buttons and a page field. Zero-based; folds back to the last page when the total shrinks. Text follows LocaleProvider; the labels prop replaces any part of it. hideSinglePage leaves it out while everything fits on one page; bar pins it to the bottom of the page.",
       "categories": ["table", "navigation"],
       "dependencies": ["@phosphor-icons/react"],
       "registryDependencies": [
@@ -228,7 +228,7 @@
       "name": "table-kit",
       "type": "registry:component",
       "title": "Table kit",
-      "description": "Helpers for open tables built on the shadcn table: TableScroll (scrolls both ways, pins the header, keeps shadcn's rule under each row unless rules={false}), TableHeaderRow (shadcn's header row, pinned), TableRows (loading, empty and rows states), ClickableRow (whole-row click forwarded to the row's first link or button, selected and warning/error tints) and clickFirstControl.",
+      "description": "Helpers for open tables built on the shadcn table: TableScroll (scrolls both ways, pins the header, keeps shadcn's rule under each row unless rules={false}; page hands the vertical scroll to the page), TableHeaderRow (shadcn's header row, pinned; or filled, a quiet rounded band that pins 8px under the top), TableRows (loading, empty and rows states), ClickableRow (whole-row click forwarded to the row's first link or button, selected and warning/error tints) clickFirstControl and LockedRow (a faded row the person can see but not open).",
       "categories": ["table", "data-display"],
       "registryDependencies": [
         "table",
@@ -248,7 +248,7 @@
       "name": "page-layout",
       "type": "registry:component",
       "title": "Page layout",
-      "description": "Frameless page structure: Page (document or fill-height, optional narrow width), PageHeader (h1 with badges, actions and a meta line, or a screen-reader-only title), Section (heading over open content), FactLine (dot-separated facts), Facts (label over value) and StatStrip (headline figures, colored only when they need action).",
+      "description": "Frameless page structure: Page (document, list or fill-height, optional narrow width of 768px), PageHeader (h1 with badges, actions and a meta line, or a screen-reader-only title), Section (heading over open content), FactLine (dot-separated facts), Facts (label over value) and StatStrip (headline figures, open or on muted cards spread evenly, colored only when they need action).",
       "categories": ["layout"],
       "registryDependencies": ["juchangrong/eridanus/status-colors"],
       "files": [
@@ -401,7 +401,7 @@
       "name": "app-shell",
       "type": "registry:block",
       "title": "AppShell",
-      "description": "The frame of a console app: a sidebar on the window's own background with the product (or, given tenants, a tenant switcher: a bordered pill with the tenant's small tile and name, like the search entry, opening a list with a new-tenant item), an optional search entry, under the header or (placement topbar) centred in the top bar, that opens the app's search on click or ⌘K, navigation groups (pinned or recent items are groups too) under small headings (icon, label, badge, current page) and, at its foot, the account (avatar and name, opening a menu with the system/light/dark theme choice and sign-out) beside a few icon buttons such as notifications; the page sits in a card inset from the window. A breadcrumb or page-wide actions add a top bar inside the card with the sidebar toggle. On desktop the sidebar's edge drags between 180 and 320px, and letting go short of that, ⌘B or a click on the edge collapses it to icons with tooltips; it remembers both; opens as a sheet under 768px. The card scrolls by itself, so Page fill gets an exact height. Needs a ThemeProvider above it; renderLink plugs in the router's links.",
+      "description": "The frame of a console app: a sidebar on the window's own background with the product (or, given tenants, a tenant switcher: a bordered pill with the tenant's small tile and name, like the search entry, opening a list, optionally cut to the first few with the current one kept, with a new-tenant item; tiles are rounded squares or circles), an optional search entry, under the header or (placement topbar) centred in the top bar, that opens the app's search on click or ⌘K, navigation groups (pinned or recent items are groups too) under small headings (icon, label, badge, current page) and, at its foot, the account (avatar and name, opening a menu with its items, optional switch rows such as an admin mode, the system/light/dark theme choice and sign-out) beside a few icon buttons such as notifications; the page sits in a card inset from the window. A breadcrumb or page-wide actions add a top bar inside the card with the sidebar toggle. On desktop the sidebar's edge drags between 180 and 320px, and letting go short of that, ⌘B or a click on the edge collapses it to icons with tooltips; it remembers both; opens as a sheet under 768px. The card scrolls by itself, so Page fill gets an exact height. Needs a ThemeProvider above it; renderLink plugs in the router's links. AppHeaderShell is the frame for pages without a sidebar, such as a workspace picker before any tenant is chosen: a top bar with the square logo, text links (external ones open a new tab), actions and the account menu, over a scrolling main area, narrow or wide.",
       "categories": ["layout", "navigation"],
       "dependencies": ["@phosphor-icons/react"],
       "registryDependencies": [
@@ -409,6 +409,7 @@
         "juchangrong/eridanus/dropdown-menu",
         "separator",
         "sidebar",
+        "switch",
         "juchangrong/eridanus/person-avatar",
         "juchangrong/eridanus/theme-provider",
         "juchangrong/eridanus/locale-provider"
