@@ -637,7 +637,7 @@ function Tile({
     <span
       aria-hidden
       className={cn(
-        "flex shrink-0 items-center justify-center rounded-full bg-primary font-semibold text-primary-foreground",
+        "flex shrink-0 items-center justify-center rounded-full bg-primary font-semibold text-primary-foreground! **:text-primary-foreground!",
         size === "md"
           ? "size-7 text-[12px] [&_svg]:size-3.5!"
           : "size-5 text-[11px] [&_svg]:size-3!",
