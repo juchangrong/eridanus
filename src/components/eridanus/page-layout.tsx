@@ -1,34 +1,45 @@
-import type { ReactNode } from "react";
+import type { CSSProperties, ReactNode } from "react";
 
 import { cn } from "@/lib/utils";
 
 /**
- * The page container, 16px in from its sides, the inset of the app shell's
- * top bar, so the page's text lines up under the bar's toggle. Document
- * pages grow and let their parent scroll, with
- * 32px between blocks, twice the 16px inside a section, so each block reads
- * as one group. `fill` pages take exactly the height they are
- * given, so a table or workbench can scroll inside itself with its header and
- * pager in view. `narrow` is for forms and settings, where full-width lines of
- * text stop being readable.
+ * The page container. On desktop a full-width page sits 44px in from its
+ * sides and 32px under the top bar, so its edge lines up with the rule
+ * beside the app shell's sidebar toggle; a `narrow` page is a 768px column,
+ * centred, for forms, settings and short lists, where full-width lines stop
+ * being readable. Phones keep 16px all round. Document pages grow and let
+ * their parent scroll, with 32px between blocks, twice the 16px inside a
+ * section, so each block reads as one group. `fill` pages take exactly the
+ * height they are given, so a table or workbench can scroll inside itself
+ * with its header and pager in view; a list page that scrolls with the page
+ * instead uses `list`, which keeps the pager at the foot of a short list.
  */
 export function Page({
   children,
   fill,
+  list,
   narrow,
   className,
 }: {
   children: ReactNode;
   fill?: boolean;
+  /** A table page that scrolls as a whole: 12px between blocks, at least
+   * the viewport's height, and no bottom padding, so a `<Pager bar>` sits
+   * on the card's bottom edge. */
+  list?: boolean;
   narrow?: boolean;
   className?: string;
 }) {
   return (
     <div
       className={cn(
-        "mx-auto flex w-full flex-col px-4",
-        fill ? "h-full min-h-[36rem] gap-3 py-4" : "gap-8 py-6",
-        narrow ? "max-w-5xl" : "max-w-[1600px]",
+        "mx-auto flex w-full flex-col px-4 md:pt-8",
+        fill
+          ? "h-full min-h-[36rem] gap-3 py-4"
+          : list
+            ? "min-h-full gap-3 pt-6 pb-0"
+            : "gap-8 py-6",
+        narrow ? "max-w-3xl" : "max-w-[1600px] md:px-11",
         className,
       )}
     >
@@ -193,12 +204,15 @@ export function Facts({
   );
 }
 
-/** Headline figures in a row, label above figure, spaced apart rather than
- * boxed. They pack from the leading edge, each as wide as it needs (at least
- * 7rem) with 48px between, so a wide page does not pull them apart. Only a
- * figure that needs action takes a color. */
+/** Headline figures in a row, label above figure. They pack from the
+ * leading edge, each as wide as it needs (at least 7rem) with 48px between,
+ * so a wide page does not pull them apart; `cards` puts each on a quiet
+ * tile instead, the row split into equal columns (two on phones) for an
+ * overview's headline numbers. Only a figure that needs action takes a
+ * color. */
 export function StatStrip({
   items,
+  variant = "open",
 }: {
   items: {
     label: ReactNode;
@@ -206,12 +220,28 @@ export function StatStrip({
     hint?: ReactNode;
     tone?: "danger" | "warning";
   }[];
+  variant?: "open" | "cards";
 }) {
+  const cards = variant === "cards";
   return (
-    <dl className="m-0 flex shrink-0 flex-wrap gap-x-12 gap-y-4">
+    <dl
+      className={cn(
+        "m-0 shrink-0",
+        cards
+          ? "grid grid-cols-2 gap-3 md:grid-cols-[repeat(var(--stats),minmax(0,1fr))]"
+          : "flex flex-wrap gap-x-12 gap-y-4",
+      )}
+      style={cards ? ({ "--stats": items.length } as CSSProperties) : undefined}
+    >
       {items.map((item, i) => (
-        // eslint-disable-next-line react/no-array-index-key -- items have no id and keep the caller's order
-        <div key={i} className="flex min-w-28 flex-col gap-1">
+        <div
+          // eslint-disable-next-line react/no-array-index-key -- items have no id and keep the caller's order
+          key={i}
+          className={cn(
+            "flex flex-col gap-1",
+            cards ? "min-w-0 rounded-lg bg-muted p-4" : "min-w-28",
+          )}
+        >
           <dt className="truncate text-sm text-muted-foreground">
             {item.label}
           </dt>
@@ -225,9 +255,11 @@ export function StatStrip({
           >
             {item.value}
           </dd>
-          {item.hint ? (
+          {item.hint || cards ? (
+            // A card without a hint keeps the line, so the row's cards
+            // stay one height.
             <dd className="m-0 truncate text-xs text-muted-foreground">
-              {item.hint}
+              {item.hint ?? "\u00a0"}
             </dd>
           ) : null}
         </div>

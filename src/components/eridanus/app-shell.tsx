@@ -9,6 +9,7 @@ import {
   SunIcon,
 } from "@phosphor-icons/react";
 import {
+  cloneElement,
   type ComponentProps,
   type CSSProperties,
   type KeyboardEvent as ReactKeyboardEvent,
@@ -55,6 +56,7 @@ import {
   SidebarProvider,
   useSidebar,
 } from "@/components/ui/sidebar";
+import { Switch } from "@/components/ui/switch";
 import { useIsMobile } from "@/hooks/use-mobile";
 import type { Locale } from "@/lib/eridanus/locale";
 import { cn } from "@/lib/utils";
@@ -65,6 +67,9 @@ export interface AppBrand {
   logo?: ReactNode;
   /** Where the mark links; defaults to "/". */
   href?: string;
+  /** The mark's tile: round (the default), or a square with rounded
+   * corners, for a logo drawn as an app icon. */
+  shape?: "circle" | "square";
 }
 
 /** One of the tenants (workspaces, teams, organisations) a person can work
@@ -98,6 +103,9 @@ export interface AppTenants {
   actions?: { label: string; icon?: ReactNode; onSelect: () => void }[];
   /** Adds a "new tenant" item at the end of the menu. */
   onCreate?: () => void;
+  /** Lists only the first this many items, such as the most recently used
+   * ones, in the caller's order; the current tenant is always listed. */
+  limit?: number;
 }
 
 export interface AppNavItem {
@@ -133,8 +141,19 @@ export interface AppAccount {
   avatar?: string;
   /** Extra DropdownMenuItem elements above the theme choice, such as a profile link. */
   items?: ReactNode;
+  /** On/off rows with a switch, under the items: a mode the person flips,
+   * such as an admin view. The whole row toggles it. */
+  toggles?: AppAccountToggle[];
   /** Shows a sign-out item at the end of the menu. */
   onSignOut?: () => void;
+}
+
+export interface AppAccountToggle {
+  label: string;
+  /** A Phosphor icon element, in the column of the menu's other icons. */
+  icon?: ReactNode;
+  checked: boolean;
+  onCheckedChange: (checked: boolean) => void;
 }
 
 export interface AppShellLabels {
@@ -156,6 +175,8 @@ export interface AppShellLabels {
   light: string;
   dark: string;
   signOut: string;
+  /** Read after a link that opens in a new tab. */
+  newTab: string;
 }
 
 /** The built-in text in each locale. */
@@ -175,6 +196,7 @@ export const appShellLabels: Record<Locale, AppShellLabels> = {
     light: "浅色",
     dark: "深色",
     signOut: "退出登录",
+    newTab: "（新标签页打开）",
   },
   "en-US": {
     toggleSidebar: "Toggle sidebar",
@@ -191,6 +213,7 @@ export const appShellLabels: Record<Locale, AppShellLabels> = {
     light: "Light",
     dark: "Dark",
     signOut: "Sign out",
+    newTab: " (opens in a new tab)",
   },
 };
 
@@ -412,6 +435,7 @@ export function AppShell({
                   {brand.logo ? (
                     <Tile
                       logo={brand.logo}
+                      shape={brand.shape}
                       size="sm"
                       className="size-6 [&_svg]:size-3.5!"
                     />
@@ -626,18 +650,23 @@ function Tile({
   logo,
   name,
   size = "md",
+  shape = "circle",
   className,
 }: {
   logo?: ReactNode;
   name?: string;
   size?: "sm" | "md";
+  shape?: "circle" | "square";
   className?: string;
 }) {
   return (
     <span
       aria-hidden
       className={cn(
-        "flex shrink-0 items-center justify-center rounded-full bg-primary font-semibold text-primary-foreground! **:text-primary-foreground!",
+        "flex shrink-0 items-center justify-center overflow-hidden bg-primary font-semibold text-primary-foreground! **:text-primary-foreground!",
+        // A square tile keeps a quarter of its side as the corner radius,
+        // an app icon's proportion: 6px at 24px.
+        shape === "square" ? "rounded-[25%]" : "rounded-full",
         size === "md"
           ? "size-7 text-[12px] [&_svg]:size-3.5!"
           : "size-5 text-[11px] [&_svg]:size-3!",
@@ -647,6 +676,14 @@ function Tile({
       {logo ?? Array.from(name?.trim() ?? "")[0]?.toUpperCase()}
     </span>
   );
+}
+
+/** The tenants a switcher lists: the first `limit` of them, with the
+ * current one appended when the cut leaves it out. */
+function listed(tenants: AppTenants, current: AppTenant): AppTenant[] {
+  if (tenants.limit === undefined) return tenants.items;
+  const first = tenants.items.slice(0, Math.max(0, tenants.limit));
+  return first.some((t) => t.id === current.id) ? first : [...first, current];
 }
 
 /** The header as a tenant switcher: the current tenant's tile and name with
@@ -702,7 +739,7 @@ function TenantSwitcher({
               tenants.onSelect(id);
           }}
         >
-          {tenants.items.map((tenant) => (
+          {listed(tenants, current).map((tenant) => (
             <DropdownMenuRadioItem key={tenant.id} value={tenant.id}>
               <Tile logo={tenant.logo} name={tenant.name} size="sm" />
               <span className="truncate">{tenant.name}</span>
@@ -1237,7 +1274,6 @@ function AccountMenu({
   labels: AppShellLabels;
 }) {
   const { isMobile } = useSidebar();
-  const { preference, setPreference } = useTheme();
   return (
     // As wide as the avatar and name, so the hover pill hugs them and the
     // footer's buttons keep the rest of the row; min-w-8, as in the header:
@@ -1267,57 +1303,259 @@ function AccountMenu({
                 footer's buttons. */}
             <span className="truncate font-medium">{account.name}</span>
           </SidebarMenuButton>
-          <DropdownMenuContent
+          <AccountMenuContent
+            account={account}
+            labels={labels}
             side={isMobile ? "bottom" : "right"}
-            align="end"
-            sideOffset={8}
-            className="w-(--anchor-width) min-w-56"
-          >
-            <DropdownMenuGroup>
-              <DropdownMenuLabel className="flex flex-col gap-0.5">
-                <span className="truncate text-sm font-medium text-foreground">
-                  {account.name}
-                </span>
-                {account.email ? (
-                  <span className="truncate">{account.email}</span>
-                ) : null}
-              </DropdownMenuLabel>
-            </DropdownMenuGroup>
-            {account.items ? (
-              <>
-                <DropdownMenuSeparator />
-                <DropdownMenuGroup>{account.items}</DropdownMenuGroup>
-              </>
-            ) : null}
-            <DropdownMenuSeparator />
-            <DropdownMenuGroup>
-              <DropdownMenuLabel>{labels.theme}</DropdownMenuLabel>
-              <DropdownMenuRadioGroup
-                value={preference}
-                onValueChange={(next) => {
-                  if (isPreference(next)) setPreference(next);
-                }}
-              >
-                {THEME_OPTIONS.map(({ value, Icon }) => (
-                  <DropdownMenuRadioItem key={value} value={value}>
-                    <Icon />
-                    {labels[value]}
-                  </DropdownMenuRadioItem>
-                ))}
-              </DropdownMenuRadioGroup>
-            </DropdownMenuGroup>
-            {account.onSignOut ? (
-              <>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={account.onSignOut}>
-                  <SignOutIcon />
-                  {labels.signOut}
-                </DropdownMenuItem>
-              </>
-            ) : null}
-          </DropdownMenuContent>
+            className="w-(--anchor-width)"
+          />
         </DropdownMenu>
       </SidebarMenuItem>
     </SidebarMenu>
+  );
+}
+
+/** A router link element, given its children and class here. */
+type LinkElement = ReactElement<{
+  className?: string;
+  children?: ReactNode;
+  "aria-label"?: string;
+}>;
+
+/** A link in the header shell's bar. */
+export interface AppHeaderLink {
+  label: string;
+  href: string;
+  /** Opens in a new tab, such as documentation on another site. */
+  external?: boolean;
+}
+
+/**
+ * The frame of a page that stands on its own, without the console's sidebar:
+ * a home or directory page that comes before choosing a workspace. A 56px
+ * bar holds the product's mark (a link home, its name read to screen readers
+ * only) and a few text links on the leading edge, page-wide actions and the
+ * account's avatar on the trailing one; the page scrolls under it. The bar's
+ * contents line up with the page: `width="narrow"` (the default) is the
+ * 768px column of a narrow `Page`, `"wide"` that of a full-width one.
+ *
+ * Shares the account menu with AppShell, so it needs a ThemeProvider above
+ * it too.
+ */
+export function AppHeaderShell({
+  brand,
+  links,
+  actions,
+  account,
+  width = "narrow",
+  renderLink = defaultLink,
+  labels: labelOverrides,
+  className,
+  children,
+}: {
+  brand: AppBrand;
+  links?: AppHeaderLink[];
+  /** Buttons before the avatar, such as a way into an admin console. */
+  actions?: ReactNode;
+  account?: AppAccount;
+  width?: "narrow" | "wide";
+  renderLink?: (href: string) => ReactElement;
+  labels?: Partial<AppShellLabels>;
+  className?: string;
+  children: ReactNode;
+}) {
+  const labels = { ...useMessages(appShellLabels), ...labelOverrides };
+  useNoRootBounce();
+  const focusRing =
+    "outline-none focus-visible:ring-3 focus-visible:ring-ring/50";
+  return (
+    <div className={cn("flex h-svh flex-col bg-background", className)}>
+      <header className="shrink-0 border-b">
+        <div
+          className={cn(
+            "mx-auto flex h-14 w-full items-center justify-between gap-3 px-4",
+            width === "narrow" ? "max-w-3xl" : "max-w-[1600px] md:px-11",
+          )}
+        >
+          <nav
+            aria-label={labels.navigation}
+            className="flex items-center gap-6"
+          >
+            {cloneElement(renderLink(brand.href ?? "/") as LinkElement, {
+              "aria-label": brand.name,
+              className: cn(
+                brand.shape === "circle" ? "rounded-full" : "rounded-[6px]",
+                focusRing,
+              ),
+              children: (
+                // An app icon's square, 26px with 6px corners; an image
+                // fills it, an icon sits on the primary ground.
+                <span
+                  aria-hidden
+                  className={cn(
+                    "flex size-[26px] items-center justify-center overflow-hidden bg-primary text-primary-foreground [&_img]:size-full [&_img]:object-cover [&_svg]:size-4",
+                    brand.shape === "circle" ? "rounded-full" : "rounded-[6px]",
+                  )}
+                >
+                  {brand.logo ??
+                    Array.from(brand.name.trim())[0]?.toUpperCase()}
+                </span>
+              ),
+            })}
+            {links?.map((link) => {
+              const className = cn(
+                "rounded-full text-sm text-muted-foreground transition-colors hover:text-foreground",
+                focusRing,
+              );
+              const children = (
+                <>
+                  {link.label}
+                  {link.external ? (
+                    <span className="sr-only">{labels.newTab}</span>
+                  ) : null}
+                </>
+              );
+              return link.external ? (
+                <a
+                  key={link.href}
+                  href={link.href}
+                  target="_blank"
+                  rel="noreferrer"
+                  className={className}
+                >
+                  {children}
+                </a>
+              ) : (
+                cloneElement(renderLink(link.href) as LinkElement, {
+                  key: link.href,
+                  className,
+                  children,
+                })
+              );
+            })}
+          </nav>
+          <div className="flex items-center gap-2">
+            {actions}
+            {account ? (
+              <DropdownMenu>
+                <DropdownMenuTrigger
+                  aria-label={labels.account(account.name)}
+                  className={cn("rounded-full", focusRing)}
+                >
+                  <PersonAvatar
+                    name={account.name}
+                    src={account.avatar}
+                    size="sm"
+                    className="size-7! **:data-[slot=avatar-fallback]:text-[11px]"
+                  />
+                </DropdownMenuTrigger>
+                <AccountMenuContent
+                  account={account}
+                  labels={labels}
+                  side="bottom"
+                />
+              </DropdownMenu>
+            ) : null}
+          </div>
+        </div>
+      </header>
+      <main
+        id="main"
+        tabIndex={-1}
+        className="relative min-h-0 flex-1 overflow-y-auto outline-none"
+      >
+        {children}
+      </main>
+    </div>
+  );
+}
+
+/** The account menu's list: who is signed in, the app's own items and
+ * toggles, the theme choice and sign-out. Shared by the sidebar's account
+ * button and the header shell's avatar. */
+function AccountMenuContent({
+  account,
+  labels,
+  side,
+  className,
+}: {
+  account: AppAccount;
+  labels: AppShellLabels;
+  side: "bottom" | "right";
+  className?: string;
+}) {
+  const { preference, setPreference } = useTheme();
+  return (
+    <DropdownMenuContent
+      side={side}
+      align="end"
+      sideOffset={8}
+      className={cn("min-w-56", className)}
+    >
+      <DropdownMenuGroup>
+        <DropdownMenuLabel className="flex flex-col gap-0.5">
+          <span className="truncate text-sm font-medium text-foreground">
+            {account.name}
+          </span>
+          {account.email ? (
+            <span className="truncate">{account.email}</span>
+          ) : null}
+        </DropdownMenuLabel>
+      </DropdownMenuGroup>
+      {account.items || account.toggles?.length ? (
+        <>
+          <DropdownMenuSeparator />
+          <DropdownMenuGroup>
+            {account.items}
+            {account.toggles?.map((toggle) => (
+              <DropdownMenuItem
+                key={toggle.label}
+                // A switch row stays open, so the new state shows.
+                closeOnClick={false}
+                role="menuitemcheckbox"
+                aria-checked={toggle.checked}
+                onClick={() => toggle.onCheckedChange(!toggle.checked)}
+              >
+                {toggle.icon}
+                <span className="min-w-0 flex-1 truncate">{toggle.label}</span>
+                <Switch
+                  size="sm"
+                  checked={toggle.checked}
+                  tabIndex={-1}
+                  aria-hidden
+                  className="pointer-events-none"
+                />
+              </DropdownMenuItem>
+            ))}
+          </DropdownMenuGroup>
+        </>
+      ) : null}
+      <DropdownMenuSeparator />
+      <DropdownMenuGroup>
+        <DropdownMenuLabel>{labels.theme}</DropdownMenuLabel>
+        <DropdownMenuRadioGroup
+          value={preference}
+          onValueChange={(next) => {
+            if (isPreference(next)) setPreference(next);
+          }}
+        >
+          {THEME_OPTIONS.map(({ value, Icon }) => (
+            <DropdownMenuRadioItem key={value} value={value}>
+              <Icon />
+              {labels[value]}
+            </DropdownMenuRadioItem>
+          ))}
+        </DropdownMenuRadioGroup>
+      </DropdownMenuGroup>
+      {account.onSignOut ? (
+        <>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem onClick={account.onSignOut}>
+            <SignOutIcon />
+            {labels.signOut}
+          </DropdownMenuItem>
+        </>
+      ) : null}
+    </DropdownMenuContent>
   );
 }

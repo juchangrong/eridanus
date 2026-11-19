@@ -79,6 +79,8 @@ export function Pager({
   onPage,
   onPageSize,
   pageSizes = [20, 50, 100],
+  hideSinglePage = false,
+  bar = false,
   labels: overrides,
 }: {
   total: number;
@@ -88,6 +90,13 @@ export function Pager({
   /** Shows the page-size select when set. */
   onPageSize?: (size: number) => void;
   pageSizes?: number[];
+  /** Renders nothing while every row fits on one page at the smallest page
+   * size, so a short list ends with its last row. */
+  hideSinglePage?: boolean;
+  /** Pins the pager to the bottom of the scrolling area on the page's
+   * ground, out to the edges of a full-width `Page`, and pushes it to the
+   * foot of a short `<Page list>`. */
+  bar?: boolean;
   labels?: Partial<PagerLabels>;
 }) {
   const labels = { ...useMessages(pagerLabels), ...overrides };
@@ -101,7 +110,9 @@ export function Pager({
     label: labels.size(n),
   }));
 
-  return (
+  if (hideSinglePage && total <= Math.min(pageSize, ...pageSizes)) return null;
+
+  const pager = (
     <nav
       aria-label={labels.navigation}
       className="flex shrink-0 flex-wrap items-center gap-x-4 gap-y-2 text-xs text-muted-foreground"
@@ -183,6 +194,13 @@ export function Pager({
         </div>
       ) : null}
     </nav>
+  );
+  if (!bar) return pager;
+  return (
+    // Out to the page's sides, the gutters of a full-width Page.
+    <div className="sticky bottom-0 z-10 -mx-4 mt-auto bg-background px-4 py-3 md:-mx-11 md:px-11">
+      {pager}
+    </div>
   );
 }
 

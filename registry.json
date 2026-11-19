@@ -15,7 +15,7 @@
       "type": "registry:base",
       "extends": "none",
       "title": "Eridanus base",
-      "description": "Starts a project on the Eridanus look: the shadcn base-rhea style on Base UI (preset beqC918K: zinc, Phosphor icons, Inter), JetBrains Mono for code, success/warning/info status colors, and destructive and muted-foreground values that keep text at 4.5:1 or better in both themes, on muted grounds, on badge tints over tinted or hovered table rows, and on the destructive button's hover. Installs the Eridanus forks of input, textarea, select and input-group, whose focus and errors show on the border alone. Use with `shadcn init`.",
+      "description": "Starts a project on the Eridanus look: the shadcn base-rhea style on Base UI (preset beqC918K: zinc, Phosphor icons), the system font for all text, identifiers included, JetBrains Mono only in code blocks, a five-step type scale (12, 13 for body, 15, 20), success/warning/info status colors, and destructive and muted-foreground values that keep text at 4.5:1 or better in both themes, on muted grounds, on badge tints over tinted or hovered table rows, and on the destructive button's hover. Installs the Eridanus forks of input, textarea, select and input-group, whose focus and errors show on the border alone. Use with `shadcn init`.",
       "categories": ["theme", "setup"],
       "config": {
         "style": "base-rhea",
@@ -36,7 +36,6 @@
       "devDependencies": ["shadcn", "tw-animate-css"],
       "registryDependencies": [
         "utils",
-        "font-inter",
         "juchangrong/eridanus/status-colors",
         "juchangrong/eridanus/input",
         "juchangrong/eridanus/textarea",
@@ -53,8 +52,18 @@
       ],
       "cssVars": {
         "theme": {
+          "font-sans": "system-ui, -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, \"PingFang SC\", \"Hiragino Sans GB\", \"Microsoft YaHei\", sans-serif",
           "font-heading": "var(--font-sans)",
-          "font-mono": "'JetBrains Mono Variable', ui-monospace, SFMono-Regular, Menlo, monospace"
+          "font-mono": "system-ui, -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, \"PingFang SC\", \"Hiragino Sans GB\", \"Microsoft YaHei\", sans-serif",
+          "font-code": "'JetBrains Mono Variable', ui-monospace, SFMono-Regular, Menlo, monospace",
+          "text-sm": "0.8125rem",
+          "text-sm--line-height": "1.25rem",
+          "text-base": "0.9375rem",
+          "text-base--line-height": "1.375rem",
+          "text-lg": "0.9375rem",
+          "text-lg--line-height": "1.375rem",
+          "text-2xl": "1.25rem",
+          "text-2xl--line-height": "1.75rem"
         },
         "light": {
           "background": "oklch(1 0 0)",
@@ -136,7 +145,7 @@
             "@apply border-border outline-ring/50": {}
           },
           "body": {
-            "@apply bg-background text-foreground": {}
+            "@apply bg-background text-foreground text-sm": {}
           },
           "code, kbd, samp, pre": {
             "@apply font-mono": {}
@@ -164,7 +173,13 @@
           },
           ".dark": {
             "color-scheme": "dark"
+          },
+          "html": {
+            "@apply font-sans": {}
           }
+        },
+        "pre, pre *": {
+          "font-family": "var(--font-code)"
         }
       }
     },

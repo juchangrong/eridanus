@@ -228,7 +228,8 @@ for (const needle of [
   "--success:",
   "--color-success: var(--success)",
   "--muted-foreground: oklch(0.52 0.016 285.938)",
-  "Inter Variable",
+  "PingFang SC",
+  "--font-code:",
   "JetBrains Mono Variable",
   "color-scheme: dark",
 ]) {
