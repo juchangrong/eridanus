@@ -16,6 +16,7 @@ import {
   type ReactElement,
   type ReactNode,
   useEffect,
+  useLayoutEffect,
   useRef,
   useState,
 } from "react";
@@ -82,6 +83,9 @@ export interface AppSearch {
   onOpen: () => void;
   /** The button's text; defaults to the built-in "Search". */
   placeholder?: string;
+  /** Where the entry sits: under the sidebar's header (the default) or in
+   * the middle of the card's top bar, which it then always shows. */
+  placement?: "sidebar" | "topbar";
 }
 
 export interface AppTenants {
@@ -302,7 +306,8 @@ export function AppShell({
   /** Makes the header a tenant switcher, in place of the brand link: the
    * current tenant's tile and name, opening a menu of the others. */
   tenants?: AppTenants;
-  /** A search button under the header, with ⌘K to open it. */
+  /** A search button under the header, or in the top bar with
+   * `placement: "topbar"`, with ⌘K to open it. */
   search?: AppSearch;
   nav: AppNavGroup[];
   account?: AppAccount;
@@ -327,6 +332,9 @@ export function AppShell({
   );
   const [width, setWidth] = useState(storedWidth);
   const peek = usePeek(pinned);
+  useNoRootBounce();
+  const barSearch = search?.placement === "topbar" ? search : undefined;
+  const bar = Boolean(breadcrumb || actions || barSearch);
   return (
     <SidebarProvider
       // Open when the user opened it (stored in the cookie by shadcn's
@@ -389,18 +397,33 @@ export function AppShell({
               {tenants ? (
                 <TenantSwitcher tenants={tenants} labels={labels} />
               ) : (
+                // The mark sized as the tenant switcher's tile: 24px in
+                // both states, 4px in, centred on the icon column, the
+                // name a step above the nav and bold. A link home, not a
+                // control, so it shows no hover ground.
                 <NavButton
                   tooltip={brand.name}
                   link={renderLink(brand.href ?? "/")}
-                  className={HEADER_ROW}
+                  className={cn(
+                    HEADER_ROW,
+                    "gap-2 ps-1 transition-[width,height,padding,margin] group-data-[collapsible=icon]:p-0.5! hover:bg-transparent active:bg-transparent",
+                  )}
                 >
-                  {brand.logo ? <Tile logo={brand.logo} /> : null}
-                  <span className="font-heading font-medium">{brand.name}</span>
+                  {brand.logo ? (
+                    <Tile
+                      logo={brand.logo}
+                      size="sm"
+                      className="size-6 [&_svg]:size-3.5!"
+                    />
+                  ) : null}
+                  <span className="truncate text-[15px] font-semibold">
+                    {brand.name}
+                  </span>
                 </NavButton>
               )}
               {/* With a top bar the toggle stays there, in the card's
                   corner, in both states; without one it is here. */}
-              {breadcrumb || actions ? null : (
+              {bar ? null : (
                 <CollapseButton
                   label={
                     peek.open ? labels.expandSidebar : labels.collapseSidebar
@@ -410,7 +433,7 @@ export function AppShell({
               )}
             </SidebarMenuItem>
           </SidebarMenu>
-          {search ? (
+          {search && search.placement !== "topbar" ? (
             <SearchButton search={search} label={labels.search} />
           ) : null}
         </SidebarHeader>
@@ -432,15 +455,25 @@ export function AppShell({
                   "group-data-[collapsible=icon]:hidden",
               )}
             >
+              {/* Collapsed, the headings fade away, so a short rule centred
+                  on the icon column parts the groups instead: out of the
+                  flow, midway between the last button above and the first
+                  below (10px from each). */}
+              {i > 0 ? (
+                <div
+                  aria-hidden
+                  className="absolute -top-1.5 left-1.5 hidden h-px w-4 bg-sidebar-border group-data-[collapsible=icon]:block"
+                />
+              ) : null}
               {group.title ? (
-                <SidebarGroupLabel className="ps-[7px]">
+                <SidebarGroupLabel className="h-7 ps-2 text-xs">
                   {group.title}
                 </SidebarGroupLabel>
               ) : null}
               <SidebarGroupContent>
                 {/* Collapsed, the 28px buttons part by 8px (a 36px pitch),
                     so the bare icons have room around them. */}
-                <SidebarMenu className="transition-[gap] duration-(--sidebar-duration) ease-(--sidebar-ease) group-data-[collapsible=icon]:gap-2">
+                <SidebarMenu className="gap-px transition-[gap] duration-(--sidebar-duration) ease-(--sidebar-ease) group-data-[collapsible=icon]:gap-2">
                   {group.items.map((item) => (
                     <SidebarMenuItem key={item.href}>
                       <NavButton
@@ -448,17 +481,19 @@ export function AppShell({
                         aria-current={item.active ? "page" : undefined}
                         tooltip={item.label}
                         link={renderLink(item.href)}
-                        // One column with the header: the 18px icon centred
-                        // under the logo, the label where the product's name
-                        // starts, 7px around the icon on every side and a
-                        // badge 7px from the other end. The pills span the
-                        // sidebar's own 8px inset, the same at both sides.
-                        // Collapsed, the icon centres in a 28px button.
+                        // Dense, like Linear's: 28px rows with 13px labels.
+                        // One column with the header: the 16px icon centred
+                        // under the logo (8px in, as the search's 18px icon
+                        // sits 7px in), the label where the product's name
+                        // starts and a badge 8px from the other end. The
+                        // pills span the sidebar's own 8px inset, the same
+                        // at both sides. Collapsed, the icon centres in the
+                        // same 28px button.
                         // The icon takes the button's muted color, darkening
                         // on hover and on the current page; the label and
                         // badge keep the text color. An icon with a color of
                         // its own (a status dot) keeps it.
-                        className="gap-[11px] pe-[7px] text-muted-foreground transition-[width,height,padding,margin] duration-(--sidebar-duration) ease-(--sidebar-ease) group-data-[collapsible=icon]:size-7! group-data-[collapsible=icon]:p-[5px]! has-[>svg:first-child]:pl-[7px] [&_svg]:size-[18px]"
+                        className="h-7 gap-[12px] pe-2 text-[13px] text-muted-foreground transition-[width,height,padding,margin] duration-(--sidebar-duration) ease-(--sidebar-ease) group-data-[collapsible=icon]:size-7! group-data-[collapsible=icon]:p-1.5! has-[>svg:first-child]:pl-2 [&_svg]:size-4"
                       >
                         {item.icon}
                         <span className="min-w-0 flex-1 truncate text-sidebar-foreground">
@@ -505,28 +540,40 @@ export function AppShell({
             icon 16px from the card's top and left, over the page's text,
             which starts 16px in; the controls at either end 10px from the
             edges. 48px tall, so they centre on the sidebar's header row
-            beside it. No rule under it: the page's own space
-            sets it apart. Without a breadcrumb or actions only phones get
+            beside it. A hairline under it, in the card's border color,
+            parts it from the page that scrolls beneath. Without a breadcrumb or actions only phones get
             the bar, to open the sidebar. */}
         <div
           className={cn(
-            "flex h-12 shrink-0 items-center gap-2 px-4",
-            !breadcrumb && !actions && "md:hidden",
+            "flex h-12 shrink-0 items-center gap-2 border-b px-4",
+            !bar && "md:hidden",
           )}
         >
-          <BarToggle
-            label={labels.toggleSidebar}
-            separator={Boolean(breadcrumb)}
-          />
-          {breadcrumb ? (
-            <div className="min-w-0 flex-1 truncate">{breadcrumb}</div>
-          ) : (
-            <div className="flex-1" />
-          )}
-          {actions ? (
+          {/* With search in the bar, the ends grow alike, so the search
+              sits on the card's centre line between them. */}
+          <div className="flex min-w-0 flex-1 items-center gap-2">
+            <BarToggle
+              label={labels.toggleSidebar}
+              separator={Boolean(breadcrumb)}
+            />
+            {breadcrumb ? (
+              <div className="min-w-0 flex-1 truncate [&_ol]:flex-nowrap [&_ol]:whitespace-nowrap">
+                {breadcrumb}
+              </div>
+            ) : null}
+          </div>
+          {barSearch ? (
+            <TopBarSearch search={barSearch} label={labels.search} />
+          ) : null}
+          {actions || barSearch ? (
             // The last action 10px from the card's right edge, as from its
             // top, like the toggle at the other end.
-            <div className="-me-1.5 flex shrink-0 items-center gap-2">
+            <div
+              className={cn(
+                "-me-1.5 flex items-center justify-end gap-2",
+                barSearch ? "min-w-0 flex-1" : "shrink-0",
+              )}
+            >
               {actions}
             </div>
           ) : null}
@@ -579,19 +626,22 @@ function Tile({
   logo,
   name,
   size = "md",
+  className,
 }: {
   logo?: ReactNode;
   name?: string;
   size?: "sm" | "md";
+  className?: string;
 }) {
   return (
     <span
       aria-hidden
       className={cn(
-        "flex shrink-0 items-center justify-center rounded-full bg-primary font-semibold text-primary-foreground",
+        "flex shrink-0 items-center justify-center rounded-full bg-primary font-semibold text-primary-foreground! **:text-primary-foreground!",
         size === "md"
           ? "size-7 text-[12px] [&_svg]:size-3.5!"
-          : "size-5 text-[10px] [&_svg]:size-3!",
+          : "size-5 text-[11px] [&_svg]:size-3!",
+        className,
       )}
     >
       {logo ?? Array.from(name?.trim() ?? "")[0]?.toUpperCase()}
@@ -617,17 +667,24 @@ function TenantSwitcher({
       {/* The menu button renders the trigger, as in the account menu. */}
       <SidebarMenuButton
         aria-label={labels.switchTenant(current.name)}
-        // The tenant's tile and name in a 32px row like a nav pill, the
-        // 28px tile 2px inside (concentric: 16 less 2 is 14), centred on
-        // the icon column. Collapsed it is the bare tile, like the icons.
+        // A bordered 32px pill: the 24px tile 4px in, centred on the icon
+        // column, the name a step above the nav and bold, as the header's
+        // mark. Collapsed it is a bare 28px button holding the same tile;
+        // the padding, ring and ground change, all transitioned, so the
+        // tile glides between the two places without resizing.
         className={cn(
           HEADER_ROW,
-          "h-8 gap-2.5 rounded-full ps-0.5 data-popup-open:bg-sidebar-accent data-popup-open:text-sidebar-accent-foreground",
+          "h-8 gap-2 rounded-full bg-background ps-1 pe-2.5 ring-1 ring-sidebar-border transition-[width,height,padding,margin,box-shadow,background-color] ring-inset group-data-[collapsible=icon]:bg-transparent group-data-[collapsible=icon]:p-0.5! group-data-[collapsible=icon]:ring-0 data-popup-open:bg-sidebar-accent data-popup-open:text-sidebar-accent-foreground",
         )}
         render={<DropdownMenuTrigger />}
       >
-        <Tile logo={current.logo} name={current.name} />
-        <span className="min-w-0 flex-1 truncate text-left font-heading text-base font-medium">
+        <Tile
+          logo={current.logo}
+          name={current.name}
+          size="sm"
+          className="size-6"
+        />
+        <span className="min-w-0 flex-1 truncate text-left text-[15px] font-semibold">
           {current.name}
         </span>
         <CaretUpDownIcon className="size-3.5! text-muted-foreground" />
@@ -694,17 +751,31 @@ function TenantSwitcher({
 function FooterActions({ children }: { children: ReactNode }) {
   const { state } = useSidebar();
   const ref = useRef<HTMLDivElement>(null);
-  const first = useRef(true);
-  useEffect(() => {
-    if (first.current) {
-      first.current = false;
+  // Where the buttons sat in the footer before the last layout change:
+  // beside the account open, stacked above it collapsed.
+  const last = useRef<{ x: number; y: number } | null>(null);
+  useLayoutEffect(() => {
+    const el = ref.current;
+    const footer = el?.parentElement;
+    if (!el || !footer) return;
+    const box = el.getBoundingClientRect();
+    const frame = footer.getBoundingClientRect();
+    const now = { x: box.left - frame.left, y: box.top - frame.top };
+    const before = last.current;
+    last.current = now;
+    if (!before || matchMedia("(prefers-reduced-motion: reduce)").matches)
       return;
-    }
-    if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    ref.current?.animate([{ opacity: 0 }, { opacity: 1 }], {
-      duration: SIDEBAR_DURATION,
-      easing: SIDEBAR_EASE,
-    });
+    // The layout jumps at once; slide the buttons from where they were,
+    // in the sidebar's own timing, while its width eases alongside.
+    el.animate(
+      [
+        {
+          transform: `translate(${before.x - now.x}px, ${before.y - now.y}px)`,
+        },
+        { transform: "none" },
+      ],
+      { duration: SIDEBAR_DURATION, easing: SIDEBAR_EASE },
+    );
   }, [state]);
   return (
     <div
@@ -720,7 +791,7 @@ function FooterActions({ children }: { children: ReactNode }) {
 /** The search entry: a field-like pill with the nav's icon column, opening
  * the app's search on click or ⌘K (Ctrl+K off Apple systems). Collapsed it
  * is a bare icon button with a tooltip. */
-function SearchButton({ search, label }: { search: AppSearch; label: string }) {
+function useSearchShortcut(search: AppSearch) {
   const onOpen = useRef(search.onOpen);
   onOpen.current = search.onOpen;
   const [apple, setApple] = useState(false);
@@ -740,6 +811,45 @@ function SearchButton({ search, label }: { search: AppSearch; label: string }) {
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
   }, []);
+  return { apple, open: () => onOpen.current() };
+}
+
+/** The search entry in the top bar: a 32px field-like pill on the card's
+ * centre line, up to 480px wide, shrinking before the bar's ends do; a bare
+ * icon button on phones. */
+function TopBarSearch({ search, label }: { search: AppSearch; label: string }) {
+  const { apple, open } = useSearchShortcut(search);
+  const text = search.placeholder ?? label;
+  return (
+    <>
+      <Button
+        variant="ghost"
+        size="icon"
+        aria-label={text}
+        aria-keyshortcuts={apple ? "Meta+K" : "Control+K"}
+        onClick={open}
+        className="md:hidden"
+      >
+        <MagnifyingGlassIcon />
+      </Button>
+      <button
+        type="button"
+        aria-keyshortcuts={apple ? "Meta+K" : "Control+K"}
+        onClick={open}
+        className="hidden h-8 w-120 max-w-[40%] min-w-40 shrink items-center gap-2 rounded-full bg-sidebar ps-3 pe-1.5 text-sm text-muted-foreground ring-1 ring-sidebar-border transition-colors outline-none ring-inset hover:bg-sidebar-accent focus-visible:ring-2 focus-visible:ring-ring md:flex [&_svg]:size-4 [&_svg]:shrink-0"
+      >
+        <MagnifyingGlassIcon />
+        <span className="min-w-0 flex-1 truncate text-left">{text}</span>
+        <kbd className="rounded-full bg-muted px-2 py-0.5 font-sans text-[11px] font-medium text-muted-foreground">
+          {apple ? "⌘K" : "Ctrl K"}
+        </kbd>
+      </button>
+    </>
+  );
+}
+
+function SearchButton({ search, label }: { search: AppSearch; label: string }) {
+  const { apple, open } = useSearchShortcut(search);
   const text = search.placeholder ?? label;
   return (
     <SidebarMenu>
@@ -748,8 +858,8 @@ function SearchButton({ search, label }: { search: AppSearch; label: string }) {
         <SidebarMenuButton
           tooltip={text}
           aria-keyshortcuts={apple ? "Meta+K" : "Control+K"}
-          onClick={() => onOpen.current()}
-          className="gap-[11px] rounded-full bg-background pe-1.5 text-muted-foreground ring-1 ring-sidebar-border transition-[width,height,padding,margin] duration-(--sidebar-duration) ease-(--sidebar-ease) ring-inset group-data-[collapsible=icon]:size-7! group-data-[collapsible=icon]:bg-transparent group-data-[collapsible=icon]:p-[5px]! group-data-[collapsible=icon]:ring-0 has-[>svg:first-child]:pl-[7px] [&_svg]:size-[18px]"
+          onClick={open}
+          className="gap-[11px] rounded-full bg-background pe-1.5 text-[13px] text-muted-foreground ring-1 ring-sidebar-border transition-[width,height,padding,margin] duration-(--sidebar-duration) ease-(--sidebar-ease) ring-inset group-data-[collapsible=icon]:size-7! group-data-[collapsible=icon]:bg-transparent group-data-[collapsible=icon]:p-[5px]! group-data-[collapsible=icon]:ring-0 has-[>svg:first-child]:pl-[7px] [&_svg]:size-[18px]"
         >
           <MagnifyingGlassIcon />
           <span className="flex-1">{text}</span>
@@ -807,6 +917,23 @@ const PEEK_CLOSE_DELAY = 150;
  * is open, as the menu's popup is outside it, and closes when the user
  * collapses or opens the sidebar for good. Keyboard users have the tooltips.
  */
+/** No rubber-band on the page while the shell is mounted. The shell fills
+ * the viewport and the card scrolls by itself, so the page has nothing to
+ * scroll, yet macOS still bounces it on a trackpad: the card then slides
+ * while the fixed sidebar stays, and the sidebar open on hover, which draws
+ * the card's left edge beside it, comes apart from the card. Scrolling inside
+ * the card still bounces there. Restored on unmount. */
+function useNoRootBounce() {
+  useEffect(() => {
+    const root = document.documentElement;
+    const before = root.style.overscrollBehavior;
+    root.style.overscrollBehavior = "none";
+    return () => {
+      root.style.overscrollBehavior = before;
+    };
+  }, []);
+}
+
 function usePeek(pinned: boolean) {
   const isMobile = useIsMobile();
   const [open, setOpen] = useState(false);
@@ -913,9 +1040,12 @@ function BarToggle({
         <SidebarSimpleIcon />
       </Button>
       {separator ? (
+        // 12px of clear space on each side: the bar's 8px gap less 2px
+        // after the button, whose icon sits 6px inside it, and plus 4px
+        // before the breadcrumb.
         <Separator
           orientation="vertical"
-          className="data-vertical:h-4 data-vertical:self-center"
+          className="-ms-0.5 me-1 data-vertical:h-4 data-vertical:self-center"
         />
       ) : null}
     </>
@@ -1109,9 +1239,10 @@ function AccountMenu({
   const { isMobile } = useSidebar();
   const { preference, setPreference } = useTheme();
   return (
-    // min-w-8, as in the header: the footer's buttons never squeeze the
-    // avatar while the sidebar opens.
-    <SidebarMenu className="w-auto min-w-8 flex-1">
+    // As wide as the avatar and name, so the hover pill hugs them and the
+    // footer's buttons keep the rest of the row; min-w-8, as in the header:
+    // they never squeeze the avatar while the sidebar opens.
+    <SidebarMenu className="w-auto min-w-8 shrink">
       <SidebarMenuItem>
         <DropdownMenu>
           {/* The menu button renders the trigger, not the other way round:
@@ -1119,16 +1250,18 @@ function AccountMenu({
               the trigger's element to open. */}
           <SidebarMenuButton
             aria-label={labels.account(account.name)}
-            // The 24px avatar centred under the logo and nav icons, 4px from
-            // the pill on every side, the name in line with their labels.
-            className="gap-2 rounded-full ps-1 transition-[width,height,padding,margin] duration-(--sidebar-duration) ease-(--sidebar-ease) group-data-[collapsible=icon]:size-7! group-data-[collapsible=icon]:p-1! data-popup-open:bg-sidebar-accent data-popup-open:text-sidebar-accent-foreground"
+            // The 24px avatar, as the header's tile, in both states: 4px
+            // in, centred under the logo and nav icons, the name in line
+            // with their labels. Collapsed the 28px button sits 2px up, so
+            // the avatar keeps the open row's height.
+            className="w-auto max-w-full gap-2 rounded-full ps-1 pe-3 text-[13px] transition-[width,height,padding,margin] duration-(--sidebar-duration) ease-(--sidebar-ease) group-data-[collapsible=icon]:mb-0.5 group-data-[collapsible=icon]:size-7! group-data-[collapsible=icon]:p-0.5! data-popup-open:bg-sidebar-accent data-popup-open:text-sidebar-accent-foreground"
             render={<DropdownMenuTrigger />}
           >
             <PersonAvatar
               name={account.name}
               src={account.avatar}
               size="sm"
-              className="transition-[width,height] duration-(--sidebar-duration) ease-(--sidebar-ease) group-data-[collapsible=icon]:size-5!"
+              className="size-6! **:data-[slot=avatar-fallback]:text-[11px]"
             />
             {/* The email waits in the menu, which leaves room for the
                 footer's buttons. */}
