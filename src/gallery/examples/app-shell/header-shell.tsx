@@ -48,22 +48,22 @@ export default function HeaderShellDemo() {
               管理控制台
             </Button>
           ) : (
-            // A disabled button takes no pointer, so the tooltip hangs on a
-            // focusable wrapper that says why.
+            // Disabled but still focusable, so the tooltip that says why
+            // reaches pointer and keyboard users alike.
             <Tooltip>
               <TooltipTrigger
                 render={
-                  // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex -- keyboard users reach the reason too
-                  <span
-                    tabIndex={0}
-                    className="rounded-full outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
+                  <Button
+                    size="sm"
+                    variant="secondary"
+                    disabled
+                    focusableWhenDisabled
+                    className="data-disabled:opacity-50"
                   />
                 }
               >
-                <Button size="sm" variant="secondary" disabled>
-                  <GearSixIcon />
-                  管理控制台
-                </Button>
+                <GearSixIcon />
+                管理控制台
               </TooltipTrigger>
               <TooltipContent>需要超级管理员权限</TooltipContent>
             </Tooltip>
