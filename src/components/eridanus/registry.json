@@ -248,7 +248,7 @@
       "name": "page-layout",
       "type": "registry:component",
       "title": "Page layout",
-      "description": "Frameless page structure: Page (document, list or fill-height, optional narrow width of 768px), PageHeader (h1 with badges, actions and a meta line, or a screen-reader-only title), Section (heading over open content), FactLine (dot-separated facts), Facts (label over value) and StatStrip (headline figures, open or on muted cards spread evenly, colored only when they need action).",
+      "description": "Frameless page structure: Page (document, list or fill-height, optional narrow width of 768px), PageHeader (h1 with badges, actions and a meta line, or a screen-reader-only title), Section (heading over open content), FactLine (dot-separated facts), Facts (label over value) and StatStrip (headline figures, open or on muted cards spread evenly, colored only when they need action) and Toolbar (the controls over a list, wrapping, the search on a line of its own on phones).",
       "categories": ["layout"],
       "registryDependencies": ["juchangrong/eridanus/status-colors"],
       "files": [
@@ -256,6 +256,21 @@
           "path": "page-layout.tsx",
           "type": "registry:component",
           "target": "@components/eridanus/page-layout.tsx"
+        }
+      ]
+    },
+    {
+      "name": "entity-card",
+      "type": "registry:component",
+      "title": "EntityCard",
+      "description": "A list of things a person owns or runs as one-row cards, for when a table would be too wide or too sparse: EntityCard (an 80px row of icon, name with a status badge, a line of facts, an aside such as the owner and age, and a menu; an optional 40px footer; a link element that covers the card and opens the entry, named by the title, with links and buttons inside still clickable; the aside folds away under 640px), EntityCardList (12px apart) and EntityCardSkeleton (placeholders while it loads). Corners match the toolbar's fields.",
+      "categories": ["data-display", "layout"],
+      "registryDependencies": ["card", "skeleton"],
+      "files": [
+        {
+          "path": "entity-card.tsx",
+          "type": "registry:component",
+          "target": "@components/eridanus/entity-card.tsx"
         }
       ]
     },
