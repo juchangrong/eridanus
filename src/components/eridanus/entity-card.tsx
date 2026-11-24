@@ -120,7 +120,6 @@ export function EntityCardSkeleton({ rows = 3 }: { rows?: number }) {
     <div className="flex flex-col gap-3" aria-hidden>
       {Array.from({ length: rows }, (_, i) => (
         <Card
-          // eslint-disable-next-line react/no-array-index-key -- placeholders have no identity
           key={i}
           className={cn(
             "flex h-20 flex-row items-center gap-3.5 py-0 ps-4 pe-3",

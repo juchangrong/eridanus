@@ -153,7 +153,6 @@ export default function EntityCardDemo() {
                 </DropdownMenuContent>
               </DropdownMenu>
             }
-            // eslint-disable-next-line jsx-a11y/anchor-has-content -- the card puts the title into it
             link={<a href={`#/services/${e.id}`} />}
           />
         ))}
