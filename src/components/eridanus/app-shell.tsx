@@ -70,6 +70,13 @@ export interface AppBrand {
   /** The mark's tile: round (the default), or a square with rounded
    * corners, for a logo drawn as an app icon. */
   shape?: "circle" | "square";
+  /** A whole lockup, such as one SVG of the mark and the wordmark, drawn in
+   * place of the tile and the name. Its mark comes first, 28px wide or
+   * centred in a 28px box: collapsed, the row clips the lockup to that box,
+   * so the mark keeps its place while only the wordmark is cut off. The nav
+   * and the account then keep the collapsed column open too (see
+   * `AppShell`). Name the product in the lockup's own `aria-label`. */
+  lockup?: ReactNode;
 }
 
 /** One of the tenants (workspaces, teams, organisations) a person can work
@@ -358,6 +365,11 @@ export function AppShell({
   useNoRootBounce();
   const barSearch = search?.placement === "topbar" ? search : undefined;
   const bar = Boolean(breadcrumb || actions || barSearch);
+  // Open, the icon column sits 2px right of where it sits collapsed, so the
+  // icons glide when the sidebar folds. A lockup cannot glide (its wordmark
+  // would slide under the clip), so with one the nav and the account keep
+  // the collapsed column in both states and nothing moves sideways.
+  const steady = Boolean(brand.lockup) && !tenants;
   return (
     <SidebarProvider
       // Open when the user opened it (stored in the cookie by shadcn's
@@ -430,9 +442,17 @@ export function AppShell({
                   className={cn(
                     HEADER_ROW,
                     "gap-2 ps-1 transition-[width,height,padding,margin] group-data-[collapsible=icon]:p-0.5! hover:bg-transparent active:bg-transparent",
+                    // A lockup starts at the row's edge in both states, so
+                    // its mark never moves and collapsing clips only the
+                    // wordmark; small corners, so the clip never cuts into
+                    // the mark.
+                    brand.lockup &&
+                      "rounded-[6.5px] ps-0 group-data-[collapsible=icon]:p-0! has-[>svg:first-child]:pl-0",
                   )}
                 >
-                  {brand.logo ? (
+                  {brand.lockup ? (
+                    brand.lockup
+                  ) : brand.logo ? (
                     <Tile
                       logo={brand.logo}
                       shape={brand.shape}
@@ -440,9 +460,11 @@ export function AppShell({
                       className="size-6 [&_svg]:size-3.5!"
                     />
                   ) : null}
-                  <span className="truncate text-[15px] font-semibold">
-                    {brand.name}
-                  </span>
+                  {brand.lockup ? null : (
+                    <span className="truncate text-[15px] font-semibold">
+                      {brand.name}
+                    </span>
+                  )}
                 </NavButton>
               )}
               {/* With a top bar the toggle stays there, in the card's
@@ -490,7 +512,9 @@ export function AppShell({
                 />
               ) : null}
               {group.title ? (
-                <SidebarGroupLabel className="h-7 ps-2 text-xs">
+                <SidebarGroupLabel
+                  className={cn("h-7 ps-2 text-xs", steady && "ps-1.5")}
+                >
                   {group.title}
                 </SidebarGroupLabel>
               ) : null}
@@ -517,7 +541,10 @@ export function AppShell({
                         // on hover and on the current page; the label and
                         // badge keep the text color. An icon with a color of
                         // its own (a status dot) keeps it.
-                        className="h-7 gap-[12px] pe-2 text-[13px] text-muted-foreground transition-[width,height,padding,margin] duration-(--sidebar-duration) ease-(--sidebar-ease) group-data-[collapsible=icon]:size-7! group-data-[collapsible=icon]:p-1.5! has-[>svg:first-child]:pl-2 [&_svg]:size-4"
+                        className={cn(
+                          "h-7 gap-[12px] pe-2 text-[13px] text-muted-foreground transition-[width,height,padding,margin] duration-(--sidebar-duration) ease-(--sidebar-ease) group-data-[collapsible=icon]:size-7! group-data-[collapsible=icon]:p-1.5! has-[>svg:first-child]:pl-2 [&_svg]:size-4",
+                          steady && "has-[>svg:first-child]:pl-1.5",
+                        )}
                       >
                         {item.icon}
                         <span className="min-w-0 flex-1 truncate text-sidebar-foreground">
@@ -541,7 +568,9 @@ export function AppShell({
         {/* No bottom padding: the row's foot lines up with the card's. */}
         {account || footerActions ? (
           <SidebarFooter className="flex-row items-center gap-1 overflow-clip px-0 pb-0 [overflow-clip-margin:4px] group-data-[collapsible=icon]:flex-col-reverse group-data-[collapsible=icon]:items-start">
-            {account ? <AccountMenu account={account} labels={labels} /> : null}
+            {account ? (
+              <AccountMenu account={account} labels={labels} steady={steady} />
+            ) : null}
             {footerActions ? (
               <FooterActions>{footerActions}</FooterActions>
             ) : null}
@@ -1269,9 +1298,12 @@ const isPreference = (value: unknown): value is ThemePreference =>
 function AccountMenu({
   account,
   labels,
+  steady,
 }: {
   account: AppAccount;
   labels: AppShellLabels;
+  /** Keep the collapsed column open too: the avatar 2px in. */
+  steady?: boolean;
 }) {
   const { isMobile } = useSidebar();
   return (
@@ -1290,7 +1322,10 @@ function AccountMenu({
             // in, centred under the logo and nav icons, the name in line
             // with their labels. Collapsed the 28px button sits 2px up, so
             // the avatar keeps the open row's height.
-            className="w-auto max-w-full gap-2 rounded-full ps-1 pe-3 text-[13px] transition-[width,height,padding,margin] duration-(--sidebar-duration) ease-(--sidebar-ease) group-data-[collapsible=icon]:mb-0.5 group-data-[collapsible=icon]:size-7! group-data-[collapsible=icon]:p-0.5! data-popup-open:bg-sidebar-accent data-popup-open:text-sidebar-accent-foreground"
+            className={cn(
+              "w-auto max-w-full gap-2 rounded-full ps-1 pe-3 text-[13px] transition-[width,height,padding,margin] duration-(--sidebar-duration) ease-(--sidebar-ease) group-data-[collapsible=icon]:mb-0.5 group-data-[collapsible=icon]:size-7! group-data-[collapsible=icon]:p-0.5! data-popup-open:bg-sidebar-accent data-popup-open:text-sidebar-accent-foreground",
+              steady && "ps-0.5",
+            )}
             render={<DropdownMenuTrigger />}
           >
             <PersonAvatar

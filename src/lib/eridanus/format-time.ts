@@ -1,6 +1,6 @@
 /**
  * Time formatting for interfaces people scan and copy from: a readable form
- * for the surface ("刚刚", "今天 14:05"; "just now", "Today 14:05" in English)
+ * for the surface ("just now", "Today 14:05", in the locale's own words)
  * and the exact forms a hover card shows. Every function takes a Date, an ISO
  * string or epoch milliseconds, works in the browser's time zone, and returns
  * "" (or null) for missing or unparseable input. The readable forms take a
@@ -49,9 +49,9 @@ const UNITS = [
 ] as const;
 
 /**
- * How long ago or ahead: "刚刚" ("just now") within ten seconds, then seconds,
- * minutes, hours or days, in the past ("12 分钟前", "12 minutes ago") or the
- * future ("3 小时后", "in 3 hours"), such as a lease or a scheduled job.
+ * How long ago or ahead: "just now" within ten seconds, then seconds,
+ * minutes, hours or days, in the past ("12 minutes ago") or the future
+ * ("in 3 hours"), such as a lease or a scheduled job.
  */
 export function relative(
   value: TimeInput,
@@ -90,11 +90,10 @@ const dayNumber = (d: Date) =>
   Math.floor((d.getTime() - d.getTimezoneOffset() * 60_000) / 86_400_000);
 
 /**
- * An instant the way a person says it: relative within the hour ("12 分钟前"),
- * then "今天 14:05", "昨天 09:12" or "明天 08:00", "9月21日 20:40" within the
- * year, and "2025年12月3日" before it. In English: "12 minutes ago",
- * "Today 14:05", "Yesterday 09:12", "Tomorrow 08:00", "Sep 21 20:40" and
- * "Dec 3, 2025". `seconds` keeps the seconds on the clock and skips the
+ * An instant the way a person says it: relative within the hour ("12 minutes
+ * ago"), then "Today 14:05", "Yesterday 09:12" or "Tomorrow 08:00",
+ * "Sep 21 20:40" within the year, and "Dec 3, 2025" before it, in the
+ * locale's own words. `seconds` keeps the seconds on the clock and skips the
  * relative form, for instants that need them, such as a job's start and end.
  */
 export function friendly(
@@ -123,7 +122,7 @@ export function friendly(
 }
 
 /**
- * Whether friendly() shows the instant in its relative form ("12 分钟前"),
+ * Whether friendly() shows the instant in its relative form ("12 minutes ago"),
  * which changes as time passes: within the hour, unless `seconds` is set.
  */
 export function isRelative(

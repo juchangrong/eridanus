@@ -39,7 +39,7 @@ export function ConfirmDialog({
   destructive,
   onConfirm,
 }: {
-  /** The control that opens the dialog, e.g. `<Button variant="destructive">删除</Button>`. */
+  /** The control that opens the dialog, e.g. `<Button variant="destructive">Delete</Button>`. */
   trigger: AlertDialogPrimitive.Trigger.Props["render"];
   title: ReactNode;
   description: ReactNode;

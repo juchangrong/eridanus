@@ -111,7 +111,7 @@ export function SelectCell({
 }: {
   selection: RowSelection;
   id: string;
-  /** Names the row, e.g. `选择 ${run.id}`. */
+  /** Names the row, e.g. `Select ${run.id}`. */
   label: string;
 }) {
   return (

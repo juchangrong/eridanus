@@ -20,7 +20,7 @@ const MESSAGES: Record<Locale, { all: string }> = {
 
 /**
  * A select that filters a list, whose trigger names what it filters
- * ("状态 全部"). The empty string means no filter and is offered as the first
+ * ("Status All"). The empty string means no filter and is offered as the first
  * item, `allLabel`. `size="sm"` (28px) matches small buttons.
  */
 export function FilterSelect({

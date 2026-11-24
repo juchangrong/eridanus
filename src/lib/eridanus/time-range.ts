@@ -71,8 +71,8 @@ export function resolveTimeRange(
 }
 
 /**
- * "最近 1 小时", "2026-10-01" or "2026-09-28 至 2026-10-01"; in English
- * "Last 1 hour", "Last 7 days" and "2026-09-28 to 2026-10-01".
+ * A range as one line in the locale's own words: "Last 1 hour", "Last 7
+ * days", "2026-10-01" or "2026-09-28 to 2026-10-01".
  */
 export function describeTimeRange(
   range: TimeRange,
