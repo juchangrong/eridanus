@@ -137,6 +137,33 @@ export function Section({
 }
 
 /**
+ * The row of controls over a list: scope tabs, a search field, filters and
+ * actions, 8px apart, wrapping when they run out of room. On phones the
+ * search gets a line of its own: the first control does, unless it is
+ * Tabs, in which case the control after it does, so the tabs keep the
+ * top line.
+ */
+export function Toolbar({
+  children,
+  className,
+}: {
+  children: ReactNode;
+  className?: string;
+}) {
+  return (
+    <div
+      className={cn(
+        "flex flex-wrap items-center gap-2",
+        "max-sm:[&>*:first-child:not([data-slot=tabs])]:basis-full max-sm:[&>[data-slot=tabs]:first-child+*]:basis-full",
+        className,
+      )}
+    >
+      {children}
+    </div>
+  );
+}
+
+/**
  * A line of facts separated by middle dots. Each dot belongs to the fact after
  * it, so a wrapped line starts on a fact. A fact too long for the line
  * truncates; give it a `title` so the full value stays one hover away.

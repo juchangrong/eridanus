@@ -136,6 +136,7 @@ const GROUPS: { id: string; title: Localized; names: string[] }[] = [
       "table-selection",
       "pager",
       "page-layout",
+      "entity-card",
     ],
   },
   {
