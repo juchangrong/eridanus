@@ -137,7 +137,7 @@
       "name": "person-avatar",
       "type": "registry:component",
       "title": "PersonAvatar",
-      "description": "A person's picture, or up to two initials while it is missing or loading. Hidden from screen readers; render the name beside it.",
+      "description": "A person's picture, or up to two initials while it is missing or loading; tint=\"name\" sets them in white on a color the name picks. Hidden from screen readers; render the name beside it.",
       "categories": ["data-display", "people"],
       "registryDependencies": ["avatar"],
       "files": [
@@ -207,7 +207,7 @@
       "name": "pager",
       "type": "registry:component",
       "title": "Pager",
-      "description": "Paging controls under a table: the range shown (第 1–50 条，共 173 条 or 1–50 of 173), an optional page-size select, first/previous/next/last buttons and a page field. Zero-based; folds back to the last page when the total shrinks. Text follows LocaleProvider; the labels prop replaces any part of it. hideSinglePage leaves it out while everything fits on one page; bar pins it to the bottom of the page.",
+      "description": "Paging controls under a table: the range shown (第 1–50 条，共 173 条 or 1–50 of 173), an optional page-size select, first/previous/next/last buttons and a page field. Zero-based; folds back to the last page when the total shrinks. Text follows LocaleProvider; the labels prop replaces any part of it. hideSinglePage leaves it out while everything fits on one page; bar pins it to the bottom of the page, and fade lets the rows under it fade out instead of meeting a rule.",
       "categories": ["table", "navigation"],
       "dependencies": ["@phosphor-icons/react"],
       "registryDependencies": [

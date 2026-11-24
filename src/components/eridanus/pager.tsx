@@ -17,6 +17,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import type { Locale } from "@/lib/eridanus/locale";
+import { cn } from "@/lib/utils";
 
 export interface PagerLabels {
   navigation: string;
@@ -81,6 +82,7 @@ export function Pager({
   pageSizes = [20, 50, 100],
   hideSinglePage = false,
   bar = false,
+  fade = false,
   labels: overrides,
 }: {
   total: number;
@@ -97,6 +99,9 @@ export function Pager({
    * ground, out to the edges of a full-width `Page`, and pushes it to the
    * foot of a short `<Page list>`. */
   bar?: boolean;
+  /** With `bar`: the rows scrolling under the bar fade out over 24px above
+   * it instead of meeting its edge, so it needs no rule. */
+  fade?: boolean;
   labels?: Partial<PagerLabels>;
 }) {
   const labels = { ...useMessages(pagerLabels), ...overrides };
@@ -198,7 +203,13 @@ export function Pager({
   if (!bar) return pager;
   return (
     // Out to the page's sides, the gutters of a full-width Page.
-    <div className="sticky bottom-0 z-10 -mx-4 mt-auto bg-background px-4 py-3 md:-mx-11 md:px-11">
+    <div
+      className={cn(
+        "sticky bottom-0 z-10 -mx-4 mt-auto bg-background px-4 py-3 md:-mx-11 md:px-11",
+        fade &&
+          "before:pointer-events-none before:absolute before:inset-x-0 before:bottom-full before:h-6 before:bg-linear-to-b before:from-transparent before:to-background",
+      )}
+    >
       {pager}
     </div>
   );
