@@ -27,7 +27,7 @@ export interface PagerLabels {
   pageSize: string;
   /** The page field's accessible name, given the page count. */
   page: (pages: number) => string;
-  /** The range line, e.g. "第 1–50 条，共 173 条" or "1–50 of 173"; `total` is 0 for an empty list. */
+  /** The range line, e.g. "1–50 of 173"; `total` is 0 for an empty list. */
   range: (first: number, last: number, total: number) => string;
   /** An option in the page-size select. */
   size: (size: number) => string;

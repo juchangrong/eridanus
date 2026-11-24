@@ -36,7 +36,7 @@ const MESSAGES: Record<
 };
 
 /**
- * A filter that takes several values at once ("状态 failed, running"). The
+ * A filter that takes several values at once ("Status failed, running"). The
  * trigger names what it filters and shows up to two chosen labels, then a
  * count; the menu stays open while values are toggled (arrow keys and
  * typing a label move through it) and ends with a clear item. An empty

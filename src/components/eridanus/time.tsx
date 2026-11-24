@@ -18,7 +18,7 @@ import { cn } from "@/lib/utils";
 
 /**
  * An instant that reads easily and stays exact. The surface shows the
- * readable form ("12 分钟前", "今天 14:05"); the tooltip shows local time to
+ * readable form ("12 minutes ago", "Today 14:05"); the tooltip shows local time to
  * the millisecond with its offset, the UTC time and the relative time. Screen
  * readers get the exact local time along with the surface text, since the
  * tooltip is out of their reach.
@@ -29,7 +29,7 @@ import { cn } from "@/lib/utils";
  * The readable and relative forms follow LocaleProvider ("12 minutes ago",
  * "Today 14:05" in English).
  *
- * Within the hour the readable form is relative ("12 分钟前") and keeps
+ * Within the hour the readable form is relative ("12 minutes ago") and keeps
  * itself current: one shared one-second timer runs while any such Time is
  * mounted, and a Time renders again only when its text changes.
  */

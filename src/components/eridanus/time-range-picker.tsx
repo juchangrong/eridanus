@@ -30,8 +30,8 @@ const MESSAGES: Record<
 };
 
 /**
- * The time filter of a log, run or metrics page: trailing presets ("最近
- * 1 小时") that pick and close on one click, and a calendar for a span of
+ * The time filter of a log, run or metrics page: trailing presets ("Last
+ * 1 hour") that pick and close on one click, and a calendar for a span of
  * whole days, applied with a button (one chosen day is a one-day span). Days after
  * today cannot be picked. The trigger names what it filters, like
  * FilterSelect, and is sized to sit beside it. Text and the calendar follow

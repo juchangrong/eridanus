@@ -14,8 +14,8 @@ const MESSAGES: Record<Locale, { copy: string; copied: string }> = {
 
 /**
  * An icon-only copy control. After a copy the icon cross-fades to a check for
- * a moment, and the accessible name says "已复制" for anyone not watching
- * the icon. `label` names what is copied, e.g. "复制 Run ID".
+ * a moment, and the accessible name says "Copied" for anyone not watching
+ * the icon. `label` names what is copied, e.g. "Copy run ID".
  */
 export function CopyButton({
   text,
